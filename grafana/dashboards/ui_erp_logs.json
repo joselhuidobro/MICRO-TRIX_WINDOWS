@@ -1,0 +1,278 @@
+{
+  "id": null,
+  "uid": "trix-core-observ",
+  "title": "TRIX — Core Observability",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 2,
+  "refresh": "10s",
+  "time": { "from": "now-6h", "to": "now" },
+  "templating": {
+    "list": [
+      {
+        "name": "job",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values(up, job)",
+        "includeAll": true,
+        "refresh": 2,
+        "current": { "text": "All", "value": "$__all" }
+      },
+      {
+        "name": "instance",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values(up{job=~\"$job\"}, instance)",
+        "includeAll": true,
+        "refresh": 2,
+        "current": { "text": "All", "value": "$__all" }
+      },
+      {
+        "name": "prom_handler",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values(prometheus_http_request_duration_seconds_bucket, handler)",
+        "includeAll": true,
+        "refresh": 2,
+        "current": { "text": "All", "value": "$__all" }
+      },
+      {
+        "name": "graf_handler",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values(grafana_http_request_duration_seconds_bucket, handler)",
+        "includeAll": true,
+        "refresh": 2,
+        "current": { "text": "All", "value": "$__all" }
+      }
+    ]
+  },
+ 
+  "panels": [
+    {
+      "type": "bargauge",
+      "title": "Servicios up (% por job)",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "100 * sum by (job) (up{job=~\"$job\",instance=~\"$instance\"} == 1) / sum by (job) (up{job=~\"$job\",instance=~\"$instance\"})",
+          "legendFormat": "{{job}}"
+        }
+      ],
+      "options": { "displayMode": "basic", "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "horizontal" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 80 },
+              { "color": "green", "value": 99 }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "type": "table",
+      "title": "Servicios down (instancias)",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "up{job=~\"$job\",instance=~\"$instance\"} == 0",
+          "legendFormat": "{{job}} {{instance}}"
+        }
+      ],
+      "transformations": [
+        { "id": "labelsToFields", "options": { "mode": "columns" } }
+      ],
+      "options": {
+        "showHeader": true,
+        "sortBy": [{ "displayName": "job", "desc": false }]
+      },
+      "fieldConfig": { "defaults": { "unit": "none" }, "overrides": [] }
+    },
+    {
+      "type": "timeseries",
+      "title": "HTTP p95 — Prometheus",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (handler, le) (rate(prometheus_http_request_duration_seconds_bucket{handler=~\"$prom_handler\"}[5m])))",
+          "legendFormat": "{{handler}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s", "decimals": 3 }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom" } }
+    },
+    {
+      "type": "timeseries",
+      "title": "HTTP p95 — Grafana",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (handler, le) (rate(grafana_http_request_duration_seconds_bucket{handler=~\"$graf_handler\"}[5m])))",
+          "legendFormat": "{{handler}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s", "decimals": 3 }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom" } }
+    },
+    {
+      "type": "timeseries",
+      "title": "Tasa de peticiones — Prometheus (por handler)",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+      "targets": [
+        {
+          "expr": "sum by (handler) (rate(prometheus_http_request_duration_seconds_count{handler=~\"$prom_handler\"}[5m]))",
+          "legendFormat": "{{handler}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "req/s", "decimals": 2 }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "right" } }
+    },
+    {
+      "type": "timeseries",
+      "title": "Tasa de peticiones — Grafana (por handler)",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+      "targets": [
+        {
+          "expr": "sum by (handler) (rate(grafana_http_request_duration_seconds_count{handler=~\"$graf_handler\"}[5m]))",
+          "legendFormat": "{{handler}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "req/s", "decimals": 2 }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "right" } }
+    },
+    {
+      "type": "timeseries",
+      "title": "Memoria Go en uso (heap alloc)",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 9, "w": 24, "x": 0, "y": 24 },
+      "targets": [
+        {
+          "expr": "go_memstats_alloc_bytes{job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "{{job}} • {{instance}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "bytes", "decimals": 0 }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom" } }
+    },
+    {
+      "type": "timeseries",
+      "title": "CPU del proceso (cores)",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 33 },
+      "targets": [
+        {
+          "expr": "sum by (job, instance) (rate(process_cpu_seconds_total{job=~\"$job\",instance=~\"$instance\"}[5m]))",
+          "legendFormat": "{{job}} • {{instance}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "cores", "decimals": 2 }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom" } }
+    },
+    {
+      "type": "timeseries",
+      "title": "Goroutines por instancia",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 33 },
+      "targets": [
+        {
+          "expr": "go_goroutines{job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "{{job}} • {{instance}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "none", "decimals": 0 }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom" } }
+    },
+    {
+      "type": "timeseries",
+      "title": "Redis CPU (user+sys) — cores",
+      "description": "Calculado desde redis_exporter: rate(user_seconds_total)+rate(sys_seconds_total). Valor en núcleos lógicos consumidos.",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 9, "w": 24, "x": 0, "y": 42 },
+      "targets": [
+        {
+          "expr": "sum by (job, instance) (rate(redis_cpu_user_seconds_total{job=~\"$job\",instance=~\"$instance\"}[5m]) + rate(redis_cpu_sys_seconds_total{job=~\"$job\",instance=~\"$instance\"}[5m]))",
+          "legendFormat": "{{job}} • {{instance}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "cores", "decimals": 2 }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom" } }
+    },
+    {
+      "type": "logs",
+      "title": "🚨 Logs de ERROR (todos los servicios)",
+      "datasource": "Loki",
+      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 51},
+      "targets": [
+        {
+          "expr": "{job=~\".+\"} |~ \"(?i)error|fatal|exception|panic\"",
+          "refId": "A",
+          "maxLines": 200
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "wrapLogMessage": true,
+        "sortOrder": "Descending"
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "📊 Tasa de logs por nivel",
+      "datasource": "Loki",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 61},
+      "targets": [
+        {
+          "expr": "sum by (level) (rate({job=~\".+\"} [5m]))",
+          "legendFormat": "{{level}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "logs/s",
+          "decimals": 2,
+          "custom": {"lineWidth": 2}
+        }
+      }
+    },
+    {
+      "type": "logs",
+      "title": "🔍 Logs de Prometheus",
+      "datasource": "Loki",
+      "gridPos": {"h": 9, "w": 12, "x": 0, "y": 69},
+      "targets": [
+        {
+          "expr": "{job=\"prometheus\"}",
+          "refId": "A",
+          "maxLines": 100
+        }
+      ]
+    },
+    {
+      "type": "logs",
+      "title": "📈 Logs de Grafana",
+      "datasource": "Loki",
+      "gridPos": {"h": 9, "w": 12, "x": 12, "y": 69},
+      "targets": [
+        {
+          "expr": "{job=\"grafana\"}",
+          "refId": "A",
+          "maxLines": 100
+        }
+      ]
+    }
+  ]
+}

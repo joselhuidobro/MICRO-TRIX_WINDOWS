@@ -24,9 +24,9 @@ services:
       dockerfile: Dockerfile
     container_name: postgres_trix
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-trixdb}
-      POSTGRES_USER: ${POSTGRES_USER:-trix}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-trixpass_secure_cambia_esta}
+      POSTGRES_DB: trixdb                   
+      POSTGRES_USER: trix                    
+      POSTGRES_PASSWORD: trixpass            
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - pg_data:/var/lib/postgresql/data/pgdata
@@ -47,9 +47,10 @@ services:
     image: dpage/pgadmin4:latest
     container_name: pgadmin_trix
     environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@trix.com}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-trixadmin123}
-      PGADMIN_SERVER_JSON_FILE: /pgadmin4/servers.json  # 👈 CLAVE
+       PGADMIN_DEFAULT_EMAIL: admin@trix.com
+       PGADMIN_DEFAULT_PASSWORD: admin123
+       PGADMIN_CONFIG_SERVER_MODE: 'False'
+       PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
     ports:
       - "9070:80"
     volumes:

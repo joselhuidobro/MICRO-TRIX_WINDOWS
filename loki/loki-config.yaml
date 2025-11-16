@@ -25,7 +25,7 @@ schema_config:
         period: 24h
 
 limits_config:
-  querier_max_concurrent: 2
+  max_query_parallelism: 2  
   query_timeout: 10s
   ingestion_rate_mb: 32
   ingestion_burst_size_mb: 64
