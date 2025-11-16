@@ -1,0 +1,81 @@
+-- Logs begin at Wed 2021-07-21 13:51:38 CDT, end at Sun 2025-11-02 01:23:16 CST. --
+nov 02 00:43:48 jose-desktop systemd[1]: Starting WireGuard via wg-quick(8) for wg0...
+-- Subject: Unit wg-quick@wg0.service has begun start-up
+-- Defined-By: systemd
+-- Support: http://www.ubuntu.com/support
+-- 
+-- Unit wg-quick@wg0.service has begun starting up.
+nov 02 00:43:49 jose-desktop wg-quick[4978]: [#] ip link add wg0 type wireguard
+nov 02 00:43:49 jose-desktop wg-quick[4978]: [#] wg setconf wg0 /dev/fd/63
+nov 02 00:43:49 jose-desktop wg-quick[4978]: [#] ip -4 address add 10.6.0.1/24 dev wg0
+nov 02 00:43:49 jose-desktop wg-quick[4978]: [#] ip link set mtu 1420 up dev wg0
+nov 02 00:43:49 jose-desktop systemd[1]: Started WireGuard via wg-quick(8) for wg0.
+-- Subject: Unit wg-quick@wg0.service has finished start-up
+-- Defined-By: systemd
+-- Support: http://www.ubuntu.com/support
+-- 
+-- Unit wg-quick@wg0.service has finished starting up.
+-- 
+-- The start-up result is RESULT.
+nov 02 01:05:46 jose-desktop systemd[1]: Stopping WireGuard via wg-quick(8) for wg0...
+-- Subject: Unit wg-quick@wg0.service has begun shutting down
+-- Defined-By: systemd
+-- Support: http://www.ubuntu.com/support
+-- 
+-- Unit wg-quick@wg0.service has begun shutting down.
+nov 02 01:05:46 jose-desktop wg-quick[20111]: [#] ip link delete dev wg0
+nov 02 01:05:46 jose-desktop systemd[1]: Stopped WireGuard via wg-quick(8) for wg0.
+-- Subject: Unit wg-quick@wg0.service has finished shutting down
+-- Defined-By: systemd
+-- Support: http://www.ubuntu.com/support
+-- 
+-- Unit wg-quick@wg0.service has finished shutting down.
+nov 02 01:05:46 jose-desktop systemd[1]: Starting WireGuard via wg-quick(8) for wg0...
+-- Subject: Unit wg-quick@wg0.service has begun start-up
+-- Defined-By: systemd
+-- Support: http://www.ubuntu.com/support
+-- 
+-- Unit wg-quick@wg0.service has begun starting up.
+nov 02 01:05:46 jose-desktop wg-quick[20162]: [#] ip link add wg0 type wireguard
+nov 02 01:05:46 jose-desktop wg-quick[20162]: [#] wg setconf wg0 /dev/fd/63
+nov 02 01:05:46 jose-desktop wg-quick[20162]: [#] ip -4 address add 10.6.0.1/24 dev wg0
+nov 02 01:05:46 jose-desktop wg-quick[20162]: [#] ip link set mtu 1420 up dev wg0
+nov 02 01:05:46 jose-desktop systemd[1]: Started WireGuard via wg-quick(8) for wg0.
+-- Subject: Unit wg-quick@wg0.service has finished start-up
+-- Defined-By: systemd
+-- Support: http://www.ubuntu.com/support
+-- 
+-- Unit wg-quick@wg0.service has finished starting up.
+-- 
+-- The start-up result is RESULT.
+nov 02 01:22:50 jose-desktop systemd[1]: Stopping WireGuard via wg-quick(8) for wg0...
+-- Subject: Unit wg-quick@wg0.service has begun shutting down
+-- Defined-By: systemd
+-- Support: http://www.ubuntu.com/support
+-- 
+-- Unit wg-quick@wg0.service has begun shutting down.
+nov 02 01:22:50 jose-desktop wg-quick[1045]: [#] ip link delete dev wg0
+nov 02 01:22:51 jose-desktop systemd[1]: Stopped WireGuard via wg-quick(8) for wg0.
+-- Subject: Unit wg-quick@wg0.service has finished shutting down
+-- Defined-By: systemd
+-- Support: http://www.ubuntu.com/support
+-- 
+-- Unit wg-quick@wg0.service has finished shutting down.
+nov 02 01:22:51 jose-desktop systemd[1]: Starting WireGuard via wg-quick(8) for wg0...
+-- Subject: Unit wg-quick@wg0.service has begun start-up
+-- Defined-By: systemd
+-- Support: http://www.ubuntu.com/support
+-- 
+-- Unit wg-quick@wg0.service has begun starting up.
+nov 02 01:22:51 jose-desktop wg-quick[1074]: [#] ip link add wg0 type wireguard
+nov 02 01:22:51 jose-desktop wg-quick[1074]: [#] wg setconf wg0 /dev/fd/63
+nov 02 01:22:51 jose-desktop wg-quick[1074]: [#] ip -4 address add 10.6.0.1/24 dev wg0
+nov 02 01:22:51 jose-desktop wg-quick[1074]: [#] ip link set mtu 1420 up dev wg0
+nov 02 01:22:51 jose-desktop systemd[1]: Started WireGuard via wg-quick(8) for wg0.
+-- Subject: Unit wg-quick@wg0.service has finished start-up
+-- Defined-By: systemd
+-- Support: http://www.ubuntu.com/support
+-- 
+-- Unit wg-quick@wg0.service has finished starting up.
+-- 
+-- The start-up result is RESULT.

@@ -1,0 +1,16 @@
+# docker-compose.yml
+
+version: '3.8'
+
+services:
+  web:
+    build: .
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"  # Asegúrate de que este puerto coincide con el expuesto en Dockerfile
+    environment:
+      - FLASK_DEBUG=0
+      - SECRET_KEY=tu_clave_secreta
+      # Agrega otras variables de entorno necesarias
+    restart: unless-stopped

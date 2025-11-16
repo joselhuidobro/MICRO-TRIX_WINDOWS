@@ -1,0 +1,24 @@
+running develop
+running egg_info
+creating robotio_bridge.egg-info
+writing robotio_bridge.egg-info/PKG-INFO
+writing dependency_links to robotio_bridge.egg-info/dependency_links.txt
+writing requirements to robotio_bridge.egg-info/requires.txt
+writing top-level names to robotio_bridge.egg-info/top_level.txt
+writing manifest file 'robotio_bridge.egg-info/SOURCES.txt'
+reading manifest file 'robotio_bridge.egg-info/SOURCES.txt'
+writing manifest file 'robotio_bridge.egg-info/SOURCES.txt'
+running build_ext
+Creating /ws/install/robotio_bridge/lib/python3.10/site-packages/robotio-bridge.egg-link (link to .)
+
+Installed /ws/build/robotio_bridge
+running symlink_data
+creating /ws/install/robotio_bridge/share/ament_index
+creating /ws/install/robotio_bridge/share/ament_index/resource_index
+creating /ws/install/robotio_bridge/share/ament_index/resource_index/packages
+symbolically linking /ws/build/robotio_bridge/resource/robotio_bridge -> /ws/install/robotio_bridge/share/ament_index/resource_index/packages
+symbolically linking /ws/build/robotio_bridge/package.xml -> /ws/install/robotio_bridge/share/robotio_bridge
+creating /ws/install/robotio_bridge/share/robotio_bridge/launch
+symbolically linking /ws/build/robotio_bridge/launch/robotio_sim.launch.py -> /ws/install/robotio_bridge/share/robotio_bridge/launch
+creating /ws/install/robotio_bridge/lib/robotio_bridge
+symbolically linking /ws/build/robotio_bridge/scripts/run_servo_to_controller -> /ws/install/robotio_bridge/lib/robotio_bridge

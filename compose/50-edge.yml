@@ -1,0 +1,82 @@
+
+services:
+  kong:
+    build:
+      context: ../kong
+    image: trix/kong:latest
+    container_name: kong_db_less
+    networks: [trix-net]
+    volumes:
+      - ../kong/kong.yml:/etc/kong/kong.yml:ro
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: "/etc/kong/kong.yml"
+      KONG_STATUS_LISTEN: "0.0.0.0:8100"
+      KONG_PROXY_LISTEN: "0.0.0.0:8000"
+      KONG_ADMIN_LISTEN: "off"
+      KONG_PROXY_ACCESS_LOG: "/dev/stdout"
+      KONG_PROXY_ERROR_LOG: "/dev/stderr"
+      KONG_PROXY_STREAM_ACCESS_LOG: "/dev/stdout basic"
+      KONG_PROXY_STREAM_ERROR_LOG: "/dev/stderr"
+      KONG_DNS_ORDER: "LAST,A,CNAME,SRV"
+    ports:
+      - "30080:8000"
+      - "8100:8100"
+    depends_on: [ui, micro_ros_agent_hmi]
+    restart: unless-stopped
+
+  caddy:
+    build:
+      context: ../caddy
+    container_name: caddy_public
+    depends_on:
+      - hugo_build
+      - doxygen_build
+      - sphinx_build
+    networks: [web-net, trix-net]
+    ports:
+      - "80:80"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+      - hugo_public:/srv/hugo:ro
+      - sphinx_html:/srv/docs:ro
+      - doxygen_html:/srv/api:ro
+      - ../caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL","curl -fsS http://localhost/ >/dev/null"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  cloudflare_tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflare_tunnel
+    network_mode: "host"
+    command: tunnel --no-autoupdate --url http://127.0.0.1:8030
+    restart: unless-stopped
+    depends_on: [trixweb]
+
+  knot:
+    build:
+      context: ../knot_dns
+    container_name: knot
+    networks: [trix-net]
+    ports:
+       - "5353:1053/udp"  
+       - "5353:1053/tcp"  
+    volumes:
+      - ../knot_dns/knot.conf:/etc/knot/knot.conf:ro
+      - ../knot_dns/zones:/zones:ro
+      - knot_data:/var/lib/knot
+    cap_add: [NET_BIND_SERVICE]
+    healthcheck:
+      test: ["CMD", "kdig", "@127.0.0.1", "-p", "1053", "example.test", "SOA", "+time=2", "+retry=0"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+ 

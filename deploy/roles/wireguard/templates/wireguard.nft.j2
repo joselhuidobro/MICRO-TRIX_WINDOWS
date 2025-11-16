@@ -1,0 +1,23 @@
+table inet wg {
+  chain input {
+    type filter hook input priority 0;
+    policy accept;
+    udp dport {{ wg_listen_port }} accept
+  }
+
+  chain forward {
+    type filter hook forward priority 0;
+    policy drop;
+    iif "{{ wg_interface }}" oif "{{ wg_nat_egress_iface_final }}" accept
+    iif "{{ wg_nat_egress_iface_final }}" oif "{{ wg_interface }}" ct state related,established accept
+  }
+}
+
+table ip wg_nat {
+  chain postrouting {
+    type nat hook postrouting priority 100;
+    policy accept;
+    oif "{{ wg_nat_egress_iface_final }}" ip saddr {{ wg_network_cidr }} masquerade
+  }
+}
+

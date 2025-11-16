@@ -1,0 +1,70 @@
+
+
+services:
+  robot_encoder:
+    build:
+      context: ../esp-docker-jetson-encoder_motor_ui
+      dockerfile: Dockerfile
+    image: ubuntu:robot_encoder
+    container_name: ros_relevadores_y_encoder
+    privileged: true
+    devices:
+      - "/dev/ttyUSB0:/dev/ttyUSB0"
+    environment:
+      - ROS_DOMAIN_ID=0
+      - UROS_AGENT_PORT=9999
+      - RMW_IMPLEMENTATION=rmw_microxrcedds
+      - IDF_PATH=/opt/esp-idf
+    volumes:
+      - /dev/bus/usb:/dev/bus/usb
+      - /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0:/dev/ttyUSB0
+      - ../esp-docker-jetson-encoder_motor_ui/main:/esp2024/main
+      - ../esp-docker-jetson-encoder_motor_ui/components:/esp2024/components
+      - ccache:/ccache
+      - /opt/vc/lib:/opt/vc/lib
+    networks: [trix-net]
+    stdin_open: true
+    tty: true
+    restart: "no"
+    group_add: [dialout]
+
+  net_sensor_cdmx:
+    build:
+      context: ../net-sensor
+    image: net-sensor:local
+    container_name: net_sensor_cdmx
+    network_mode: host
+    cap_add: [NET_RAW]
+    environment:
+      - REDIS_URL=redis://:trixredis123@127.0.0.1:6379/0
+      - REDIS_HOST=127.0.0.1
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=trixredis123
+      - REDIS_DB=0
+      - REDIS_KEY_DEVICES=trix:udp:devices:last
+      - LAN_NETS=192.168.0.0/24
+      - SUBNETS_EXTRA=192.168.0.0/24
+      - ARP_MAX_HOSTS=4096
+      - SENSOR_NAME=cdmx-lab
+    restart: unless-stopped
+
+   # AGENTE LANGGRAPH (SOLO ESTO ES NUEVO)
+  trix_agent_orchestrator:
+    build:
+      context: ../trix-agent
+      dockerfile: Dockerfile.agentic
+    image: trix-agent:v1.0
+    container_name: trix_agent
+    environment:
+      - REDIS_URL=redis://:trixredis123@redis:6379/0  # Usa el servicio "redis" de 00
+      - OPA_POLICY_URL=http://opa:8181/v1/data/trix/policy
+      - GITLAB_TOKEN=${GITLAB_TOKEN}
+    volumes:
+      - ../trix-agent:/app
+    networks: [trix-net]
+    ports:
+      - "9080:9080"
+    restart: unless-stopped
+
+
+ 

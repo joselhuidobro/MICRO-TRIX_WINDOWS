@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trix-svm-backend
+spec:
+  replicas: 3 # Número de réplicas
+  selector:
+    matchLabels:
+      app: trix-svm-backend
+  template:
+    metadata:
+      labels:
+        app: trix-svm-backend
+    spec:
+      containers:
+      - name: trix-svm-backend
+        image: registry.heroku.com/trix-svm-backend/web:v12024-2025 
+        ports:
+        - containerPort: 7000 # Puerto de tu aplicación Flask
+        envFrom:
+        - configMapRef:
+            name: trix-svm-config

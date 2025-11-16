@@ -1,0 +1,11 @@
+- name: Reload nftables
+  shell: |
+    nft list table inet wg >/dev/null 2>&1 && nft delete table inet wg || true
+    nft list table ip wg_nat >/dev/null 2>&1 && nft delete table ip wg_nat || true
+    nft -f /etc/nftables.conf
+
+- name: Restart wg-quick
+  systemd:
+    name: "wg-quick@{{ wg_interface }}"
+    state: restarted
+

@@ -1,0 +1,50 @@
+
+services:
+  hugo_build:
+    build:
+      context: ../hugo_builder
+      args:
+        HUGO_VERSION: "0.135.0"
+    platform: linux/arm64/v8
+    working_dir: /src
+    command: ["sh","-lc","cd /src && hugo --minify --cleanDestinationDir --destination /public"]
+    volumes:
+      - ../trix-web:/src
+      - hugo_public:/public
+    networks: [web-net]
+    restart: "no"
+    pull_policy: never
+
+  doxygen_build:
+    build:
+      context: ../docs/doxygen
+    working_dir: /work
+    command: ["sh","-lc","doxygen Doxyfile && cp -r out/html/* /out/html/ && cp -r out/xml/* /out/xml/"]
+    volumes:
+     - ./docs/doxygen/Doxyfile:/work/Doxyfile:ro
+     - ./src:/work/src:ro
+     - ./esp-docker-jetson-encoder_motor_ui/main:/work/esp/main:ro
+     - ./esp-docker-jetson-encoder_motor_ui/components:/work/esp/components:ro
+     - doxygen_html:/out/html
+     - doxygen_xml:/out/xml
+
+
+    networks: [web-net]
+    restart: "no"
+    pull_policy: never
+
+
+
+  sphinx_build:
+    build:
+      context: ../docs/sphinx
+    depends_on: [doxygen_build]
+    working_dir: /docs
+    command: ["sh","-lc","make clean html && cp -r _build/html/* /out/"]
+    volumes:
+      - ../docs/sphinx:/docs
+      - doxygen_xml:/docs/_doxygen/xml:ro
+      - sphinx_html:/out
+    networks: [web-net]
+    restart: "no"
+    pull_policy: never

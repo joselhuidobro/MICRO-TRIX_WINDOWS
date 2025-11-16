@@ -1,0 +1,150 @@
+services:
+  # UI Flask
+  ui:
+    build:
+      context: ../2025_DOCKER-dronui
+    image: flask_ui_robot
+    container_name: flask_ui_encoder_robot
+    networks: [trix-net]
+    ports:
+      - "5000:5000"
+      - "5002:5002/udp"
+    environment:
+      - ROS_DISTRO=humble
+      - ROS_DOMAIN_ID=0
+      - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+      - ROS_LOCALHOST_ONLY=0
+      - PROJECT_PATH=/esp2024
+      - UDP_PORT=5002
+      - PYTHONUNBUFFERED=1
+      - FLASK_DEBUG=0
+      - MQTT_URL=mqtt://emqx:1883
+      - MQTT_WS_URL=ws://emqx:8083/mqtt
+      - MQTT_USER=admin
+      - MQTT_PASS=trix1234
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=trixredis123
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    entrypoint: ["/ros_entrypoint.sh"]
+    command: ["hypercorn","-b","0.0.0.0:5000","app:app"]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ../2025_DOCKER-dronui:/app
+      - ui_tmp:/tmp
+    restart: always
+    stdin_open: true
+    tty: true
+    depends_on: [emqx, redis]
+
+  # Node-RED
+  node_red:
+    build:
+      context: ../node-red
+    image: trix/node-red:latest
+    container_name: node_red_trix
+    networks: [trix-net]
+    environment:
+      - TZ=America/Mexico_City
+      - FLOWS=flows.json
+      - NODE_OPTIONS=--max-old-space-size=256
+      - MQTT_BROKER_HOST=emqx
+      - MQTT_BROKER_PORT=1883
+      - MQTT_USER=admin
+      - MQTT_PASS=trix1234
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=trixredis123
+    volumes:
+      - node_red_data:/data
+    ports:
+      - "1880:1880"
+    restart: unless-stopped
+    depends_on: [emqx, ui, redis]
+
+  # API Spring Boot
+  springboot_api:
+    build:
+      context: ../springboot-app
+      dockerfile: Dockerfile
+      args:
+        JAVA_VERSION: 21
+    image: trix/springboot-api:latest
+    container_name: springboot_api
+    networks: [trix-net]
+    environment:
+      - JAVA_OPTS=-Xms256m -Xmx512m
+      - SERVER_PORT=8080
+      - MQTT_BROKER_URL=tcp://emqx:1883
+      - MQTT_USER=admin
+      - MQTT_PASS=trix1234
+      - CONTAINER_BACKEND=docker
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=trixredis123
+    volumes:
+      - ../springboot-app/src/main/resources/static/models:/app/models:ro
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    depends_on: [emqx, redis]
+
+  # ERP (usa Postgres)
+  trix-erp:
+    build:
+      context: ../trix-erp
+    networks:
+      trix-net:
+        aliases: [trix-erp]
+    env_file:
+      - ../trix-erp/.env.trix_erp
+    environment:
+      - PORT=6800
+    ports:
+      - "6800:6800"
+    restart: unless-stopped
+    volumes:
+      - ../trix-erp/.env.trix_erp:/app/.env:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Nginx estático (sitio)
+  trixweb:
+    build:
+      context: ../trix-web
+    container_name: trix-pagina
+    user: "0:0"
+    ports:
+      - "8030:8030"
+    tmpfs:
+      - /var/cache/nginx
+      - /var/run
+    volumes:
+      - ../trix-web/nginx/mime.types:/etc/nginx/mime.types:ro
+    networks: [trix-net]
+    restart: unless-stopped
+
+  # Git observer (utilidad)
+  git:
+    build:
+      context: ../git
+    image: alpine/git:latest
+    container_name: git_observer
+    networks:
+      trix-net:
+        aliases: [git]
+    environment:
+      GIT_AUTHOR_NAME: "TRIX Bot"
+      GIT_AUTHOR_EMAIL: "bot@trix.local"
+      GIT_COMMITTER_NAME: "TRIX Bot"
+      GIT_COMMITTER_EMAIL: "bot@trix.local"
+    volumes:
+      - ../springboot-app/src/main/resources/static/models:/repo
+   #   - ../git/data:/data
+    command: ["sh", "-c", "sleep infinity"]
+    ports:
+      - "7011:7011"
+    restart: unless-stopped
+    stdin_open: true
+    tty: true

@@ -1,0 +1,8 @@
+table inet wg_mss {
+  chain post {
+    type filter hook postrouting priority mangle; policy accept;
+    # Ajusta MSS de SYN salientes desde wg hacia Internet
+    iif "{{ wg_interface }}" oif "{{ wg_nat_egress_iface_final }}" tcp flags syn tcp option maxseg size set clamp to pmtu
+  }
+}
+

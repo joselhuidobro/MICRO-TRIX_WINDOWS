@@ -1,0 +1,94 @@
+[0.000000] (-) TimerEvent: {}
+[0.000433] (robotio_bridge) JobQueued: {'identifier': 'robotio_bridge', 'dependencies': OrderedDict()}
+[0.000691] (robotio_description) JobQueued: {'identifier': 'robotio_description', 'dependencies': OrderedDict()}
+[0.000839] (robotio_bridge) JobStarted: {'identifier': 'robotio_bridge'}
+[0.085791] (robotio_description) JobStarted: {'identifier': 'robotio_description'}
+[0.097703] (-) TimerEvent: {}
+[0.198199] (-) TimerEvent: {}
+[0.298539] (-) TimerEvent: {}
+[0.398879] (-) TimerEvent: {}
+[0.499283] (-) TimerEvent: {}
+[0.599868] (-) TimerEvent: {}
+[0.700182] (-) TimerEvent: {}
+[0.800643] (-) TimerEvent: {}
+[0.901065] (-) TimerEvent: {}
+[1.001496] (-) TimerEvent: {}
+[1.102032] (-) TimerEvent: {}
+[1.202476] (-) TimerEvent: {}
+[1.302887] (-) TimerEvent: {}
+[1.403335] (-) TimerEvent: {}
+[1.503728] (-) TimerEvent: {}
+[1.604103] (-) TimerEvent: {}
+[1.704465] (-) TimerEvent: {}
+[1.804862] (-) TimerEvent: {}
+[1.905680] (-) TimerEvent: {}
+[2.006298] (-) TimerEvent: {}
+[2.106794] (-) TimerEvent: {}
+[2.207394] (-) TimerEvent: {}
+[2.308638] (-) TimerEvent: {}
+[2.409315] (-) TimerEvent: {}
+[2.509993] (-) TimerEvent: {}
+[2.555816] (robotio_bridge) Command: {'cmd': ['/usr/bin/python3', '-W', 'ignore:setup.py install is deprecated', '-W', 'ignore:easy_install command is deprecated', 'setup.py', 'develop', '--editable', '--build-directory', '/ws/build/robotio_bridge/build', '--no-deps', 'symlink_data'], 'cwd': '/ws/build/robotio_bridge', 'env': {'HOSTNAME': 'jose-K45VD', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib', 'HOME': '/root', 'OLDPWD': '/ws/src/robotio_description', 'GAZEBO_MASTER_URI': 'http://127.0.0.1:11345', 'ROS_PYTHON_VERSION': '3', 'COLCON_PREFIX_PATH': '/ws/install', 'ROS_DISTRO': 'humble', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'TERM': 'xterm', 'GAZEBO_MODEL_PATH': '/sim/models:/usr/share/gazebo-11/models', 'ROS_LOCALHOST_ONLY': '0', 'PATH': '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'LANG': 'C.UTF-8', 'RMW_IMPLEMENTATION': 'rmw_fastrtps_cpp', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:', 'ROS_DOMAIN_ID': '0', 'AMENT_PREFIX_PATH': '/ws/install/robotio_bridge:/opt/ros/humble', 'DEBIAN_FRONTEND': 'noninteractive', 'GZ_HEADLESS': '1', 'WORLD': '/sim/worlds/my_test.world', 'GAZEBO_RESOURCE_PATH': '/usr/share/gazebo-11:/sim/worlds', 'PWD': '/ws/build/robotio_bridge', 'LC_ALL': 'C.UTF-8', 'PYTHONPATH': '/ws/build/robotio_bridge/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/ws/install/robotio_bridge/lib/python3.10/site-packages:/ws/build/robotio_bridge:/ws/install/robotio_bridge/lib/python3.10/site-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages', 'TZ': 'Etc/UTC', 'COLCON': '1'}, 'shell': False}
+[2.610150] (-) TimerEvent: {}
+[2.625936] (robotio_description) Command: {'cmd': ['/usr/bin/python3', '-W', 'ignore:setup.py install is deprecated', '-W', 'ignore:easy_install command is deprecated', 'setup.py', 'develop', '--editable', '--build-directory', '/ws/build/robotio_description/build', '--no-deps', 'symlink_data'], 'cwd': '/ws/build/robotio_description', 'env': {'HOSTNAME': 'jose-K45VD', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib', 'HOME': '/root', 'OLDPWD': '/ws/src/robotio_description', 'GAZEBO_MASTER_URI': 'http://127.0.0.1:11345', 'ROS_PYTHON_VERSION': '3', 'COLCON_PREFIX_PATH': '/ws/install', 'ROS_DISTRO': 'humble', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'TERM': 'xterm', 'GAZEBO_MODEL_PATH': '/sim/models:/usr/share/gazebo-11/models', 'ROS_LOCALHOST_ONLY': '0', 'PATH': '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'LANG': 'C.UTF-8', 'RMW_IMPLEMENTATION': 'rmw_fastrtps_cpp', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:', 'ROS_DOMAIN_ID': '0', 'AMENT_PREFIX_PATH': '/ws/install/robotio_bridge:/opt/ros/humble', 'DEBIAN_FRONTEND': 'noninteractive', 'GZ_HEADLESS': '1', 'WORLD': '/sim/worlds/my_test.world', 'GAZEBO_RESOURCE_PATH': '/usr/share/gazebo-11:/sim/worlds', 'PWD': '/ws/build/robotio_description', 'LC_ALL': 'C.UTF-8', 'PYTHONPATH': '/ws/build/robotio_description/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/ws/install/robotio_description/lib/python3.10/site-packages:/ws/build/robotio_bridge:/ws/install/robotio_bridge/lib/python3.10/site-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages', 'TZ': 'Etc/UTC', 'COLCON': '1'}, 'shell': False}
+[2.710239] (-) TimerEvent: {}
+[2.810747] (-) TimerEvent: {}
+[2.911137] (-) TimerEvent: {}
+[3.011537] (-) TimerEvent: {}
+[3.096896] (robotio_description) StdoutLine: {'line': b'running develop\n'}
+[3.097366] (robotio_bridge) StdoutLine: {'line': b'running develop\n'}
+[3.111650] (-) TimerEvent: {}
+[3.212189] (-) TimerEvent: {}
+[3.312590] (-) TimerEvent: {}
+[3.356479] (robotio_description) StdoutLine: {'line': b'running egg_info\n'}
+[3.357124] (robotio_description) StdoutLine: {'line': b'creating robotio_description.egg-info\n'}
+[3.358108] (robotio_description) StdoutLine: {'line': b'writing robotio_description.egg-info/PKG-INFO\n'}
+[3.359164] (robotio_description) StdoutLine: {'line': b'writing dependency_links to robotio_description.egg-info/dependency_links.txt\n'}
+[3.360222] (robotio_description) StdoutLine: {'line': b'writing requirements to robotio_description.egg-info/requires.txt\n'}
+[3.360706] (robotio_bridge) StdoutLine: {'line': b'running egg_info\n'}
+[3.361149] (robotio_bridge) StdoutLine: {'line': b'creating robotio_bridge.egg-info\n'}
+[3.361647] (robotio_bridge) StdoutLine: {'line': b'writing robotio_bridge.egg-info/PKG-INFO\n'}
+[3.361907] (robotio_bridge) StdoutLine: {'line': b'writing dependency_links to robotio_bridge.egg-info/dependency_links.txt\n'}
+[3.362214] (robotio_bridge) StdoutLine: {'line': b'writing requirements to robotio_bridge.egg-info/requires.txt\n'}
+[3.362450] (robotio_bridge) StdoutLine: {'line': b'writing top-level names to robotio_bridge.egg-info/top_level.txt\n'}
+[3.362700] (robotio_bridge) StdoutLine: {'line': b"writing manifest file 'robotio_bridge.egg-info/SOURCES.txt'\n"}
+[3.362866] (robotio_description) StdoutLine: {'line': b'writing top-level names to robotio_description.egg-info/top_level.txt\n'}
+[3.363020] (robotio_description) StdoutLine: {'line': b"writing manifest file 'robotio_description.egg-info/SOURCES.txt'\n"}
+[3.363386] (robotio_description) StdoutLine: {'line': b"reading manifest file 'robotio_description.egg-info/SOURCES.txt'\n"}
+[3.365130] (robotio_description) StdoutLine: {'line': b"writing manifest file 'robotio_description.egg-info/SOURCES.txt'\n"}
+[3.369533] (robotio_description) StdoutLine: {'line': b'running build_ext\n'}
+[3.369957] (robotio_description) StdoutLine: {'line': b'Creating /ws/install/robotio_description/lib/python3.10/site-packages/robotio-description.egg-link (link to .)\n'}
+[3.371386] (robotio_description) StdoutLine: {'line': b'\n'}
+[3.371676] (robotio_description) StdoutLine: {'line': b'Installed /ws/build/robotio_description\n'}
+[3.371995] (robotio_description) StdoutLine: {'line': b'running symlink_data\n'}
+[3.372241] (robotio_description) StdoutLine: {'line': b'creating /ws/install/robotio_description/share/ament_index\n'}
+[3.372507] (robotio_description) StdoutLine: {'line': b'creating /ws/install/robotio_description/share/ament_index/resource_index\n'}
+[3.372757] (robotio_description) StdoutLine: {'line': b'creating /ws/install/robotio_description/share/ament_index/resource_index/packages\n'}
+[3.372958] (robotio_description) StdoutLine: {'line': b'symbolically linking /ws/build/robotio_description/resource/robotio_description -> /ws/install/robotio_description/share/ament_index/resource_index/packages\n'}
+[3.373151] (robotio_description) StdoutLine: {'line': b'symbolically linking /ws/build/robotio_description/package.xml -> /ws/install/robotio_description/share/robotio_description\n'}
+[3.373341] (robotio_description) StdoutLine: {'line': b'creating /ws/install/robotio_description/share/robotio_description/urdf\n'}
+[3.373528] (robotio_description) StdoutLine: {'line': b'symbolically linking /ws/build/robotio_description/robotio_description/urdf/robotio.urdf.xacro -> /ws/install/robotio_description/share/robotio_description/urdf\n'}
+[3.373715] (robotio_description) StdoutLine: {'line': b'creating /ws/install/robotio_description/share/robotio_description/config\n'}
+[3.386395] (robotio_bridge) StdoutLine: {'line': b"reading manifest file 'robotio_bridge.egg-info/SOURCES.txt'\n"}
+[3.387628] (robotio_bridge) StdoutLine: {'line': b"writing manifest file 'robotio_bridge.egg-info/SOURCES.txt'\n"}
+[3.390391] (robotio_bridge) StdoutLine: {'line': b'running build_ext\n'}
+[3.390962] (robotio_bridge) StdoutLine: {'line': b'Creating /ws/install/robotio_bridge/lib/python3.10/site-packages/robotio-bridge.egg-link (link to .)\n'}
+[3.392581] (robotio_bridge) StdoutLine: {'line': b'\n'}
+[3.392940] (robotio_bridge) StdoutLine: {'line': b'Installed /ws/build/robotio_bridge\n'}
+[3.393760] (robotio_bridge) StdoutLine: {'line': b'running symlink_data\n'}
+[3.394171] (robotio_bridge) StdoutLine: {'line': b'creating /ws/install/robotio_bridge/share/ament_index\n'}
+[3.394414] (robotio_bridge) StdoutLine: {'line': b'creating /ws/install/robotio_bridge/share/ament_index/resource_index\n'}
+[3.394629] (robotio_bridge) StdoutLine: {'line': b'creating /ws/install/robotio_bridge/share/ament_index/resource_index/packages\n'}
+[3.394844] (robotio_bridge) StdoutLine: {'line': b'symbolically linking /ws/build/robotio_bridge/resource/robotio_bridge -> /ws/install/robotio_bridge/share/ament_index/resource_index/packages\n'}
+[3.395060] (robotio_bridge) StdoutLine: {'line': b'symbolically linking /ws/build/robotio_bridge/package.xml -> /ws/install/robotio_bridge/share/robotio_bridge\n'}
+[3.395275] (robotio_bridge) StdoutLine: {'line': b'creating /ws/install/robotio_bridge/share/robotio_bridge/launch\n'}
+[3.395480] (robotio_bridge) StdoutLine: {'line': b'symbolically linking /ws/build/robotio_bridge/launch/robotio_sim.launch.py -> /ws/install/robotio_bridge/share/robotio_bridge/launch\n'}
+[3.395687] (robotio_bridge) StdoutLine: {'line': b'creating /ws/install/robotio_bridge/lib/robotio_bridge\n'}
+[3.396025] (robotio_bridge) StdoutLine: {'line': b'symbolically linking /ws/build/robotio_bridge/scripts/run_servo_to_controller -> /ws/install/robotio_bridge/lib/robotio_bridge\n'}
+[3.412720] (-) TimerEvent: {}
+[3.426076] (robotio_description) CommandEnded: {'returncode': 0}
+[3.513048] (-) TimerEvent: {}
+[3.582068] (robotio_description) JobEnded: {'identifier': 'robotio_description', 'rc': 0}
+[3.586808] (robotio_bridge) CommandEnded: {'returncode': 0}
+[3.603039] (robotio_bridge) JobEnded: {'identifier': 'robotio_bridge', 'rc': 0}
+[3.605494] (-) EventReactorShutdown: {}

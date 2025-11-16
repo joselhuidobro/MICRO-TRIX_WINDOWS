@@ -1,0 +1,247 @@
+
+
+div.Tabla_V {
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+table {
+    border-collapse: collapse;
+    max-width: 100%;  
+    height: 400px;
+    font-size: 12px;
+    border: 1px solid #bdc3c7;
+    margin: auto;
+    table-layout: fixed; /* Force table to not auto size columns based on content */
+}
+
+
+
+th, td {
+    padding: 0;  
+    line-height: 1em; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center; /* esto centra el texto en las celdas */
+}
+
+th {
+    background-color: #308a38;
+    color: white;
+    border-right: 1px solid white;
+}
+td {
+    border-right: 1px solid #ddd;
+    line-height: 1em; /* ajusta este valor, que controla la altura de la línea de texto y, por lo tanto, la altura de la celda */
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+tr {
+    transition: all .2s ease-in;
+    cursor: pointer;
+    position: relative; 
+}
+tr::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 100%;
+    width: calc(100% - 2px); 
+    height: 1px; 
+    background: #ddd;
+}
+
+tr:hover {
+    background-color: #3498db;
+    color: #fff;
+}
+
+.btn-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around; 
+    box-shadow: none; /* Esto debería eliminar cualquier sombra */
+    
+}
+
+.btn {
+    font-size: 1em;
+    padding: 1px; 
+    margin: 0 2px; 
+    box-shadow: none; /* esto debería eliminar cualquier sombra */
+}
+.status-select {
+    width: 100px;
+    height: 15px; /* Cambia a un valor más pequeño */
+    font-size: 0.8em; /* Reduce el tamaño de la fuente */
+}
+
+@media (max-width: 600px) {
+    .Tabla_V {
+      /* Ajustes para la tabla en pantallas pequeñas */
+      font-size: 10px; 
+    }
+  
+    .Tabla_V td, 
+    .Tabla_V th {
+      /* Ajustes para las celdas en pantallas pequeñas */
+      padding: 5px; 
+      line-height: 1.2em; 
+    }
+  
+    .Tabla_V .btn-container {
+      /* Ajustes para los botones en pantallas pequeñas */
+      flex-direction: column; 
+      align-items: center;
+    }
+  
+    .Tabla_V .btn {
+      /* Ajustes adicionales para los botones en pantallas pequeñas */
+      margin: 5px 0; 
+    }
+
+    .containercol {
+        flex-direction: column;
+        /* Apila las columnas en dispositivos pequeños */
+    }
+
+    .search-column {
+        width: 100%;
+        /* Las columnas ocupan todo el ancho en dispositivos pequeños */
+        margin-bottom: 10px;
+        /* Espacio entre las columnas y el formulario */
+    }
+  }
+
+
+  #Direccion_b {
+    width: 100%;
+    max-width: 700px;
+}
+
+/* Estilos para los días de la semana */
+.Lunes,
+.Martes,
+.Miércoles,
+.Jueves,
+.Viernes,
+.Sábado,
+.vacio,
+.facturar,
+.proceso,
+.cotizar,
+.terminado,
+.pagar,
+.programado,
+.marcar_urgente,
+.ciclo_de_ventas,
+.retrasado {
+    text-align: center;
+}
+
+/* Estilos de fondo y color para los días de la semana */
+.Lunes {
+    background-color: #FFCCCC;
+}
+
+.Martes {
+    background-color: #FFEBCC;
+}
+
+.Miércoles {
+    background-color: #FFFFCC;
+}
+
+.Jueves {
+    background-color: #CCFFCC;
+}
+
+.Viernes {
+    background-color: #CCFFFF;
+}
+
+.Sábado {
+    background-color: #CCCCFF;
+}
+
+.vacio {
+    background-color: #FFFFFF;
+    color: #000000;
+}
+
+.facturar {
+    background-color: #FF0000;
+    color: #FFFFFF;
+}
+
+.proceso {
+    background-color: #FFFF00;
+    color: #000000;
+}
+
+.terminado {
+    background-color: #17d727;
+    color: #000000;
+}
+
+.cotizar {
+    background-color: #0000FF;
+    color: #FFFFFF;
+}
+
+.pagar {
+    background-color: #FFA500;
+    color: #000000;
+}
+
+.programado {
+    background-color: #800080;
+    color: #FFFFFF;
+}
+
+.marcar_urgente {
+    background-color: #80001a;
+    color: #FFFFFF;
+}
+
+.ciclo_de_ventas {
+    background-color: #034f6f;
+    color: #FFFFFF;
+}
+
+.retrasado {
+    background-color: #006f80;
+    color: #FFFFFF;
+}
+
+/* Estilos para la disposición de las columnas */
+.containercol {
+    display: flex;
+    justify-content: space-between;
+    /* Distribuye las columnas horizontalmente */
+    margin-bottom: 20px;
+    /* Espacio entre las columnas y el formulario */
+}
+
+.search-column {
+    width: calc(50% - 10px);
+    /* Ancho del 50% menos el margen entre columnas */
+    padding: 10px;
+    box-sizing: border-box;
+    /* Incluye el padding en el ancho total */
+}
+
+.form-column {
+    width: 100%;
+    /* El formulario ocupa todo el ancho */
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+

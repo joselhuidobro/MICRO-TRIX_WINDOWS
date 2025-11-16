@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block title %}Cotización TRIX{% endblock %}
+
+{% block body %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/formulario.css') }}">
+
+
+<h2>Puertas Automáticas TRIX | Dashboard IA</h2>
+
+<div class="form-section">
+    <div class="search-column">
+        <p>Buscar en Google Maps</p>
+        <input type="text" id="location-input" placeholder="Escribe una dirección">
+        <input type="text" id="lat-output" placeholder="Latitud correspondiente a búsqueda">
+        <input type="text" id="lon-output" placeholder="Longitud correspondiente">
+        <button type="button" id="usar-datos-btn">Usar Datos</button>
+    </div>
+
+    <form action="{{url_for('cotizar.generar_cotizacion')}}" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="cantidad">Cantidad de productos</label>
+                <input type="text" id="cantidad" name="cantidad" placeholder="Ej: 3">
+            </div>
+
+            <div class="form-group">
+                <label for="cel">Cel</label>
+                <input type="text" name="cel" id="cel" placeholder="cel">
+            </div>
+
+            <div class="form-group">
+                <label for="direccion">Dirección</label>
+                <input type="text" id="direccion" name="direccion" placeholder="Direccion completa">
+            </div>
+
+
+            <div class="form-group">
+                <input type="text" id="lat" name="lat" placeholder="Latitud">
+                <input type="text" id="lon" name="lon" placeholder="Longitud">
+            </div>
+        </div>
+
+        <div class="form-row">
+         
+    
+            <div class="form-group">
+                <label for="nombre">Nombre</label>
+                <input type="text" id="nombre" name="nombre" placeholder="Nombre del cliente">
+            </div>
+        </div>
+
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="Correo">Correo</label>
+                <input type="text" id="correo" name="Correo" placeholder="Correo electrónico">
+            </div>
+            <div class="form-group">
+                <label for="Fecha">Fecha</label>
+                <input type="text" id="fecha" name="Fecha" placeholder="YYYY-MM-DD">
+            </div>
+        </div>
+
+
+        <div class="productos-container" id="productosContainer">
+            <!-- Aquí se agregan dinámicamente las listas de productos -->
+        </div>
+        <button type="submit">Crear cotización</button>
+    </form>
+</div>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVWlkQtoEbJEamknYtNYP0zmXVlgEfDy0&libraries=places"></script>
+<script>
+    function initAutocomplete() {
+        var input = document.getElementById('location-input');
+        var autocomplete = new google.maps.places.Autocomplete(input);
+
+        autocomplete.addListener('place_changed', function() {
+            var place = autocomplete.getPlace();
+            if (place.geometry) {
+                var lat = place.geometry.location.lat();
+                var lon = place.geometry.location.lng();
+                // Asignar 'lat' y 'lon' a los campos de texto
+                document.getElementById('lat-output').value = lat;
+                document.getElementById('lon-output').value = lon;
+            }
+        });
+    }
+
+    google.maps.event.addDomListener(window, 'load', initAutocomplete);
+</script>
+<script>
+    $(document).ready(function() {
+        $('#cantidad').on('input', function() {
+            const cantidad = parseInt($(this).val());
+            const productosContainer = $('#productosContainer');
+            productosContainer.empty();
+
+            if (isNaN(cantidad) || cantidad <= 0) return;
+            
+            const productosLista = [
+                'Motor711', 'nota_recibo', 'Bateria_711', 'Motor511','Merik411','Merikmyq','SEG_cadena_rt800',
+                'Power230','afpamsuper1000','SEGDuoCombat','bmt5011','Gbat110v','faac_412_brazos110v_EM',
+                'Gbat24v','SEG_operador_peatonal','Peatonal_motorSEG','Roller24V','Dahua_2mp_domo_2.8mm',
+                'Dahua_ptz','Control','Fotoceldas','ChapaBFT110v','Barrera_pluma_3m','Chapa24v','Bateria12vSEG',
+                'fococelda_power230','Trabajo_de_Herrería','Riel_1500_carretillas','Riel_1400_carretillas',
+                'Trabajo_de_pintura','Tejueloybibel','Resorte_torsion_IZQ','Mantenimiento','Mantenimiento_camaras',
+                'Mantenimiento_hidraulico','Mantenimiento_cerca','Mtto_Motor_Cadena','Mtto_Piston_EM',
+                'Pivus30024v','Faac_400_CBACL_kit','Faac_350h_kit','CadenaCh','CadenaG','Carretillas',
+                'videoporterohikvision','DashCAM_hikvision','Cremallera','Tarjeta_electronica_mec200',
+                'Tarjeta_genius_brain_15_24V','bisagra_escuadra','Engrane_helicoidal','Shocker',
+                'Seg_2puertas_controlacceso','dormakaba_80kg_cierrapuerta','receptor__433',
+                'receptor_administrableSEG','receptor_metalico_liftmaster','control_llavero_433','DVR16chanDAHUA',
+                'Tensor_motorcadena','Collarin_riel_Cadena','Duelas_madera','bastidores_metalicos_duelasplastico',
+                'puerta_peatonal1_ventana_herreria_Sencilla','BARRERA_VEHICULAR_CLASSIC_SEG_24VDC',
+                'fort_1000_cremallera_24v','afpam1500_cremallera','s800h_indv','s800h_par_kit','plegadiza_a_abatible',
+                'mtto_cabezal','merik_ks3000','gilgen_sla','gilgel_fd20_peatonal','Stanley_duraglide',
+                'seg_slider_cabezal','PPA_cabezal_RAC'
+            ];
+
+            for (let i = 1; i <= cantidad; i++) {
+                const productoDiv = $('<div></div>').addClass('producto');
+                
+                const label = $('<label></label>').text(`Producto ${i}: `);
+                const selectElement = $('<select></select>').attr('name', `productos`).attr('id', `producto${i}`);
+
+                productosLista.forEach(value => 
+                    selectElement.append($('<option></option>').attr('value', value).text(value.replace(/_/g, ' ')))
+                );
+
+                const costoVenta = $('<input>').attr('type', 'number').attr('name', `costo_venta${i}`).attr('placeholder', `Costo Venta`).addClass('costo-venta').data('index', i);
+                const margen = $('<input>').attr('type', 'number').attr('name', `margen${i}`).attr('placeholder', `Margen (%)`).addClass('margen').data('index', i);
+                const precioVenta = $('<input>').attr('type', 'number').attr('name', `precio_venta${i}`).attr('placeholder', `Precio Venta`).addClass('precio-venta').data('index', i).prop('readonly', true);
+
+                productoDiv.append(label, selectElement, costoVenta, margen, precioVenta);
+                productosContainer.append(productoDiv);
+
+                costoVenta.on('input', function() {
+                    calculatePrecioVenta(i);
+                });
+                margen.on('input', function() {
+                    calculatePrecioVenta(i);
+                });
+            }
+        });
+
+        function calculatePrecioVenta(index) {
+            const costo = parseFloat($(`.costo-venta[data-index=${index}]`).val());
+            const margen = parseFloat($(`.margen[data-index=${index}]`).val());
+
+            if (!isNaN(costo) && !isNaN(margen)) {
+                const precioVenta = costo + (costo * (margen / 100));
+                $(`.precio-venta[data-index=${index}]`).val(precioVenta.toFixed(2));
+            } else {
+                $(`.precio-venta[data-index=${index}]`).val('');
+            }
+        }
+    });
+</script>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Fecha</th>
+            <th>Nombre</th>
+            <th>Dirección</th>
+            <th>Concepto</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for cotizacion in cotizaciones %}
+            <tr>
+                <td>{{ cotizacion.id }}</td>
+                <td>{{ cotizacion.fecha }}</td>
+                <td>{{ cotizacion.nombre }}</td>
+                <td>{{ cotizacion.direccion }}</td>
+                <td>{{ cotizacion.concepto }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+{% endblock %}

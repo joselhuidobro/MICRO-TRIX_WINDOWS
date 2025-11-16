@@ -1,0 +1,11 @@
+package.xml
+setup.cfg
+setup.py
+resource/robotio_description
+robotio_description.egg-info/PKG-INFO
+robotio_description.egg-info/SOURCES.txt
+robotio_description.egg-info/dependency_links.txt
+robotio_description.egg-info/requires.txt
+robotio_description.egg-info/top_level.txt
+robotio_description.egg-info/zip-safe
+robotio_description/urdf/robotio.urdf.xacro

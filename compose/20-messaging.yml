@@ -1,0 +1,40 @@
+services:
+  # EMQX (MQTT broker)
+  emqx:
+    image: emqx:5
+    container_name: emqx_broker
+    networks: [trix-net]
+    environment:
+      - EMQX_NODE__NAME=emqx@127.0.0.1
+      - EMQX_DASHBOARD__DEFAULT_USERNAME=admin
+      - EMQX_DASHBOARD__DEFAULT_PASSWORD=trix1234
+      - EMQX_LISTENERS__TCP__DEFAULT__BIND=0.0.0.0:1883
+      - EMQX_LISTENERS__WS__DEFAULT__BIND=0.0.0.0:8083
+      - EMQX_MQTT__MAX_PACKET_SIZE=10MB
+    volumes:
+      - emqx_data:/opt/emqx/data
+      - emqx_log:/opt/emqx/log
+    ports:
+      - "1883:1883"    # MQTT TCP
+      - "8083:8083"    # MQTT over WebSocket
+      - "18083:18083"  # Dashboard
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "sh", "-c", "nc -z 127.0.0.1 1883 || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 20
+
+  # micro-ROS Agent (UDP)
+  micro_ros_agent_hmi:
+    image: microros/micro-ros-agent:humble
+    container_name: micro_ros_agent_HMI2
+    networks: [trix-net]
+    command: ["udp4","--port","9999","-v6"]
+    ports:
+      - "9999:9999/udp"
+    environment:
+      - ROS_DOMAIN_ID=0
+      - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+      - ROS_LOCALHOST_ONLY=0
+    restart: unless-stopped

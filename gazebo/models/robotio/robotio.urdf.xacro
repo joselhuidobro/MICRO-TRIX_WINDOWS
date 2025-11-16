@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<robot name="robotio" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!-- Base inerte -->
+  <link name="base_link">
+    <inertial><mass value="1"/><inertia ixx="1e-3" iyy="1e-3" izz="1e-3" ixy="0" ixz="0" iyz="0"/></inertial>
+    <visual><geometry><box size="0.2 0.2 0.05"/></geometry></visual>
+    <collision><geometry><box size="0.2 0.2 0.05"/></geometry></collision>
+  </link>
+
+  <!-- Eslabón giratorio -->
+  <link name="arm_link">
+    <inertial><mass value="0.5"/><inertia ixx="5e-4" iyy="5e-4" izz="5e-4" ixy="0" ixz="0" iyz="0"/></inertial>
+    <visual><geometry><box size="0.25 0.02 0.02"/></geometry><origin xyz="0.125 0 0"/></visual>
+    <collision><geometry><box size="0.25 0.02 0.02"/></geometry><origin xyz="0.125 0 0"/></collision>
+  </link>
+
+
+<xacro:arg name="use_ros2_control" default="false"/>
+
+<xacro:if value="$(arg use_ros2_control)">
+  <gazebo>
+    <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
+      <parameters>/tmp/robotio_rw/config/controllers.yaml</parameters>
+    </plugin>
+  </gazebo>
+</xacro:if>
+
+
+  <!-- Joint de rotación en Z (grados de libertad del servo) -->
+  <joint name="arm_joint" type="revolute">
+    <parent link="base_link"/>
+    <child link="arm_link"/>
+    <origin xyz="0 0 0.03" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.1416" upper="3.1416" effort="1.0" velocity="2.0"/>
+    <dynamics damping="0.1"/>
+  </joint>
+
+
+<xacro:arg name="mesh_root" default="/sim/models/robotio"/>
+
+  <!-- Transmisión del joint (obligatoria para ros2_control) -->
+  <transmission name="arm_transmission">
+    <type>transmission_interface/SimpleTransmission</type>
+    <actuator name="arm_motor"><mechanicalReduction>1</mechanicalReduction></actuator>
+    <joint name="arm_joint">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    </joint>
+  </transmission>
+</robot>
+

@@ -1,0 +1,19 @@
+PROJECT_NAME           = "TRIX"
+
+OUTPUT_DIRECTORY       = out
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+GENERATE_XML           = YES
+XML_OUTPUT             = xml
+
+INPUT                  = src esp/main esp/components
+RECURSIVE              = YES
+FILE_PATTERNS          = *.c *.cc *.cpp *.cxx *.h *.hpp *.hh *.ino
+EXCLUDE_PATTERNS       = */build/* */.pio/* */.git/*
+
+EXTRACT_ALL            = YES
+HAVE_DOT               = YES
+CALL_GRAPH             = YES
+CALLER_GRAPH           = YES
+JAVADOC_AUTOBRIEF      = YES
+MULTILINE_CPP_IS_BRIEF = YES

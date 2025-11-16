@@ -1,0 +1,20 @@
+baseURL = "/"
+
+languageCode = "es-MX"
+title = "TRIX Studio | Ingeniería & Diseño"
+defaultContentLanguage = "es"
+
+[permalinks]
+  sections = "/:section/:slug/"
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+  
+[params]
+  logo = "img/logo_trix_st.png"
+  logo_webp = "img/logo_trix_st.webp"
+  whatsapp_icon = "img/whatsapp.ico"
+  gabinete = "img/gabinete.webp"
+  bft200h = "img/bft200h.webp"

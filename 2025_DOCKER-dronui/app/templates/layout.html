@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% if title %}
+    <title>TRIX  - {{ title }}</title>
+    {% else %}
+    <title>App</title>
+    {% endif %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css')}}">
+    {% block customCSS %}
+    {% endblock %}
+</head>
+<body>
+    <div class="container-fluid content-wrapper">
+        <header>
+            <div class="bg-div">
+                <nav>
+                    <div class="brand-container">
+                        <img class="logo-img" src="{{ url_for('static', filename='img/logo_trix_st.png')}}">
+                        <div class="headings-container">
+                            <h1 class="brand-heading">
+                                <span class="brand-part-blue">TRIX </span><span class="brand-part-red">STUDIO</span>
+                            </h1>
+                            <h2 class="tagline">INGENIERÍA Y DISEÑO</h2>
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button id="buildIdfBtn" class="btn btn-primary">BUILD IDF</button>
+                        <button id="flashEsp32Btn" class="btn btn-success">Flash ESP32</button>
+                        <button id="idfMonitorBtn" class="btn btn-info">IDF Monitor</button>
+                        <button id="viewCodeBtn" class="btn btn-info">Codigo</button>
+                    </div>
+                </nav>
+            </div>
+        </header>
+        <div id="build-output" style="margin: 20px; padding: 10px; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; display: none;">
+            <pre id="build-output-text"></pre>
+        </div>
+        <div id="page-content-wrapper">
+            {% block body %}
+            {% endblock %}
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const buildIdfBtn = document.getElementById('buildIdfBtn');
+            const buildOutputDiv = document.getElementById('build-output');
+            const buildOutputText = document.getElementById('build-output-text');
+
+            buildIdfBtn.addEventListener('click', () => {
+                buildIdfBtn.disabled = true;
+                buildOutputText.textContent = 'Building...';
+                buildOutputDiv.style.display = 'block';
+
+                fetch('/build_idf', { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        buildOutputText.textContent = data.output || data.message;
+                        buildIdfBtn.disabled = false;
+                        if (data.status === 'error') {
+                            buildOutputDiv.style.borderColor = 'red';
+                        } else {
+                            buildOutputDiv.style.borderColor = 'green';
+                        }
+                    })
+                    .catch(error => {
+                        buildOutputText.textContent = `Error: ${error.message}`;
+                        buildOutputDiv.style.borderColor = 'red';
+                        buildIdfBtn.disabled = false;
+                    });
+            });
+
+            // Other button handlers (flashEsp32Btn, idfMonitorBtn, viewCodeBtn) can be implemented similarly
+        });
+    </script>
+</body>
+</html>

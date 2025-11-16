@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Editar Orden{% endblock %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/formulario.css') }}">
+
+{% block body %}
+<form action="{{ url_for('agenda.actualizar_semana', id=orden.id) }}" method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <input type="text" name="cel" placeholder="Cel" value="{{ orden.cel }}">
+    <input type="text" name="nombre" placeholder="Nombre" value="{{ orden.nombre }}">
+    <input type="text" name="fecha" placeholder="Fecha" value="{{ orden.fecha }}">
+    <input type="text" name="direccion" placeholder="Dirección" value="{{ orden.direccion }}">
+    <input type="text" name="concepto" placeholder="Concepto" value="{{ orden.concepto }}">
+
+    <select id="categoria" name="categoria">
+        <option value="Motor" {% if orden.categoria == 'Motor' %} selected {% endif %}>Motor</option>
+        <option value="Mantenimiento" {% if orden.categoria == 'Mantenimiento' %} selected {% endif %}>Mantenimiento</option>
+        <option value="Taller" {% if orden.categoria == 'Taller' %} selected {% endif %}>Taller</option>
+        <option value="Ajuste" {% if orden.categoria == 'Ajuste' %} selected {% endif %}>Ajuste</option>
+        <option value="Refacción" {% if orden.categoria == 'Refacción' %} selected {% endif %}>Refacción</option>
+        <option value="Herreria" {% if orden.categoria == 'Herreria' %} selected {% endif %}>Herrería</option>
+        <option value="Electronica" {% if orden.categoria == 'Electronica' %} selected {% endif %}>Electrónica</option>
+        <option value="Garantia" {% if orden.categoria == 'Garantia' %} selected {% endif %}>Garantía</option>
+        <option value="Programación" {% if orden.categoria == 'Programación' %} selected {% endif %}>Programación de control</option>
+        <option value="Levantamiento" {% if orden.categoria == 'Levantamiento' %} selected {% endif %}>Levantamiento</option>
+        <option value="Cotizacion" {% if orden.categoria == 'Cotizacion' %} selected {% endif %}>Cotización</option>
+    </select>
+
+    <input type="text" name="no_semana" placeholder="Número de Semana" value="{{ orden.no_semana }}">
+
+    <select id="dia_semana" name="dia_semana">
+        <option value="Lunes" {% if orden.dia_semana == 'Lunes' %} selected {% endif %}>Lunes</option>
+        <option value="Martes" {% if orden.dia_semana == 'Martes' %} selected {% endif %}>Martes</option>
+        <option value="Miércoles" {% if orden.dia_semana == 'Miércoles' %} selected {% endif %}>Miércoles</option>
+        <option value="Jueves" {% if orden.dia_semana == 'Jueves' %} selected {% endif %}>Jueves</option>
+        <option value="Viernes" {% if orden.dia_semana == 'Viernes' %} selected {% endif %}>Viernes</option>
+        <option value="Sábado" {% if orden.dia_semana == 'Sábado' %} selected {% endif %}>Sábado</option>
+        <option value="Domingo" {% if orden.dia_semana == 'Domingo' %} selected {% endif %}>Domingo</option>
+    </select>
+
+    <input type="text" name="cantidad" placeholder="Cantidad" value="{{ orden.cantidad }}">
+    <input type="text" name="precio_unitario" placeholder="Precio Unitario" value="{{ orden.precio_unitario }}">
+    <input type="text" name="total_cotizado" placeholder="Total Cotizado" readonly value="{{ orden.total_cotizado }}">
+    <input type="text" name="total_pagado" placeholder="Total Pagado" value="{{ orden.total_pagado }}">
+
+    <select id="forma_de_pago" name="forma_de_pago">
+        <option value="Efectivo" {% if orden.forma_de_pago == 'Efectivo' %} selected {% endif %}>Efectivo</option>
+        <option value="Transferencia" {% if orden.forma_de_pago == 'Transferencia' %} selected {% endif %}>Transferencia</option>
+        <option value="Tarjeta" {% if orden.forma_de_pago == 'Tarjeta' %} selected {% endif %}>Tarjeta</option>
+        <option value="Cheque" {% if orden.forma_de_pago == 'Cheque' %} selected {% endif %}>Cheque</option>
+    </select>
+
+    <input type="text" name="pendiente" placeholder="Pendiente" readonly value="{{ orden.pendiente }}">
+    <input type="text" name="lat" placeholder="Latitud" value="{{ orden.lat }}">
+    <input type="text" name="lon" placeholder="Longitud" value="{{ orden.lon }}">
+
+    <button type="submit">Guardar</button>
+</form>
+
+
+<script>
+    document.getElementById("cantidad").addEventListener("input", function(){
+      var cantidad = parseFloat(document.getElementById("cantidad").value);
+      var precio_unitario = parseFloat(document.getElementById("precio_unitario").value);
+      document.getElementById("total_cotizado").value = cantidad * precio_unitario;
+    });
+    
+    document.getElementById("precio_unitario").addEventListener("input", function(){
+      var cantidad = parseFloat(document.getElementById("cantidad").value);
+      var precio_unitario = parseFloat(document.getElementById("precio_unitario").value);
+      document.getElementById("total_cotizado").value = cantidad * precio_unitario;
+    });
+    </script>
+
+<script>
+    document.getElementById("total_cotizado").addEventListener("input", function(){
+      var total_cotizado = parseFloat(document.getElementById("total_cotizado").value);
+      var total_pagado = parseFloat(document.getElementById("total_pagado").value);
+      document.getElementById("pendiente").value = total_cotizado - total_pagado;
+    });
+    
+    document.getElementById("total_pagado").addEventListener("input", function(){
+      var total_cotizado = parseFloat(document.getElementById("total_cotizado").value);
+      var total_pagado= parseFloat(document.getElementById("total_pagado").value);
+      document.getElementById("pendiente").value = total_cotizado - total_pagado;
+    });
+    </script> 
+    
+    
+
+
+
+
+{% endblock %}
+

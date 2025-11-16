@@ -1,0 +1,34 @@
+sudo docker system prune -a
+docker system prune -a --volumes
+sudo docker-compose build
+docker exec -it robot bash
+
+source /opt/esp-idf/export.sh
+
+
+idf.py fullclean
+idf.py build
+idf.py -p /dev/ttyUSB0 flash
+idf.py -p /dev/ttyUSB0 flash monitor
+idf.py -p /dev/ttyUSB0 monitor
+
+sudo docker stop $(sudo docker ps -aq) 
+sudo docker stop robot
+sudo docker rm robot
+sudo docker rmi ubuntu:robot # Or whatever your image name is
+
+# Elimina todos los contenedores y volúmenes
+sudo docker rm -f $(docker ps -aq) 2>/dev/null
+sudo docker volume rm $(docker volume ls -q) 2>/dev/null
+
+# Limpia el sistema Docker
+sudo docker system prune -af
+sudo docker system prune -a --volumes
+
+
+sudo docker-compose up --build -d
+sudo docker exec -it robot bash
+
+grep "ESP_WIFI_" build/config/sdkconfig.h
+
+

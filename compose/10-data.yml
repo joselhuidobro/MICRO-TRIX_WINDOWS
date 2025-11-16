@@ -1,0 +1,63 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: redis_trix
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD:-trixredis123}"]
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-trixredis123}
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    networks:
+      - trix-net
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a $$REDIS_PASSWORD ping | grep PONG"]
+      interval: 10s
+      timeout: 3s
+      retries: 20
+
+  postgres:
+    build:
+      context: ../postgres
+      dockerfile: Dockerfile
+    container_name: postgres_trix
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-trixdb}
+      POSTGRES_USER: ${POSTGRES_USER:-trix}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-trixpass_secure_cambia_esta}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - pg_data:/var/lib/postgresql/data/pgdata
+      - ../postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - trix-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin_trix
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@trix.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-trixadmin123}
+      PGADMIN_SERVER_JSON_FILE: /pgadmin4/servers.json  # 👈 CLAVE
+    ports:
+      - "9070:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ../postgres/servers.json:/pgadmin4/servers.json:ro  # 👈 MONTA EL ARCHIVO
+    restart: unless-stopped
+    networks:
+      - trix-net
+    depends_on:
+      postgres:
+        condition: service_healthy

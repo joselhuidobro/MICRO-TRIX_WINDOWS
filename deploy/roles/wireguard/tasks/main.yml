@@ -1,0 +1,85 @@
+---
+- name: Gather facts
+  setup:
+
+
+
+
+# Usa la interfaz de salida que pusiste en group_vars (wg_nat_egress_iface),
+# o detecta la default si viene vacío.
+- name: Detect default egress interface when not provided
+  set_fact:
+    wg_nat_iface_detected: "{{ ansible_default_ipv4.interface | default('eth0') }}"
+  when: wg_nat_egress_iface | default('') | length == 0
+
+- name: Set final egress iface fact
+  set_fact:
+    wg_nat_egress_iface_final: "{{ (wg_nat_egress_iface | default('')) | ternary(wg_nat_egress_iface, wg_nat_iface_detected) }}"
+
+# ---- INSTALACIÓN BASE (sin wireguard-go) ----
+- name: Install base packages (Debian/Ubuntu)
+  apt:
+    name:
+      - wireguard-tools
+      - nftables
+      - resolvconf
+    state: present
+    update_cache: true
+
+# ---- SYSCTL ----
+- name: Enable IPv4 forwarding (runtime+persist)
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: "1"
+    state: present
+    sysctl_set: true
+    reload: true
+
+- name: Disable IPv6 forwarding (optional)
+  when: not wg_enable_ipv6 | default(false)
+  sysctl:
+    name: net.ipv6.conf.all.forwarding
+    value: "0"
+    state: present
+    sysctl_set: true
+    reload: true
+
+# ---- DIRECTORIOS ----
+- name: Ensure /etc/wireguard exists
+  file:
+    path: /etc/wireguard
+    state: directory
+    mode: '0755'
+
+- name: Ensure nftables.d include dir exists
+  file:
+    path: /etc/nftables.d
+    state: directory
+    mode: '0755'
+
+# ---- PLANTILLAS ----
+- name: Deploy wg0.conf
+  template:
+    src: wg0.conf.j2
+    dest: "/etc/wireguard/{{ wg_interface }}.conf"
+    mode: '0600'
+  notify:
+    - Restart wg-quick
+
+
+
+
+# ---- ARRANQUE SERVICIO ----
+- name: systemd daemon-reload
+  systemd:
+    daemon_reload: true
+
+- name: Enable & start wg-quick@{{ wg_interface }}
+  systemd:
+    name: "wg-quick@{{ wg_interface }}"
+    enabled: true
+    state: started
+
+
+
+

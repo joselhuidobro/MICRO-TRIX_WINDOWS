@@ -1,0 +1,31 @@
+:80 {
+  encode zstd gzip
+  log
+
+  # Docs de Sphinx en /docs
+  handle_path /docs/* {
+    root * /srv/docs
+    file_server
+  }
+
+  # Grafana en /grafana
+  handle_path /grafana* {
+    reverse_proxy grafana_trix:3000
+  }
+
+  # Prometheus en /prometheus
+  handle_path /prometheus* {
+    reverse_proxy prometheus_trix:9090
+  }
+
+  # Landing por defecto en /
+  handle {
+    root * /srv/www/landing
+    header {
+      X-Frame-Options "SAMEORIGIN"
+      X-Content-Type-Options "nosniff"
+      Referrer-Policy "no-referrer-when-downgrade"
+    }
+    file_server
+  }
+}

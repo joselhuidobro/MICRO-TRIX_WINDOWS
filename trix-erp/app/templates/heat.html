@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %} Heat {% endblock %}
+
+{% block body %}
+{% include "map.html" %}  
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/formulario.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/nav.css')}}">
+
+
+<style>
+    #Direccion_b {
+        width: 100%; /* Ajusta este valor según la longitud deseada */
+        max-width: 700px; /* Ajusta este valor según la longitud máxima deseada */
+        height: 60%; /* Reducir la altura al 60% del valor original */
+    }
+</style>
+
+
+
+<script>
+    
+    // Función para agregar dirección a la lista desplegable de rutas
+$('#add-to-route').on('click', function() {
+    const direccion = $('#Direccion_b').val();
+    const lat = $('#Direccion_lat').val();
+    const lon = $('#Direccion_lon').val();
+    const cel = $('#Direccion_cel').val();
+
+    // Comprobar si la dirección seleccionada no está vacía
+    if (direccion !== '') {
+        // Crear un nuevo elemento option con la información de la dirección seleccionada
+        const option = $('<option></option>')
+            .attr('value', 'newRoute')
+            .attr('data-lat', lat)
+            .attr('data-lon', lon)
+            .attr('data-cel', cel)
+            .text(direccion);
+
+        // Agregar el nuevo elemento option a la lista desplegable de rutas
+        $('#ruta').append(option);
+
+        // Limpiar los campos del formulario
+        $('#Direccion_b').val('');
+        $('#Direccion_lat').val('');
+        $('#Direccion_lon').val('');
+        $('#Direccion_cel').val('');
+    } else {
+        alert('Por favor, seleccione una dirección válida.');
+    }
+       });
+    
+
+// Función para guardar y mostrar la ruta en el mapa
+$('#guardar_mostarEnmapa').on('click', function() {
+    // Obtener todas las opciones de la lista desplegable de rutas
+    const rutaOptions = $('#ruta option');
+    
+    // Crear una lista para almacenar las rutas
+    let direcciones_del_dia = [];
+
+    // Iterar sobre las opciones y agregar la información de la ruta a la lista
+    rutaOptions.each(function() {
+        const lat = $(this).data('lat');
+        const lon = $(this).data('lon');
+        const cel = $(this).data('cel');
+        const direccion = $(this).text();
+
+        direcciones_del_dia.push({
+            lat: lat,
+            lon: lon,
+            cel: cel,
+            direccion: direccion
+        });
+    });
+
+
+
+    // Enviar la lista de rutas a la funcion heatmap_plot(): en el script rutas.py
+    $.ajax({
+        url: '/save_rutas',
+        method: 'POST',
+        contentType: 'application/json',
+        headers: { // Agregar la cabecera X-CSRF-Token aquí
+        'X-CSRF-Token': $('input[name="csrf_token"]').val()
+    },
+        data: JSON.stringify(direcciones_del_dia),
+        success: function(response) {
+            console.log("Respuesta del servidor:", response);
+            alert('Calculando ruta');
+        },
+        error: function(error) {
+            console.error("Error al calcular la ruta:", error);
+            alert('Error al calcular la ruta');
+        }
+    });
+});
+
+  
+
+
+    
+</script>
+
+
+
+
+{% endblock %}

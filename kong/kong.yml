@@ -1,0 +1,150 @@
+_format_version: "3.0"
+_transform: false
+
+# ───────────────────────── Plugins globales ─────────────────────────
+plugins:
+  - name: correlation-id
+    enabled: true
+    config:
+      header_name: "X-Request-ID"
+      generator: "uuid"
+      echo_downstream: true
+
+  - name: prometheus
+    enabled: true
+
+# ───────────────────────────── Services HTTP ─────────────────────────
+services:
+  # UI (Flask/Hypercorn)
+  - name: ui-svc
+    url: http://ui:5000
+    routes:
+      - name: ui-app
+        protocols: [http]
+        paths: ["/ui"]
+        methods: ["GET","HEAD","POST","PUT","PATCH","DELETE","OPTIONS"]
+
+      - name: ui-static
+        protocols: [http]
+        paths: ["/static", "/assets", "/favicon.ico", "/manifest.json", "/robots.txt"]
+        strip_path: false
+
+      # ¡Deja "/" al final! Es catch-all y no debe eclipsar rutas específicas
+      - name: ui-fallback
+        protocols: [http]
+        paths: ["/"]
+        strip_path: false
+
+  # Grafana detrás de /grafana
+  - name: grafana-svc
+    url: http://grafana:3000
+    routes:
+      - name: grafana-route
+        protocols: [http]
+        paths: ["/grafana", "/grafana/"]
+        strip_path: false
+        preserve_host: true
+        methods: ["GET","HEAD","POST","PUT","PATCH","DELETE","OPTIONS"]
+
+  # Prometheus en /prometheus (opcional)
+  - name: prometheus-svc
+    url: http://prometheus:9090
+    routes:
+      - name: prometheus-route
+        protocols: [http]
+        paths: ["/prometheus", "/prometheus/"]
+        strip_path: false
+        methods: ["GET","HEAD","POST","PUT","PATCH","DELETE","OPTIONS"]
+
+  # Spring Boot API detrás de /api y assets /models
+  - name: springboot-svc
+    url: http://springboot_api:8080
+    routes:
+      - name: springboot-api
+        protocols: [http]
+        # /api/hello -> /hello en Spring
+        paths: ["/api", "/api/"]
+        strip_path: true
+        methods: ["GET","HEAD","POST","PUT","PATCH","DELETE","OPTIONS"]
+
+      # Expone los modelos estáticos de Spring:
+      - name: springboot-models
+        protocols: [http]
+        paths: ["/models", "/models/"]
+        strip_path: false
+        methods: ["GET","HEAD","OPTIONS"]
+    plugins:
+      # CORS para la API (no hace falta para /models si va mismo host)
+      - name: cors
+        enabled: true
+        config:
+          origins: ["*"]
+          methods: [GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS]
+          headers: [Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, Authorization, X-Requested-With]
+          exposed_headers: [X-Request-ID]
+          credentials: false
+          max_age: 3600
+
+  # Git metrics/API tras /git
+  - name: git-svc
+    url: http://git:7011
+    routes:
+      - name: git-route
+        protocols: [http]
+        paths: ["/git", "/git/"]
+        strip_path: false
+        methods: ["GET","HEAD","POST","OPTIONS"]
+
+  # ───────────────────────── Node-RED editor y UI ────────────────────
+  - name: nodered-svc
+    url: http://node_red_trix:1880
+    routes:
+      - name: nodered-route
+        protocols: [http]
+        paths: ["/nodered"]
+        strip_path: true
+        methods: ["GET","HEAD","POST","PUT","PATCH","DELETE","OPTIONS"]
+    plugins:
+      - name: cors
+        enabled: true
+        config:
+          origins: ["*"]
+          methods: [GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS]
+          headers: [Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, Authorization, X-Requested-With]
+          exposed_headers: [X-Request-ID]
+          credentials: false
+          max_age: 3600
+
+  # ───────────────────────── EMQX (Dashboard HTTP) ───────────────────
+  - name: emqx-dashboard-svc
+    url: http://emqx:18083
+    routes:
+      - name: emqx-dashboard-route
+        protocols: [http]
+        paths: ["/emqx", "/emqx/"]
+        strip_path: false
+        preserve_host: true
+        methods: ["GET","HEAD","POST","PUT","PATCH","DELETE","OPTIONS"]
+
+  - name: erp-svc
+    url: http://trix-erp:6800
+    routes:
+      - name: erp-route
+        protocols: [http]
+        paths: ["/erp", "/erp/"]
+        strip_path: false
+        methods: ["GET","HEAD","POST","PUT","PATCH","DELETE","OPTIONS"]
+
+
+  # Kiali detrás de /kiali
+  - name: kiali-svc
+    url: http://kiali:20001
+    routes:
+      - name: kiali-route
+        protocols: [http]
+        paths: ["/kiali", "/kiali/"]
+        strip_path: false        # Kiali espera el prefijo; combina con web_root=/kiali
+        preserve_host: true
+        methods: ["GET","HEAD","POST","PUT","PATCH","DELETE","OPTIONS"]
+
+

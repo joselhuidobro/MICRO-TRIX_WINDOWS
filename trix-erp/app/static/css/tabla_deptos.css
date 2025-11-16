@@ -1,0 +1,84 @@
+div.Tabla_deptos {
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+table {
+    border-collapse: collapse;
+    max-width: 100%;  
+    height: 200px;
+    font-size: 12px;
+    border: 1px solid #bdc3c7;
+    margin: auto;
+    table-layout: fixed; /* Force table to not auto size columns based on content */
+}
+
+
+
+th, td {
+    padding: 5px; /*  Reduce el padding  */
+    line-height: 1em; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center; /* esto centra el texto en las celdas */
+    width: 25%; /* Ajusta este porcentaje según el número de columnas */
+    box-sizing: border-box; 
+}
+
+
+th {
+    background-color: #30728a;
+    color: white;
+    border-right: 1px solid white;
+}
+td {
+    border-right: 1px solid #ddd;
+    line-height: 1em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+tr {
+    transition: all .2s ease-in;
+    cursor: pointer;
+    position: relative; 
+}
+tr::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 100%;
+    width: calc(100% - 2px); 
+    height: 1px; 
+    background: #ddd;
+}
+
+tr:hover {
+    background-color: #3498db;
+    color: #fff;
+}
+
+.btn-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around; 
+    box-shadow: none; /* Esto debería eliminar cualquier sombra */
+    
+}
+
+.btn {
+    font-size: 1em;
+    padding: 0px; 
+    margin: 0 2px; 
+    box-shadow: none; /* esto debería eliminar cualquier sombra */
+}
+.status-select {
+    width: 100px;
+    height: 15px; /* Cambia a un valor más pequeño */
+    font-size: 0.8em; /* Reduce el tamaño de la fuente */
+}

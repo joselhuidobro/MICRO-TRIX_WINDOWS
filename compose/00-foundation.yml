@@ -1,0 +1,53 @@
+networks:
+  trix-net:
+    driver: bridge
+  web-net:
+    driver: bridge
+
+volumes:
+  # Build/cache y tmp
+  ccache:
+  ui_tmp:
+
+  # Datos de apps
+  node_red_data:
+  emqx_data:
+  emqx_log:
+  
+  # PostgreSQL
+  pg_data:
+    driver: local
+    name: trix_pg_data
+    
+  # Redis
+  redis_data:
+    driver: local
+    name: trix_redis_data
+
+  pgadmin_data:
+    driver: local
+    name: trix_pgadmin_data
+
+  loki_data:
+    driver: local
+    name: trix_loki_data
+
+
+  # Observabilidad
+  grafana_data:
+  prometheus_data:
+  knot_data:
+  
+
+  # Web / estáticos / docs
+  caddy_config:
+  caddy_data:
+  hugo_public:
+  doxygen_html:
+  doxygen_xml:
+  sphinx_html:
+
+  # GitLab
+  gitlab_config:
+  gitlab_logs:
+  gitlab_data:

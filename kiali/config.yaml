@@ -1,0 +1,28 @@
+server:
+  port: 20001
+  web_root: /kiali
+
+auth:
+  strategy: token
+
+login_token:
+  signing_key: "0123456789abcdef0123456789abcdef"
+
+istio_namespace: istio-system
+
+deployment:
+  accessible_namespaces: ["**"]
+
+kubernetes_config:
+  in_cluster: false
+  kube_config_file: /home/kiali/.kube/config   # 👈 coincide con el volumen montado
+
+external_services:
+  prometheus:
+    in_cluster_url: http://prometheus:9090
+    url: /prometheus
+  grafana:
+    external_url: /grafana   # 👈 evita el warning por deprecación
+  tracing:
+    enabled: false
+

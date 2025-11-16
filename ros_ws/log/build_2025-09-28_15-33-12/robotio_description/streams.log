@@ -1,0 +1,25 @@
+[2.542s] Invoking command in '/ws/build/robotio_description': PYTHONPATH=/ws/build/robotio_description/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/ws/install/robotio_description/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /ws/build/robotio_description/build --no-deps symlink_data
+[3.011s] running develop
+[3.271s] running egg_info
+[3.271s] creating robotio_description.egg-info
+[3.272s] writing robotio_description.egg-info/PKG-INFO
+[3.274s] writing dependency_links to robotio_description.egg-info/dependency_links.txt
+[3.275s] writing requirements to robotio_description.egg-info/requires.txt
+[3.277s] writing top-level names to robotio_description.egg-info/top_level.txt
+[3.277s] writing manifest file 'robotio_description.egg-info/SOURCES.txt'
+[3.278s] reading manifest file 'robotio_description.egg-info/SOURCES.txt'
+[3.279s] writing manifest file 'robotio_description.egg-info/SOURCES.txt'
+[3.284s] running build_ext
+[3.284s] Creating /ws/install/robotio_description/lib/python3.10/site-packages/robotio-description.egg-link (link to .)
+[3.286s] 
+[3.286s] Installed /ws/build/robotio_description
+[3.286s] running symlink_data
+[3.287s] creating /ws/install/robotio_description/share/ament_index
+[3.287s] creating /ws/install/robotio_description/share/ament_index/resource_index
+[3.287s] creating /ws/install/robotio_description/share/ament_index/resource_index/packages
+[3.287s] symbolically linking /ws/build/robotio_description/resource/robotio_description -> /ws/install/robotio_description/share/ament_index/resource_index/packages
+[3.287s] symbolically linking /ws/build/robotio_description/package.xml -> /ws/install/robotio_description/share/robotio_description
+[3.288s] creating /ws/install/robotio_description/share/robotio_description/urdf
+[3.288s] symbolically linking /ws/build/robotio_description/robotio_description/urdf/robotio.urdf.xacro -> /ws/install/robotio_description/share/robotio_description/urdf
+[3.288s] creating /ws/install/robotio_description/share/robotio_description/config
+[3.341s] Invoked command in '/ws/build/robotio_description' returned '0': PYTHONPATH=/ws/build/robotio_description/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/ws/install/robotio_description/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /ws/build/robotio_description/build --no-deps symlink_data

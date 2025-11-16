@@ -1,0 +1,25 @@
+wg_interface: wg0
+wg_address: "10.6.0.1/24"
+wg_network_cidr: "10.6.0.0/24"
+wg_nat_egress_iface: "eth0"
+
+wg_listen_port: 198
+wg_public_endpoint: "201.141.100.234:198"
+wg_mtu: 1280            # para datos móviles
+wg_persistent_keepalive: 25
+wg_enable_ipv6: false
+
+wg_peers:
+  - name: phone
+    public_key: "9n1Dzx8sMtztRSqMHMPPci8OsxC6iiFdq5Nu2hU6gR8="
+    allowed_ips: "10.6.0.2/32"
+
+wg_allowed_lans:
+  - "10.6.0.0/24"
+  - "192.168.0.0/24"
+  - "172.17.0.0/16"
+  - "172.20.0.0/16"
+
+wg_clients_dir: "/etc/wireguard/clients"
+wg_firewall_backend: iptables
+

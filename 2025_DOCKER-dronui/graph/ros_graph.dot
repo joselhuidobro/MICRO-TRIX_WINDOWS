@@ -1,0 +1,35 @@
+digraph ros2_graph {
+	fontsize=10 labelloc=t rankdir=LR
+	subgraph cluster_nodes {
+		color=lightgrey label=Nodes
+		N___Encoder_node_11B384 [label="/Encoder_node_11B384" shape=box style=rounded]
+		N___Encoder_node_3C5C28 [label="/Encoder_node_3C5C28" shape=box style=rounded]
+		N___ros2_graph_exporter [label="/ros2_graph_exporter" shape=box style=rounded]
+		N___trix_graph_monitor [label="/trix_graph_monitor" shape=box style=rounded]
+		N___ui_telemetry_subscriber [label="/ui_telemetry_subscriber" shape=box style=rounded]
+	}
+	subgraph cluster_topics {
+		color=lightblue label=Topics
+		T___RELAY_telemetry_11B384 [label="/RELAY_telemetry_11B384" shape=ellipse]
+		T___RELAY_telemetry_3C5C28 [label="/RELAY_telemetry_3C5C28" shape=ellipse]
+		T___parameter_events [label="/parameter_events" shape=ellipse]
+		T___relevadores [label="/relevadores" shape=ellipse]
+		T___rosout [label="/rosout" shape=ellipse]
+		T___servo_setpoint_deg [label="/servo_setpoint_deg" shape=ellipse]
+	}
+	N___Encoder_node_11B384 -> T___RELAY_telemetry_11B384 [label=pub fontsize=9 style=solid]
+	T___RELAY_telemetry_11B384 -> N___ui_telemetry_subscriber [label=sub fontsize=9 style=dashed]
+	N___Encoder_node_3C5C28 -> T___RELAY_telemetry_3C5C28 [label=pub fontsize=9 style=solid]
+	N___ui_telemetry_subscriber -> T___parameter_events [label=pub fontsize=9 style=solid]
+	N___trix_graph_monitor -> T___parameter_events [label=pub fontsize=9 style=solid]
+	N___ros2_graph_exporter -> T___parameter_events [label=pub fontsize=9 style=solid]
+	N___ui_telemetry_subscriber -> T___relevadores [label=pub fontsize=9 style=solid]
+	T___relevadores -> N___Encoder_node_3C5C28 [label=sub fontsize=9 style=dashed]
+	T___relevadores -> N___Encoder_node_11B384 [label=sub fontsize=9 style=dashed]
+	N___ui_telemetry_subscriber -> T___rosout [label=pub fontsize=9 style=solid]
+	N___trix_graph_monitor -> T___rosout [label=pub fontsize=9 style=solid]
+	N___ros2_graph_exporter -> T___rosout [label=pub fontsize=9 style=solid]
+	N___ui_telemetry_subscriber -> T___servo_setpoint_deg [label=pub fontsize=9 style=solid]
+	T___servo_setpoint_deg -> N___Encoder_node_3C5C28 [label=sub fontsize=9 style=dashed]
+	T___servo_setpoint_deg -> N___Encoder_node_11B384 [label=sub fontsize=9 style=dashed]
+}

@@ -1,0 +1,214 @@
+services:
+  loki:
+    image: grafana/loki:2.9.3
+    container_name: loki_trix
+    networks: [trix-net]
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ../loki/loki-config.yaml:/etc/loki/local-config.yaml:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3100/ready || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  promtail:
+    image: grafana/promtail:2.9.3
+    container_name: promtail_trix
+    networks: [trix-net]
+    volumes:
+      - ../loki/promtail-config.yaml:/etc/promtail/config.yml:ro
+      - /var/log:/var/log:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: -config.file=/etc/promtail/config.yml
+    depends_on:
+      loki:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ===== GRAFANA (VISUALIZACIÓN) =====
+  grafana:
+    image: grafana/grafana:10.4.6
+    container_name: grafana_trix
+    networks: [trix-net]
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=trix1234
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_ROOT_URL=http://localhost:30080/grafana
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+      - GF_METRICS_ENABLED=true
+      - GF_SERVER_HTTP_ADDR=0.0.0.0
+      - GF_SERVER_HTTP_PORT=3000
+      # Plugin para Redis (opcional)
+      - GF_INSTALL_PLUGINS=redis-datasource
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ../grafana/provisioning:/etc/grafana/provisioning:ro
+      - ../grafana/dashboards:/var/lib/grafana/dashboards:ro
+    labels:
+      job: "grafana"  # ⭐ Esta es clave
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        # ⭐ Esto asegura que el label `job` esté en los logs
+        labels: "job"
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    depends_on:
+      - loki
+      - prometheus
+      - emqx
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ===== PROMETHEUS (MÉTRICAS) =====
+  prometheus:
+    build:
+      context: ../prometheus
+    image: trix/prometheus:latest
+    container_name: prometheus_trix
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks: [trix-net]
+    volumes:
+      - prometheus_data:/prometheus
+      - ../prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+    depends_on: [kong, emqx]
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=15d
+      - --web.enable-lifecycle
+      - --web.cors.origin=http://localhost:30080
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:9090/-/healthy || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # ===== EXPORTERS (MÉTRICAS) =====
+  redis_exporter:
+    image: oliver006/redis_exporter:latest
+    container_name: redis_exporter
+    networks: [trix-net]
+    environment:
+      REDIS_ADDR: "redis://:trixredis123@redis:6379"
+    ports:
+      - "9121:9121"
+    depends_on: [redis]
+    restart: unless-stopped
+
+  node_exporter:
+     image: prom/node-exporter:latest
+     container_name: node_exporter
+     networks: [trix-net]
+     ports:
+        - "9100:9100"
+     restart: unless-stopped
+  # VOLUMES COMENTADOS PARA WINDOWS
+  # volumes:
+  #   - /proc:/host/proc:ro
+  #   - /sys:/host/sys:ro
+  #   - /:/rootfs:ro
+  # command:
+  #   - '--path.rootfs=/rootfs'
+  #   - '--path.procfs=/host/proc'
+  #   - '--path.sysfs=/host/sys'
+  #   - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+  #
+  # Métricas básicas de Docker (sin métricas del host Windows)
+     command:
+       - '--no-collector.netdev'
+       - '--no-collector.filesystem'
+       - '--no-collector.cpu'
+       - '--no-collector.meminfo'
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    container_name: cadvisor
+    networks: [trix-net]
+    ports:
+      - "9081:8080"
+    restart: unless-stopped
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    privileged: true
+    devices:
+      - /dev/kmsg
+
+  postgres_exporter:
+    image: prometheuscommunity/postgres-exporter:latest
+    container_name: postgres_exporter
+    networks: [trix-net]
+    environment:
+      - DATA_SOURCE_NAME=postgresql://trix:trixpass_secure_cambia_esta@postgres:5432/trixdb?sslmode=disable
+    ports:
+      - "9187:9187"
+    depends_on: [postgres]
+    restart: unless-stopped
+
+  # ===== DEVOPS =====
+   #gitlab:
+  #   image: gitlab/gitlab-ce:latest
+    # container_name: gitlab
+     #hostname: gitlab
+    # networks: [trix-net]
+    # shm_size: '256m'
+    # environment:
+     #  GITLAB_OMNIBUS_CONFIG: |
+      #   external_url 'http://localhost:8929'
+      #   gitlab_rails['gitlab_shell_ssh_port'] = 2222
+      #   nginx['listen_port'] = 80
+      #   nginx['listen_https'] = false
+      #   # Configuración de logs
+      #   logging['logrotate_frequency'] = "daily"
+      #   logging['logrotate_maxsize'] = "100M"
+      #   logging['logrotate_rotate'] = 7
+      #   # Habilitar métricas de Prometheus
+      #   prometheus['enable'] = true
+      #   prometheus['listen_address'] = '0.0.0.0:9168'
+   #  ports:
+   #    - "8929:80"
+   #    - "2222:22"
+   #    - "9168:9168"  # Puerto de métricas
+  #   volumes:
+  #     - gitlab_config:/etc/gitlab
+  #     - gitlab_logs:/var/log/gitlab
+  #     - gitlab_data:/var/opt/gitlab
+  #   restart: unless-stopped
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost/-/health"]
+  #     interval: 1m
+   #    timeout: 10s
+    #   retries: 3
+     #  start_period: 120s
+    # Configurar formato de logs para Promtail
+   #  logging:
+      # driver: "json-file"
+      # options:
+        # max-size: "10m"
+        # max-file: "3"
+        # labels: "service,component"
+       #  tag: "{{.Name}}"
+

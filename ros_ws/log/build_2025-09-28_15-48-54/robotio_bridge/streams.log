@@ -1,0 +1,15 @@
+[1.465s] Invoking command in '/ws/build/robotio_bridge': PYTHONPATH=/ws/build/robotio_bridge/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/ws/install/robotio_bridge/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /ws/build/robotio_bridge/build --no-deps symlink_data
+[1.912s] running develop
+[2.225s] running egg_info
+[2.225s] writing robotio_bridge.egg-info/PKG-INFO
+[2.226s] writing dependency_links to robotio_bridge.egg-info/dependency_links.txt
+[2.226s] writing requirements to robotio_bridge.egg-info/requires.txt
+[2.226s] writing top-level names to robotio_bridge.egg-info/top_level.txt
+[2.237s] reading manifest file 'robotio_bridge.egg-info/SOURCES.txt'
+[2.238s] writing manifest file 'robotio_bridge.egg-info/SOURCES.txt'
+[2.238s] running build_ext
+[2.238s] Creating /ws/install/robotio_bridge/lib/python3.10/site-packages/robotio-bridge.egg-link (link to .)
+[2.239s] 
+[2.240s] Installed /ws/build/robotio_bridge
+[2.240s] running symlink_data
+[2.284s] Invoked command in '/ws/build/robotio_bridge' returned '0': PYTHONPATH=/ws/build/robotio_bridge/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/ws/install/robotio_bridge/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /ws/build/robotio_bridge/build --no-deps symlink_data

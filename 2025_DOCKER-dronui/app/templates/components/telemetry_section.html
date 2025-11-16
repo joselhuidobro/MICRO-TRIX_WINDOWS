@@ -1,0 +1,47 @@
+<div class="controls-row">
+  <!-- Tabla de Telemetría -->
+  <div class="telemetry-data panel">
+    <p><strong>Pitch:</strong> <span id="pitchValue">{{ telemetry.pitch | default('0.00') }}</span>°</p>
+    <p><strong>Roll:</strong> <span id="rollValue">{{ telemetry.roll | default('0.00') }}</span>°</p>
+    <p><strong>Yaw:</strong> <span id="yawValue">{{ telemetry.yaw | default('0.00') }}</span>°</p>
+    <p><strong>Motor1:</strong> <span id="m1Value">{{ telemetry.m1 | default('0') }}</span></p>
+    <p><strong>Motor2:</strong> <span id="m2Value">{{ telemetry.m2 | default('0') }}</span></p>
+    <p><strong>Motor3:</strong> <span id="m3Value">{{ telemetry.m3 | default('0') }}</span></p>
+    <p><strong>Motor4:</strong> <span id="m4Value">{{ telemetry.m4 | default('0') }}</span></p>
+    <p><strong>Latency (ms):</strong> <span id="latMsValue">{{ telemetry.lat_ms | default('N/A') }}</span></p>
+    <p><strong>Timestamp (µs):</strong> <span id="tUsValue">{{ telemetry.t_us | default('N/A') }}</span></p>
+  </div>
+
+  <!-- Gráficas -->
+  <div class="chart-container panel">
+    <canvas id="telemetryChart"></canvas>
+  </div>
+
+  <div class="chart-container panel">
+    <canvas id="telemetryChart2"></canvas>
+  </div>
+
+  <div class="chart-container panel" style="height: 150px;">
+    <canvas id="motorThrottleChart"></canvas>
+  </div>
+
+  <!-- Three.js -->
+  <div id="threejs-container" class="three-container panel"></div>
+
+  <!-- Botones de build/flash/monitor opcionales -->
+  <div class="controls-row gap-8 panel">
+
+    <button id="buildIdfBtn" class="btn btn-primary">Build ESP-IDF</button>
+    <button id="flashEsp32Btn" class="btn btn-info">Flash ESP32</button>
+    <button id="idfMonitorBtn" class="btn btn-dark">IDF Monitor</button>
+    <button id="viewCodeBtn" class="btn btn-light">Ver Código</button>
+    <button id="viewCodeBtn" class="btn btn-light">MODBUS SCAN</button>
+    <button id="viewCodeBtn" class="btn btn-light">ROS2 UDP SCAN</button>
+  </div>
+
+  <!-- Salida del build -->
+  <div id="build-output" class="panel" style="display:none;">
+    <pre id="build-output-text"></pre>
+  </div>
+</div>
+

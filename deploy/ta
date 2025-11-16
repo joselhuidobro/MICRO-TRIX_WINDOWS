@@ -1,0 +1,58 @@
+-- Logs begin at Wed 2021-07-21 13:51:38 CDT, end at Sun 2025-11-02 00:53:36 CST. --
+nov 01 23:42:15 jose-desktop systemd[1]: Starting nftables...
+-- Subject: Unit nftables.service has begun start-up
+-- Defined-By: systemd
+-- Support: http://www.ubuntu.com/support
+-- 
+-- Unit nftables.service has begun starting up.
+nov 01 23:42:15 jose-desktop nft[4647]: /etc/nftables.conf:3:1-14: Error: Operation not supported
+nov 01 23:42:15 jose-desktop nft[4647]: flush ruleset
+nov 01 23:42:15 jose-desktop nft[4647]: ^^^^^^^^^^^^^^
+nov 01 23:42:15 jose-desktop systemd[1]: [0;1;39m[0;1;31m[0;1;39mnftables.service: Main process exited, code=exited, status=1/FAILURE[0m
+nov 01 23:42:15 jose-desktop systemd[1]: [0;1;39m[0;1;31m[0;1;39mnftables.service: Failed with result 'exit-code'.[0m
+nov 01 23:42:15 jose-desktop systemd[1]: [0;1;31m[0;1;39m[0;1;31mFailed to start nftables.[0m
+-- Subject: Unit nftables.service has failed
+-- Defined-By: systemd
+-- Support: http://www.ubuntu.com/support
+-- 
+-- Unit nftables.service has failed.
+-- 
+-- The result is RESULT.
+nov 02 00:47:06 jose-desktop systemd[1]: Starting nftables...
+-- Subject: Unit nftables.service has begun start-up
+-- Defined-By: systemd
+-- Support: http://www.ubuntu.com/support
+-- 
+-- Unit nftables.service has begun starting up.
+nov 02 00:47:06 jose-desktop nft[21121]: /etc/nftables.conf:2:1-40: Error: File not found: /etc/nftables.d/wireguard.nft
+nov 02 00:47:06 jose-desktop nft[21121]: include "/etc/nftables.d/wireguard.nft"
+nov 02 00:47:06 jose-desktop nft[21121]: ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+nov 02 00:47:06 jose-desktop systemd[1]: [0;1;39m[0;1;31m[0;1;39mnftables.service: Main process exited, code=exited, status=1/FAILURE[0m
+nov 02 00:47:06 jose-desktop systemd[1]: [0;1;39m[0;1;31m[0;1;39mnftables.service: Failed with result 'exit-code'.[0m
+nov 02 00:47:06 jose-desktop systemd[1]: [0;1;31m[0;1;39m[0;1;31mFailed to start nftables.[0m
+-- Subject: Unit nftables.service has failed
+-- Defined-By: systemd
+-- Support: http://www.ubuntu.com/support
+-- 
+-- Unit nftables.service has failed.
+-- 
+-- The result is RESULT.
+nov 02 00:50:49 jose-desktop systemd[1]: Starting nftables...
+-- Subject: Unit nftables.service has begun start-up
+-- Defined-By: systemd
+-- Support: http://www.ubuntu.com/support
+-- 
+-- Unit nftables.service has begun starting up.
+nov 02 00:50:50 jose-desktop nft[24940]: /etc/nftables.conf:1:1-14: Error: Operation not supported
+nov 02 00:50:50 jose-desktop nft[24940]: flush ruleset
+nov 02 00:50:50 jose-desktop nft[24940]: ^^^^^^^^^^^^^^
+nov 02 00:50:50 jose-desktop systemd[1]: [0;1;39m[0;1;31m[0;1;39mnftables.service: Main process exited, code=exited, status=1/FAILURE[0m
+nov 02 00:50:50 jose-desktop systemd[1]: [0;1;39m[0;1;31m[0;1;39mnftables.service: Failed with result 'exit-code'.[0m
+nov 02 00:50:50 jose-desktop systemd[1]: [0;1;31m[0;1;39m[0;1;31mFailed to start nftables.[0m
+-- Subject: Unit nftables.service has failed
+-- Defined-By: systemd
+-- Support: http://www.ubuntu.com/support
+-- 
+-- Unit nftables.service has failed.
+-- 
+-- The result is RESULT.

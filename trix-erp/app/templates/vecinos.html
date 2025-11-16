@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Building 0 TRIX{% endblock %}
+
+{% block body %}
+<!-- Librerías y CSS externos -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/formulario.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tabla_ventas.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tabla_deptos.css') }}">
+
+
+<!-- Contenedor con formulario y tabla en la misma fila -->
+<div class="row">
+    
+    <div class="form-row">
+        <button type="submit">Vecinos</button>
+    </div>
+
+    <h2>TRIX | Vecinos</h2> 
+
+    <div id="selected-data" class="form-section">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class="flashes">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+    
+    
+      {% if user %}
+        <p>Bienvenido, vecino {{ user.nombre }}!</p> 
+        {% endif %}
+
+      <h2>Los datos de mi edificio:</h2>
+        <p><strong>ID Edificio:</strong> <span id="selected-id">N/A</span></p>
+        <p><strong>Direccion:</strong> <span id="selected-id">N/A</span></p>
+        <p><strong>ID Depto:</strong> <span id="selected-direccion">N/A</span></p>
+        <p><strong>No. Depto</strong> <span id="selected-direccion">N/A</span></p>
+        
+        
+        <h2>Mis datos:</h2>
+        <p><strong>Correo:</strong> <span id="selected-id">N/A</span></p>
+
+
+        <h2>Adeudos</h2>
+
+
+
+    </div>
+</div>
+
+{% endblock %}

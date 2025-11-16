@@ -1,0 +1,218 @@
+
+UI “Radar”: ver los equipos LAN (host) y los servicios en trix-net en la misma página, distinguiéndolos con una etiqueta de origen.
+
+ROS2 → micro-ROS → ESP32: asegurar que tu Flask publique a ROS 2 y que eso llegue al micro-ROS Agent (que ya recibe UDP).
+
+Modbus: mandar Modbus solo al HMI (no al ESP32) con IP configurable por env vars (no hardcodeada).
+
+
+se hace un merge con las direccion 172 .... y las direccion 192... 
+
+sudo ansible-playbook -i hosts.ini site.yml --syntax-check
+
+
+red local host   
+
+http://localhost:5000/udp/devices
+Grafana: http://localhost:30080/grafana	
+Prometheus:http://localhost:9090/targets?search=
+http://localhost:9090/metrics
+UI: http://localhost:30080/ui
+Index (fallback): http://localhost:30080/
+Telemetría: http://localhost:30080/telemetry
+     http://localhost:30080/ui/telemetry
+
+http://localhost:5000/udp/devices
+http://localhost:30080/nodered
+Telemetría: http://localhost:30080/setpoint
+UDP devices (JSON): http://localhost:30080/udp/devices
+UDP devices (SSE): http://localhost:30080/udp/devices/stream
+Orientation (SSE): http://localhost:30080/orientation
+
+http://localhost:3000/grafana/metrics
+http://localhost:8080/
+http://localhost:8080/models/robot.glb
+http://localhost:30080/ui/ros/topics
+
+
+http://localhost:30080/data     Modbus data: 
+http://localhost:8100/metrics
+http://localhost:9090/metrics
+http://localhost:9121/metrics     #redis
+http://localhost:7011/metrics     #git
+http://localhost:5000/udp/devices/debug?mode=radar
+http://localhost:5000/udp/devices/debug?mode=lan
+Grafana (con subpath): http://localhost:3000/grafana/metrics
+
+Redis health: http://localhost:30080/redis/health
+
+curl "http://localhost:5000/udp/devices/debug?mode=lan"
+Solo bridge (radar 172.18.x.x):
+curl "http://localhost:5000/udp/devices/debug?mode=radar"
+Solo contenedores por Docker SDK:
+curl "http://localhost:5000/udp/devices/debug?mode=trix"
+Mezcla con breakdown:
+curl "http://localhost:5000/udp/devices/snapshot"
+
+este ve el esp32 scam net
+docker exec redis_trix redis-cli -a trixredis123 GET trix:udp:devices:last
+docker exec redis_trix redis-cli -a trixredis123 INFO persistence
+docker exec redis_trix redis-cli -a trixredis123 INFO stats
+docker exec -it redis_trix redis-cli -a trixredis123 GET trix:udp:devices:last
+
+curl http://localhost:5000/udp/devices
+
+curl -I http://localhost:30080/nodered
+curl -G 'http://localhost:9090/api/v1/query' --data-urlencode 'query=up{job="grafana"}'
+curl -s 'http://localhost:9090/api/v1/query?query=up%7Bjob%3D%22grafana%22%7D'
+curl -G 'http://localhost:9090/api/v1/query' --data-urlencode 'query=sum by (job) (up)'
+curl http://localhost:5000/debug/redis-key         # debe mostrar type dict o str->json y devices > 0
+curl "http://localhost:5000/udp/devices/debug?mode=lan"   # debe listar 192.168.x.x (incluye ESP32)
+curl http://localhost:5000/udp/devices                    # ahora mezcla LAN + 172.18.x.x
+
+docker exec -it wireguard bash
+
+
+sudo docker logs git_observer
+sudo docker logs -f micro_ros_agent_HMI2
+sudo docker logs flask_ui_encoder_robot
+sudo docker logs -f net_sensor_cdmx 
+sudo docker logs -n 50 net_sensor_cdmx
+sudo docker logs wireguard | tail -n 80
+
+
+sudo docker exec -it ros_relevadores_y_encoder bash
+idf.py build
+idf.py -p /dev/ttyUSB0 flash
+
+sudo docker exec -it flask_ui_encoder_robot  bash
+sudo docker exec -it flask_ui_encoder_robot bash  "source /opt/ros/\$ROS_DISTRO/setup.bash"
+
+
+sudo docker exec -it flask_ui_encoder_robot bash -lc \
+'source /opt/ros/$ROS_DISTRO/setup.bash; rqt_graph'
+
+docker inspect -f '{{range .Config.Env}}{{println .}}{{end}}' wireguard | grep WG_QUICK_USERSPACE || echo "NO_ESTA"
+
+docker inspect wireguard --format '{{range .Mounts}}{{println .Type " " .Source " -> " .Destination}}{{end}}'
+
+
+
+
+sudo docker exec -it redis_trix redis-cli -a trixredis123 GET trix:udp:devices:last
+
+sudo docker exec -it flask_ui_encoder_robot bash -lc "source /opt/ros/\$ROS_DISTRO/setup.bash && ros2 topic list"
+
+sudo docker exec -it flask_ui_encoder_robot bash -lc 'source /opt/ros/$ROS_DISTRO/setup.bash && which ros2 && ros2 topic list'
+
+sudo docker exec -it flask_ui_encoder_robot bash -lc 'source /opt/ros/$ROS_DISTRO/setup.bash && ros2 topic info -v /servo_setpoint_deg'
+
+sudo docker exec -it flask_ui_encoder_robot bash -lc 'source /opt/ros/$ROS_DISTRO/setup.bash && ros2 topic info -v /RELAY_telemetry_11B384'
+
+sudo docker exec -it flask_ui_encoder_robot bash -lc 'source /opt/ros/$ROS_DISTRO/setup.bash && ros2 topic info -v /relevadores'
+
+sudo docker exec -it flask_ui_encoder_robot bash -lc 'source /opt/ros/$ROS_DISTRO/setup.bash && ros2 topic info -v /rosout'
+
+sudo docker exec -it flask_ui_encoder_robot bash -lc 'source /opt/ros/$ROS_DISTRO/setup.bash; exec bash -i'
+
+
+sudo docker exec -it ros_relevadores_y_encoder bash -lc 'if [ -f /opt/esp/idf/export.sh ]; then source /opt/esp/idf/export.sh; elif [ -f /opt/esp-idf/export.sh ]; then source /opt/esp-idf/export.sh; fi; cd /esp2024 && idf.py build && idf.py -p /dev/ttyUSB0 flash'
+
+
+sudo docker exec -it ros_relevadores_y_encoder bash -lc 'if [ -f /opt/esp/idf/export.sh ]; then source /opt/esp/idf/export.sh; elif [ -f /opt/esp-idf/export.sh ]; then source /opt/esp-idf/export.sh; fi; cd /esp2024 && idf.py -p /dev/ttyUSB0 monitor'
+
+
+sudo docker exec -it ros_relevadores_y_encoder bash -lc 'ls -l /dev/ttyUSB0; id; groups'
+cOMANDOS idf
+idf.py fullclean
+idf.py build
+idf.py -p /dev/ttyUSB0 flash
+idf.py -p /dev/ttyUSB0 monitor	
+
+sudo docker stop $(sudo docker ps -aq) 
+sudo docker stop robot
+sudo docker rm robot
+sudo docker rmi ubuntu:robot # Or whatever your image name is
+
+# Elimina todos los contenedores y volúmenes
+sudo docker rm -f $(docker ps -aq) 2>/dev/null
+sudo docker volume rm $(docker volume ls -q) 2>/dev/null
+
+# Limpia el sistema Docker
+sudo docker system prune -af
+sudo docker system prune -a --volumes
+
+sed -n '1,200p' ./wireguard/wireguard_config/wg0.conf \
+ | sed 's/PrivateKey.*/PrivateKey=<hidden>/' \
+ | sed 's/PublicKey.*/PublicKey=<hidden>/'
+
+
+docker exec -it wireguard bash -lc 'wg show; wg show wg0 latest-handshakes'
+
+
+existe el perfil peer1 ?
+
+sudo docker exec -it wireguard bash -lc 'ls -R /config'
+sudo docker exec -it wireguard bash -lc 'ping -c 3 10.6.0.2'
+
+docker exec -it wireguard bash -lc 'ip addr show wg0; wg show'
+
+docker ps --format "{{.Names}}  {{.Ports}}" | grep wireguard
+docker inspect wireguard | grep -A4 '"Ports"'
+
+
+docker exec -it wireguard bash -lc 'wg show; wg show wg0 latest-handshakes'
+
+ip -4 addr show | grep -A2 'state UP' | grep -oP '(?<=inet )\d+\.\d+\.\d+\.\d+'
+
+
+crea el qr localmente
+
+ qrencode -t ansiutf8 < peer1.con
+
+
+//////////////////////////////////////////////////////////////
+sobre la configuracion del cel  para conexion con vpn 
+
+
+interfaz
+nombre  ui2
+clave <publica la que asigne la app }
+direcciones
+10.6.0.2/32
+servidores DNS
+1.1.1.1
+MTU
+1420
+
+
+Pares
+Clave pulica 
+esta en el repo en el archivo peer1,conf
+ips permitidas
+10.6.0.0/24,192.168.0.0/24
+Endpoint
+192.168.0.82:0.0/24
+
+
+
+http://localhost:5000/api/net/info
+
+///////////////////////////////////////////////////////
+
+
+Cliente (cel/PC con VPN) → 10.6.0.1:30080 (host, interfaz wg0) → Kong → ui:5000, grafana:3000, prometheus:9090, etc.
+
+
+
+
+
+
+
+
+
+
+
+
+
+

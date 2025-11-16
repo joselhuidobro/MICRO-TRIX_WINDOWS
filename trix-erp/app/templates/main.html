@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block customCSS %}
+<!-- Aquí puedes incluir estilos adicionales si es necesario -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <h1>Bienvenido al Dashboard</h1>
+    <p>Esta es una página de ejemplo que utiliza el template base.</p>
+
+    <div class="card">
+        <h2>Sección 1</h2>
+        <p>Contenido de ejemplo para la primera sección.</p>
+    </div>  
+
+    <div class="card">
+        <h2>Sección 2</h2>
+        <p>Más contenido de ejemplo aquí.</p>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block body %}
+<!-- Scripts adicionales si es necesario -->
+<script>
+    console.log("Página cargada exitosamente.");
+</script>
+{% endblock %}

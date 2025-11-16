@@ -1,0 +1,510 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+
+{% block customCSS %}
+
+<style>
+    #Direccion_b {
+        width: 100%;
+        max-width: 700px;
+    }
+
+    /* Estilos para los días de la semana */
+    .Lunes,
+    .Martes,
+    .Miércoles,
+    .Jueves,
+    .Viernes,
+    .Sábado,
+    .vacio,
+    .facturar,
+    .proceso,
+    .cotizar,
+    .terminado,
+    .pagar,
+    .programado,
+    .marcar_urgente,
+    .ciclo_de_ventas,
+    .retrasado {
+        text-align: center;
+    }
+
+    /* Estilos de fondo y color para los días de la semana */
+    .Lunes {
+        background-color: #FFCCCC;
+    }
+
+    .Martes {
+        background-color: #FFEBCC;
+    }
+
+    .Miércoles {
+        background-color: #FFFFCC;
+    }
+
+    .Jueves {
+        background-color: #CCFFCC;
+    }
+
+    .Viernes {
+        background-color: #CCFFFF;
+    }
+
+    .Sábado {
+        background-color: #CCCCFF;
+    }
+
+    .vacio {
+        background-color: #FFFFFF;
+        color: #000000;
+    }
+
+    .facturar {
+        background-color: #FF0000;
+        color: #FFFFFF;
+    }
+
+    .proceso {
+        background-color: #FFFF00;
+        color: #000000;
+    }
+
+    .terminado {
+        background-color: #17d727;
+        color: #000000;
+    }
+
+    .cotizar {
+        background-color: #0000FF;
+        color: #FFFFFF;
+    }
+
+    .pagar {
+        background-color: #FFA500;
+        color: #000000;
+    }
+
+    .programado {
+        background-color: #800080;
+        color: #FFFFFF;
+    }
+
+    .marcar_urgente {
+        background-color: #80001a;
+        color: #FFFFFF;
+    }
+
+    .ciclo_de_ventas {
+        background-color: #034f6f;
+        color: #FFFFFF;
+    }
+
+    .retrasado {
+        background-color: #006f80;
+        color: #FFFFFF;
+    }
+
+    /* Estilos para la disposición de las columnas */
+    .containercol {
+        display: flex;
+        justify-content: space-between;
+        /* Distribuye las columnas horizontalmente */
+        margin-bottom: 20px;
+        /* Espacio entre las columnas y el formulario */
+    }
+
+    .search-column {
+        width: calc(50% - 10px);
+        /* Ancho del 50% menos el margen entre columnas */
+        padding: 10px;
+        box-sizing: border-box;
+        /* Incluye el padding en el ancho total */
+    }
+
+    .form-column {
+        width: 100%;
+        /* El formulario ocupa todo el ancho */
+        padding: 10px;
+        box-sizing: border-box;
+    }
+
+    /* Ajustar el tamaño de las columnas para pantallas pequeñas */
+    @media screen and (max-width: 600px) {
+        .container {
+            flex-direction: column;
+            /* Apila las columnas en dispositivos pequeños */
+        }
+
+        .search-column {
+            width: 100%;
+            /* Las columnas ocupan todo el ancho en dispositivos pequeños */
+            margin-bottom: 10px;
+            /* Espacio entre las columnas y el formulario */
+        }
+    }
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tabla_ventas.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/formulario.css') }}">
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+    <h2>Puertas Automáticas TRIX | Historico de Ventas</h2>
+
+    
+
+<h1>Tabla de Ventas Semana Actual </h1>
+<table class="Tabla_V">
+    <thead>
+        <tr>
+            <th>id</th>
+            <th>Cel</th>
+            <th>Nombre</th>
+            <th>Fecha</th>
+            <th>Direccion</th>
+            <th>Concepto</th>
+            <th>Categoria</th>
+            <th>Semana</th>
+            <th>Día</th>
+            <th>cantidad</th>
+            <th>Precio Unitario</th>
+            <th>T. Cotizado</th>
+            <th>Pagado</th>
+            <th>Forma de Pago</th>
+            <th>Estado</th>
+            <th>H. Llegada</th>
+            <th>ACCION</th>
+            <th>Cambiar Estado</th>
+            <th>Horario</th>
+            <th>Unidad TRIX</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for semana in semanas %}
+        <tr>
+            <td>{{ semana.id }}</td>
+            <td>{{ semana.cel }}</td>
+            <td>{{ semana.nombre }}</td>
+            <td>{{ semana.fecha }}</td>
+            <td>{{ semana.direccion }}</td>
+            <td>{{ semana.concepto }}</td>
+            <td>{{ semana.categoria }}</td>
+            <td>{{ semana.no_semana }}</td>
+            <td>{{ semana.dia_semana }}</td>
+            <td>{{ semana.cantidad }}</td>
+            <td>{{ semana.precio_unitario }}</td>
+            <td>{{ semana.total_cotizado }}</td>
+            <td>{{ semana.total_pagado }}</td>
+            <td>{{ semana.forma_de_pago }}</td>
+            <td class="{{ semana.estado }}">{{ semana.estado }}</td>
+            <td>{{ semana.h_llegada }}</td>
+
+
+
+
+            <td>
+                <div class="btn-container">
+                    <form action="{{ url_for('agenda.get_orden', id=semana.id) }}" method="GET" style="display:inline;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button class="btn" type="submit">Editar</button>
+                    </form>
+
+                    <form action="{{ url_for('agenda.borrar_venta', id=semana.id) }}" method="POST"
+                        style="display:inline;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button class="btn" type="submit">Borrar</button>
+                    </form>
+
+                    <form action="{{ url_for('agenda.get_orden', id=semana.id) }}" method="POST"
+                        style="display:inline;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <label>
+                            <input type="checkbox" name="en_ruta" value="1" onchange="this.form.submit()">
+                            En ruta
+                        </label>
+                    </form>
+
+
+                    </form>
+                </div>
+            </td>
+
+            <td>
+                <form>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <select class="status-select" name="Status" onchange="updateStatusClass(this)"
+                        style="width: 100px; height: 30px;" data-id="{{semana.id}}">
+                        <option value="Vacio" {% if semana.estado=='Vacio' %} selected {% endif %}>seleccionar</option>
+                        <option value="facturar" {% if semana.estado=='facturar' %} selected {% endif %}>factura
+                            pendiente</option>
+                        <option value="cotizar" {% if semana.estado=='cotizar' %} selected {% endif %}>cotizacion
+                            pendiente</option>
+                        <option value="proceso" {% if semana.estado=='proceso' %} selected {% endif %}>en proceso
+                        </option>
+                        <option value="terminado" {% if semana.estado=='terminado' %} selected {% endif %}>terminado
+                        </option>
+                        <option value="marcar_urgente" {% if semana.estado=='marcar_urgente' %} selected {% endif %}>
+                            marcar urgente</option>
+                        <option value="retrasado" {% if semana.estado=='retrasado' %} selected {% endif %}>retrasado
+                        </option>
+                        <option value="ciclo_de_ventas" {% if semana.estado=='ciclo_de_ventas' %} selected {% endif %}>
+                            ciclo de venta</option>
+                        <option value="pagar" {% if semana.estado=='pagar' %} selected {% endif %}>por pagar</option>
+                        <option value="programado" {% if semana.estado=='programado' %} selected {% endif %}>programado
+                        </option>
+                        <option value="cancelo_cliente" {% if semana.estado=='cancelo_cliente' %} selected {% endif %}>
+                            cancelo cliente</option>
+                    </select>
+                </form>
+            </td>
+            <td>
+                <!---------------    Lista de Horarios ------------------------------------->
+                <select class="time-select" style="width: 100px; height: 30px;" data-id="{{semana.0}}">
+                    <option value="00:00">----</option>
+                    <option value="10:00">10:00</option>
+                    <option value="10:30">10:30</option>
+                    <option value="11:00">11:00</option>
+                    <option value="11:30">11:30</option>
+                    <option value="12:00">12:00</option>
+                    <option value="12:30">12:30</option>
+                    <option value="13:00">13:00</option>
+                    <option value="13:30">13:30</option>
+                    <option value="14:00">14:00</option>
+                    <option value="14:30">14:30</option>
+                    <option value="15:00">15:00</option>
+                    <option value="15:30">15:30</option>
+                    <option value="16:00">16:00</option>
+                    <option value="16:30">16:30</option>
+                    <option value="17:00">17:00</option>
+                    <option value="17:30">17:30</option>
+                    <option value="18:00">18:00</option>
+                    <option value="18:30">18:30</option>
+                    <option value="19:00">19:00</option>
+                    <option value="19:30">19:30</option>
+                    <option value="20:00">20:00</option>
+                    <option value="20:30">20:30</option>
+                    <option value="21:00">21:00</option>
+                    <option value="21:30">21:30</option>
+                    <option value="22:00">22:00</option>
+                    <!-- ... más opciones ... -->
+                </select>
+
+                <select class="time-select" style="width: 100px; height: 30px;" data-id="{{semana.id}}">
+                    <option value="00:00">----</option>
+                    <option value="10:00">10:00</option>
+                    <!-- ... más opciones ... -->
+                </select>
+            </td>
+            <td>
+        </tr>
+        {% endfor %}
+
+    </tbody>
+</table>
+
+
+
+<script>
+
+    document.getElementById("clasificar-dato-btn").addEventListener("click", function () {
+        // Obtener los valores de los campos
+        var direccion = document.getElementById("location-input").value;
+        var latitud = document.getElementById("lat-output").value;
+        var longitud = document.getElementById("lon-output").value;
+
+        // Validar que todos los campos tengan datos
+        if (!direccion || !latitud || !longitud) {
+            alert("Por favor, completa todos los campos antes de clasificar.");
+            return;
+        }
+
+        // Crear el objeto de datos
+        var datos = {
+            dir: direccion,
+            lat: parseFloat(latitud),
+            lon: parseFloat(longitud)
+        };
+
+        // Enviar los datos al servidor usando fetch
+        fetch("{{ url_for('agenda.predict') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token() }}" // Token CSRF para Flask
+            },
+            body: JSON.stringify(datos)
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Acceder correctamente a la clave 'clasificacion' del JSON devuelto
+                if (data.clasificacion) {
+                    document.getElementById("resultado-clasificacion").innerText = "Clasificación: " + data.clasificacion;
+                } else {
+                    document.getElementById("resultado-clasificacion").innerText = "Error: No se encontró clasificación.";
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                document.getElementById("resultado-clasificacion").innerText = "Ocurrió un error al clasificar.";
+            });
+    });
+
+</script>
+
+
+<script>
+    console.log("Página cargada exitosamente.");
+</script>
+
+<script>
+
+    document.getElementById("usar-datos-btn").addEventListener("click", function () {
+        // Obtener los valores de dirección, latitud y longitud
+        var direccion = document.getElementById("location-input").value;
+        var latitud = document.getElementById("lat-output").value;
+        var longitud = document.getElementById("lon-output").value;
+
+        // Validar que los valores no estén vacíos
+        if (!direccion || !latitud || !longitud) {
+            alert("Por favor completa los campos de dirección, latitud y longitud.");
+            return;
+        }
+
+        // Llenar los campos del formulario con los valores obtenidos
+        document.getElementById("direccion").value = direccion;
+        document.getElementById("lat").value = latitud;
+        document.getElementById("lon").value = longitud;
+    });
+
+</script>
+
+<script>
+    document.getElementById("cantidad").addEventListener("input", function () {
+        var cantidad = parseFloat(document.getElementById("cantidad").value);
+        var precio_unitario = parseFloat(document.getElementById("precio_unitario").value);
+        document.getElementById("total_cotizado").value = cantidad * precio_unitario;
+    });
+
+    document.getElementById("precio_unitario").addEventListener("input", function () {
+        var cantidad = parseFloat(document.getElementById("cantidad").value);
+        var precio_unitario = parseFloat(document.getElementById("precio_unitario").value);
+        document.getElementById("total_cotizado").value = cantidad * precio_unitario;
+    });
+</script>
+
+<script>
+    document.getElementById("total_cotizado").addEventListener("input", function () {
+        var total_cotizado = parseFloat(document.getElementById("total_cotizado").value);
+        var total_pagado = parseFloat(document.getElementById("total_pagado").value);
+        document.getElementById("pendiente").value = total_cotizado - total_pagado;
+    });
+
+    document.getElementById("total_pagado").addEventListener("input", function () {
+        var total_cotizado = parseFloat(document.getElementById("total_cotizado").value);
+        var total_pagado = parseFloat(document.getElementById("total_pagado").value);
+        document.getElementById("pendiente").value = total_cotizado - total_pagado;
+    });
+</script>
+
+<script>
+    document.getElementById("fecha").value = new Date().toISOString().slice(0, 10);
+</script>
+
+<script>
+    function updateStatusClass(selectElement) {
+        // Remove all existing status classes
+        selectElement.className = "";
+        // Add the class corresponding to the selected value
+        var statusValue = selectElement.value.replace(' ', '-').toLowerCase();
+        selectElement.classList.add(statusValue);
+    }
+</script>
+
+<script>
+    function updateStatusClass(selectElement) {
+        // Remover las clases previas del td (asumiendo que la celda estado está en la misma fila)
+        var tdElement = selectElement.closest('tr').querySelector('td:nth-child(15)'); // Suponiendo que la columna "Estado" es la 15
+        // Limpia las clases del td
+        tdElement.className = '';
+        // Asignar la nueva clase según el estado seleccionado
+        var statusValue = selectElement.value;
+        tdElement.classList.add(statusValue);
+        // Actualizar el texto del td
+        tdElement.textContent = statusValue;
+    }
+</script>
+
+<script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVWlkQtoEbJEamknYtNYP0zmXVlgEfDy0&libraries=places"></script>
+<script>
+    function initAutocomplete() {
+        var input = document.getElementById('location-input');
+        var autocomplete = new google.maps.places.Autocomplete(input);
+
+        autocomplete.addListener('place_changed', function () {
+            var place = autocomplete.getPlace();
+            if (place.geometry) {
+                var lat = place.geometry.location.lat();
+                var lon = place.geometry.location.lng();
+                // Asignar 'lat' y 'lon' a los campos de texto
+                document.getElementById('lat-output').value = lat;
+                document.getElementById('lon-output').value = lon;
+
+            }
+        });
+    }
+
+    // Inicializar autocompletar cuando se carga la página
+    google.maps.event.addDomListener(window, 'load', initAutocomplete);
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('.status-select').change(function () {
+            var status = $(this).val();
+            var id = Number($(this).data('id'));  // Convierte el id a un número
+            var csrf_token = $('input[name="csrf_token"]').val();
+            $.ajax({
+                url: "{{ url_for('agenda.update_status') }}",  // Usa Flask para generar la URL
+                data: JSON.stringify({ 'id': id, 'status': status }),
+                type: 'POST',
+                contentType: 'application/json',
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('X-CSRFToken', csrf_token);
+                },
+                success: function (response) {
+                    console.log(response);
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        });
+    });
+</script>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="flash-messages">
+    {% for category, message in messages %}
+    <div class="flash-message {{ category }}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+{% endblock %}

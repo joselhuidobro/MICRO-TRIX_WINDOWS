@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>{% if title %}TRIX - {{ title }}{% else %}App{% endif %}</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/nav.css') }}">
+    {% block customCSS %}
+    {% endblock %}
+</head>
+
+<body>
+    <header>
+        <div class="bg-div">
+            <script>
+                function getWeek(date) {
+                    const oneJan = new Date(date.getFullYear(), 0, 1);
+                    return Math.ceil((((date - oneJan) / 86400000) + oneJan.getDay() + 1) / 7);
+                }
+
+                function updateTime() {
+                    const date = new Date();
+                    const timeElement = document.getElementById("current-time");
+                    const weekElement = document.getElementById("current-week");
+
+                    if (timeElement) timeElement.innerHTML = date.toLocaleString();
+                    if (weekElement) weekElement.innerHTML = getWeek(date);
+                }
+
+                updateTime();
+                setInterval(updateTime, 1000);
+            </script>
+        </div>
+    </header>
+
+    <nav>
+        <ul>
+            <img class="logo-img" src="{{ url_for('static', filename='img/logo_trix_st.png') }}" alt="Logo" width="230" height="230">
+
+            {% if current_user.is_authenticated %}
+                <li><a href="{{ url_for('building.building_route') }}">Edificios</a></li>
+                <li><a href="{{ url_for('vecinos.vecinos_route') }}">Vecinos</a></li>
+                <li><a href="{{ url_for('pago.pago_route') }}">Pagos Semanales</a></li>
+                <li><a href="{{ url_for('mapbox.mapa_box') }}">MBOX</a></li>
+
+                {% if current_user.is_authenticated and (current_user.nivel_seguridad|default(0))|int >= 2 %}
+                    <li><a href="{{ url_for('agenda.agenda_route') }}">Main</a></li>
+                    <li><a href="{{ url_for('mapa.heatmap_plot') }}">Mapa</a></li>
+                    <li><a href="{{ url_for('building.building_route') }}">Historico_ventas</a></li>
+                    <li><a href="{{ url_for('cotizar.cotizacion') }}">Cotizar</a></li>
+                {% endif %}
+
+                {% if current_user.is_authenticated and (current_user.nivel_seguridad|default(0))|int >= 3 %}
+                    <li><a href="{{ url_for('cotizar.cotizacion') }}">Cotizar</a></li>
+                    <li><a href="{{ url_for('building.building_route') }}">Dashboard</a></li>
+                    <li><a href="{{ url_for('building.building_route') }}">Configuracion</a></li>
+                    <li><a href="{{ url_for('building.building_route') }}">Datalake</a></li>
+                {% endif %}
+            {% endif %}
+
+            <div class="user-info">
+                <a class="date" id="current-time"></a>
+                <a class="date">Semana: <span id="current-week"></span></a>
+                {% if current_user.is_authenticated %}
+                    <a class="date">{{ current_user.nombre }}!</a>
+                    <a href="{{ url_for('login.logout') }}">Cerrar Sesión</a>
+                {% else %}
+                    <a class="date">Invitado</a>
+                {% endif %}
+            </div>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="container">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </main>
+
+    {% block body %}
+    {% endblock %}
+</body>
+</html>

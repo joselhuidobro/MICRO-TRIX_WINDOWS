@@ -1,0 +1,345 @@
+{% extends "layout.html" %}
+
+{% block title %}TRIX{% endblock %}
+
+{% block customCSS %}
+<style>
+  .indicator{width:10px;height:10px;border-radius:50%;display:inline-block;margin-left:10px;background:#bbb}
+  .panel{margin:20px 0;padding:16px;border:1px solid #ddd;border-radius:8px;background:#f9f9f9}
+  .data-row{display:flex;align-items:center;gap:8px;margin:8px 0;flex-wrap:wrap}
+  .btn{margin-left:8px}
+  #build-output{display:none;white-space:pre-wrap;background:#fff;border-left:4px solid #3b82f6}
+
+  .table{width:100%; border-collapse:collapse; background:#fff; border-radius:8px; overflow:hidden}
+  .table th,.table td{padding:10px 12px; border-bottom:1px solid #eee; vertical-align:top}
+  .table thead th{background:#f1f5f9; font-weight:600; text-transform:uppercase; font-size:12px; letter-spacing:.02em}
+  .muted{color:#64748b; font-size:12px}
+  .nowrap{white-space:nowrap}
+  .sha{font-family:ui-monospace, Menlo, Monaco, "Courier New", monospace; font-size:12px}
+  .badges{display:flex; gap:6px; flex-wrap:wrap}
+  .badge{display:inline-block; padding:2px 8px; border-radius:9999px; font-size:11px; border:1px solid #e5e7eb; background:#f8fafc}
+  .badge.FLASK{background:#fff7ed}
+  .badge.SpringBoot{background:#ecfdf5}
+  .badge.NodeRED{background:#fff1f2}
+  .badge.Kong{background:#eef2ff}
+  .badge.Prometheus{background:#fef9c3}
+  .badge.Grafana{background:#f5f3ff}
+  .badge.ESPIDF{background:#e0f2fe}
+
+  #viewer { position: relative; width:100%; height:72vh; border-radius:8px; overflow:hidden; background:#0f1115; }
+  #viewer canvas { display:block; }
+  .viewer-hint {
+    position:absolute; left:12px; bottom:12px;
+    background:#000b; color:#fff; padding:6px 10px; border-radius:8px;
+    font:13px/1.4 system-ui;
+  }
+  #diag {
+    position: absolute; right:12px; top:12px; max-width: 44ch;
+    background:#000b; color:#e5e7eb; font:12px/1.4 ui-monospace, Menlo, Monaco, "Courier New", monospace;
+    padding:8px 10px; border-radius:8px; white-space:pre-wrap; z-index:10;
+  }
+  /* Control de exposición */
+  .exposure {
+    display:flex; align-items:center; gap:10px; margin-top:10px; font:12px system-ui; color:#334155;
+  }
+  .exposure input { width:220px; }
+</style>
+{% endblock %}
+
+{% block content %}
+  <h1>TRIX PLM</h1>
+
+  <section id="api" class="panel">
+    <button id="btn" class="btn btn-primary">Probar /api/hello</button>
+    <pre id="out"></pre>
+  </section>
+
+
+<div id="glb-meta" class="panel">
+
+  <strong>Proyecto:</strong> <br/>
+
+  <strong>Modelo:</strong> <span id="path"></span><br/>
+  <strong>Modificado:</strong> <span id="modified"></span><br/>
+  <strong>Tamaño:</strong> <span id="size"></span> bytes<br/>
+  <strong>SHA-256:</strong> <code id="sha"></code><br/>
+  <strong>Último SHA-256:</strong> <code id="prev"></code><br/>
+  <strong>Cambió:</strong> <span id="changed"></span>
+</div>
+
+<script>
+async function loadMeta(){
+  const r = await fetch('/api/model/info', { cache:'no-store' });
+  const j = await r.json();
+  document.getElementById('path').textContent = j.path;
+  document.getElementById('modified').textContent = j.modified;
+  document.getElementById('size').textContent = j.sizeBytes;
+  document.getElementById('sha').textContent = j.sha256;
+  document.getElementById('prev').textContent = j.previousSha256 ?? '—';
+  document.getElementById('changed').textContent = j.changed ? 'Sí' : 'No';
+}
+loadMeta();
+// refresco opcional
+setInterval(loadMeta, 5000);
+</script>
+
+
+
+
+
+  <section id="commits" class="panel">
+    <h2 style="margin-top:0;">Commits</h2>
+    <div class="data-row">
+      <label for="repo" class="muted">Repo (opcional):</label>
+      <input id="repo" class="form-control" placeholder="ej. trix-studio" style="max-width:280px;">
+      <button id="load-commits" class="btn btn-secondary">Cargar commits</button>
+    </div>
+    <div id="commits-status" class="muted"></div>
+    <div style="overflow:auto">
+      <table class="table" id="commits-table">
+        <thead><tr>
+          <th style="width:170px">Fecha</th>
+          <th style="width:180px">Autor</th>
+          <th>Mensaje</th>
+          <th style="width:220px">Servicios</th>
+          <th style="width:120px">SHA</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="glb-viewer" class="panel">
+    <h2 style="margin-top:0;">Visor 3D (.glb)</h2>
+    <div id="viewer">
+      <div id="diag">Inicializando…</div>
+      <div class="viewer-hint">Arrastra para orbitar • Rueda para zoom</div>
+    </div>
+
+
+    <div class="exposure">
+      <label for="expo">Exposición:</label>
+      <input id="expo" type="range" min="0.6" max="2.0" step="0.05" value="1.35">
+      <span id="expoVal">1.35</span>
+    </div>
+    <details style="margin-top:10px;">
+      <summary>Ruta del modelo</summary>
+      <code>/models/robot.glb</code> 
+    </details>
+  </section>
+
+  <script>
+    // /api/hello
+    document.getElementById('btn').onclick = async () => {
+      const out = document.getElementById('out');
+      out.textContent = 'Consultando...';
+      try {
+        const r = await fetch('/api/hello');
+        const txt = await r.text();
+        out.textContent = txt;
+      } catch (e) {
+        out.textContent = 'Error: ' + e.message;
+      }
+    };
+
+    // Commits (igual que antes)
+    const svcKeywords = [
+      {key:'flask', label:'FLASK', cls:'FLASK'},
+      {key:'spring', label:'SpringBoot', cls:'SpringBoot'},
+      {key:'springboot', label:'SpringBoot', cls:'SpringBoot'},
+      {key:'node-red', label:'NodeRED', cls:'NodeRED'},
+      {key:'nodered', label:'NodeRED', cls:'NodeRED'},
+      {key:'kong', label:'Kong', cls:'Kong'},
+      {key:'prometheus', label:'Prometheus', cls:'Prometheus'},
+      {key:'grafana', label:'Grafana', cls:'Grafana'},
+      {key:'esp-idf', label:'ESPIDF', cls:'ESPIDF'},
+      {key:'espidf', label:'ESPIDF', cls:'ESPIDF'}
+    ];
+    function detectServices(msg){const m=(msg||'').toLowerCase();const found=[];for(const s of svcKeywords){if(m.includes(s.key)&&!found.some(x=>x.label===s.label))found.push({label:s.label,cls:s.cls})}return found;}
+    function fmtDate(iso){if(!iso)return'';try{const d=new Date(iso);return d.toLocaleString()}catch{return iso}}
+    function shaShort(sha){return sha?String(sha).slice(0,7):''}
+    function normalizeCommit(c){if(c&&c.commit){return{sha:c.sha||c.id,author:c.commit.author?.name||c.author?.name||c.committer?.name||'—',email:c.commit.author?.email||c.author?.email||'',date:c.commit.author?.date||c.commit.committer?.date||c.createdAt||c.date,message:c.commit.message||c.message||''}}return{sha:c?.sha||c?.id,author:c?.author||c?.committer||'—',email:c?.email||'',date:c?.date||c?.timestamp,message:c?.message||c?.title||''}}
+    function renderCommits(list){const tbody=document.querySelector('#commits-table tbody');tbody.innerHTML='';if(!list||!list.length){const tr=document.createElement('tr');const td=document.createElement('td');td.colSpan=5;td.className='muted';td.textContent='Sin commits para mostrar.';tr.appendChild(td);tbody.appendChild(tr);return}for(const raw of list){const c=normalizeCommit(raw);const tr=document.createElement('tr');const tdDate=document.createElement('td');tdDate.className='nowrap';tdDate.textContent=fmtDate(c.date);const tdAuthor=document.createElement('td');tdAuthor.innerHTML=`<div>${c.author||'—'}</div><div class="muted">${c.email||''}</div>`;const tdMsg=document.createElement('td');tdMsg.textContent=c.message||'—';const tdSvc=document.createElement('td');const badges=document.createElement('div');badges.className='badges';const found=detectServices(c.message);if(found.length===0){const b=document.createElement('span');b.className='badge';b.textContent='General';badges.appendChild(b)}else{for(const f of found){const b=document.createElement('span');b.className=`badge ${f.cls}`;b.textContent=f.label;badges.appendChild(b)}}tdSvc.appendChild(badges);const tdSha=document.createElement('td');tdSha.className='sha nowrap';tdSha.textContent=shaShort(c.sha);tr.appendChild(tdDate);tr.appendChild(tdAuthor);tr.appendChild(tdMsg);tr.appendChild(tdSvc);tr.appendChild(tdSha);tbody.appendChild(tr)}}
+    async function loadCommits(){const status=document.getElementById('commits-status');const repo=document.getElementById('repo').value?.trim();const url=repo?`/api/commits?repo=${encodeURIComponent(repo)}`:'/api/commits';status.textContent='Cargando commits...';try{const r=await fetch(url,{headers:{'Accept':'application/json'}});if(!r.ok)throw new Error(`HTTP ${r.status}`);const data=await r.json();const list=Array.isArray(data)?data:(data.items||[]);renderCommits(list);status.textContent=`Mostrando ${list.length} commits`}catch(e){status.textContent=`Error al cargar commits (${e.message}). Usando datos de ejemplo.`;renderCommits([{sha:"1234567",author:"TRIX Bot",email:"bot@trix.local",date:new Date().toISOString(),message:"Init dashboard y scraping Prometheus (grafana, prometheus, kong)"}])}}
+    document.getElementById('load-commits').addEventListener('click', loadCommits);
+  </script>
+
+  <!-- Three.js (desde esm.sh) -->
+  <script type="module">
+    import * as THREE from 'https://esm.sh/three@0.160.0';
+    import { OrbitControls } from 'https://esm.sh/three@0.160.0/examples/jsm/controls/OrbitControls.js?bundle';
+    import { GLTFLoader } from 'https://esm.sh/three@0.160.0/examples/jsm/loaders/GLTFLoader.js?bundle';
+    import { DRACOLoader } from 'https://esm.sh/three@0.160.0/examples/jsm/loaders/DRACOLoader.js?bundle';
+    import { KTX2Loader } from 'https://esm.sh/three@0.160.0/examples/jsm/loaders/KTX2Loader.js?bundle';
+    import { RoomEnvironment } from 'https://esm.sh/three@0.160.0/examples/jsm/environments/RoomEnvironment.js?bundle';  // ★ Entorno físico
+
+    const container = document.getElementById('viewer');
+    const diag = document.getElementById('diag');
+    const log = (m) => { diag.textContent = (diag.textContent ? diag.textContent + '\n' : '') + m; console.log('[viewer]', m); };
+
+    // Escena
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0f1115);
+
+    const camera = new THREE.PerspectiveCamera(60, container.clientWidth/container.clientHeight, 0.1, 2000);
+    camera.position.set(2.5, 1.8, 3.5);
+
+    const renderer = new THREE.WebGLRenderer({ antialias:true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+    // ★ Habilitar sombras + tone mapping más brillante
+    renderer.shadowMap.enabled = true;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.35; // controlable con el slider
+    container.appendChild(renderer.domElement);
+    log(`WebGL ok. drawCalls=${renderer.info.render.calls}`);
+
+    // ★ Entorno físico (rebotes difusos que "iluminan" materiales PBR)
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    const envTex = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    scene.environment = envTex;
+
+    // Luces (más potentes y varias fuentes)
+    const hemi = new THREE.HemisphereLight(0xffffff, 0x404040, 1.6);  // ↑ intensidad
+    scene.add(hemi);
+
+    const dir = new THREE.DirectionalLight(0xffffff, 1.8);
+    dir.position.set(5, 10, 7);
+    dir.castShadow = true;
+    dir.shadow.mapSize.set(2048, 2048);
+    scene.add(dir);
+
+    // ★ Luces de relleno suaves
+    const fill1 = new THREE.PointLight(0xffffff, 0.8, 0, 2);
+    fill1.position.set(-6, 4, 2);
+    scene.add(fill1);
+
+    const fill2 = new THREE.PointLight(0xffffff, 0.7, 0, 2);
+    fill2.position.set(4, 3, -5);
+    scene.add(fill2);
+
+    // Controles
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+
+    // Ayudas
+    scene.add(new THREE.GridHelper(10, 10, 0x555555, 0x222222));
+    scene.add(new THREE.AxesHelper(0.5));
+
+    // Fallback cubo
+    let fallbackShown = false;
+    function showFallbackCube(){
+      if (fallbackShown) return;
+      fallbackShown = true;
+      const geo = new THREE.BoxGeometry(1,1,1);
+      const mat = new THREE.MeshStandardMaterial({metalness:0.2, roughness:0.6, envMapIntensity:1.2});
+      const cube = new THREE.Mesh(geo, mat);
+      cube.castShadow = true;
+      cube.receiveShadow = true;
+      scene.add(cube);
+      log('Mostrando cubo de prueba (fallback). Render OK, el problema es la carga del GLB.');
+    }
+
+    // Loaders
+    const loader = new GLTFLoader();
+    loader.setCrossOrigin('anonymous');
+    loader.setWithCredentials(false);
+
+    const dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/');
+    loader.setDRACOLoader(dracoLoader);
+
+    const ktx2 = new KTX2Loader();
+    ktx2.setTranscoderPath('https://esm.sh/three@0.160.0/examples/jsm/libs/basis/');
+    ktx2.detectSupport(renderer);
+    loader.setKTX2Loader(ktx2);
+
+    const MODEL_URL = '/models/robot.glb';
+
+    // HEAD
+    try {
+      const head = await fetch(MODEL_URL, { method:'HEAD' });
+      if (!head.ok) {
+        log(`No se puede acceder a ${MODEL_URL} (HTTP ${head.status}). ¿Está el archivo dentro del JAR?`);
+      } else {
+        log(`Encontrado ${MODEL_URL} (Content-Type: ${head.headers.get('content-type')||'desconocido'})`);
+      }
+    } catch (e) {
+      log(`HEAD falló para ${MODEL_URL}: ${e?.message||e}`);
+    }
+
+    // Cargar GLB
+    log('Cargando ' + MODEL_URL + ' …');
+    loader.load(
+      MODEL_URL + `?v=${Date.now()}`,
+      (gltf) => {
+        const model = gltf.scene || gltf.scenes?.[0];
+        if (!model) { log('GLB sin escena'); return showFallbackCube(); }
+
+        // ★ Habilitar sombras y subir envMap en materiales PBR
+        model.traverse(obj => {
+          if (obj.isMesh) {
+            obj.castShadow = true;
+            obj.receiveShadow = true;
+            if (obj.material && obj.material.isMeshStandardMaterial) {
+              obj.material.envMapIntensity = 1.25;
+              obj.material.needsUpdate = true;
+            }
+          }
+        });
+
+        scene.add(model);
+
+        // Encadre automático
+        const box = new THREE.Box3().setFromObject(model);
+        const sizeV = box.getSize(new THREE.Vector3());
+        const center = box.getCenter(new THREE.Vector3());
+        model.position.sub(center);
+
+        const size = Math.max(sizeV.x, sizeV.y, sizeV.z) || 1;
+        const fitDist = size / (2 * Math.tan((Math.PI * camera.fov) / 360));
+        camera.position.set(fitDist * 1.3, fitDist * 0.8, fitDist * 1.3);
+        camera.lookAt(0, 0, 0);
+        controls.update();
+
+        log(`GLB cargado. size≈ ${sizeV.x.toFixed(2)} × ${sizeV.y.toFixed(2)} × ${sizeV.z.toFixed(2)}`);
+      },
+      (ev) => {
+        if (ev?.loaded && ev?.total) {
+          const p = Math.round((ev.loaded / ev.total) * 100);
+          if (p % 25 === 0) log(`Progreso GLB: ${p}%`);
+        }
+      },
+      (err) => {
+        const msg = (err && (err.message || err)) || 'Error desconocido';
+        log('Error cargando GLB: ' + msg + '\nRevisa la pestaña Network → /models/robot.glb (status, CORS, MIME).');
+        showFallbackCube();
+      }
+    );
+
+    // Resize
+    window.addEventListener('resize', () => {
+      const w = container.clientWidth, h = container.clientHeight;
+      camera.aspect = w/h; camera.updateProjectionMatrix();
+      renderer.setSize(w,h);
+    });
+
+    // ★ Slider de exposición (más luz global)
+    const expo = document.getElementById('expo');
+    const expoVal = document.getElementById('expoVal');
+    expo.addEventListener('input', () => {
+      renderer.toneMappingExposure = parseFloat(expo.value);
+      expoVal.textContent = expo.value;
+    });
+
+    // Loop
+    (function animate(){
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    })();
+  </script>
+{% endblock %}
+

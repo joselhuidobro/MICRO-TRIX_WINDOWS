@@ -1,0 +1,36 @@
+groups:
+- name: trix_performance
+  interval: 15s
+  rules:
+  # CPU % por host
+  - record: node:cpu_utilization_percent:avg1m
+    expr: 100 * (1 - avg by(instance)(irate(node_cpu_seconds_total{mode="idle"}[1m])))
+
+  # Load promedio a 1m normalizado por núcleos (útil en hosts multi-core)
+  - record: node:load1_norm
+    expr: node_load1 / count without(cpu,mode) (node_cpu_seconds_total{mode="idle"})
+
+  # Memoria usada %
+  - record: node:memory_used_percent
+    expr: 100 * (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes))
+
+  # Disco usado % (por filesystem)
+  - record: node:fs_used_percent
+    expr: 100 * (1 - (node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay"}))
+
+  # Red host: RX/TX bits/s (todas las interfaces físicas no localhost)
+  - record: node:net_rx_bits_per_sec
+    expr: 8 * sum by (instance, device) (irate(node_network_receive_bytes_total{device!~"lo"}[1m]))
+  - record: node:net_tx_bits_per_sec
+    expr: 8 * sum by (instance, device) (irate(node_network_transmit_bytes_total{device!~"lo"}[1m]))
+
+  # Contenedores (cAdvisor): CPU %, Memoria usada MB y Red bits/s por contenedor
+  - record: container:cpu_util_percent:avg1m
+    expr: 100 * sum by (name) (irate(container_cpu_usage_seconds_total{image!=""}[1m]))
+  - record: container:mem_working_set_mb
+    expr: sum by (name) (container_memory_working_set_bytes{image!=""}) / 1024 / 1024
+  - record: container:net_rx_bits_per_sec
+    expr: 8 * sum by (name) (irate(container_network_receive_bytes_total{image!=""}[1m]))
+  - record: container:net_tx_bits_per_sec
+    expr: 8 * sum by (name) (irate(container_network_transmit_bytes_total{image!=""}[1m]))
+

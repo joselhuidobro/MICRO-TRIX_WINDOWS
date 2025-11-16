@@ -1,0 +1,567 @@
+version: "3.9"
+
+# NOTA: Evita un .env global en la raíz del stack.
+# Cada servicio que lo necesite debe usar su propio archivo con `env_file:`.
+
+# ───────────────────────── Variables comunes ──────────────────────────
+x-env: &common_env
+  ROS_DOMAIN_ID: 0
+  UROS_AGENT_PORT: 9999
+
+networks:
+  trix-net:
+    driver: bridge
+  web-net:
+    driver: bridge
+
+volumes:
+  ccache:
+  ui_tmp:
+  node_red_data:
+  emqx_data:
+  emqx_log:
+  apg_certs:
+  apg_logs:
+  grafana_data:
+  redis_data:
+  prometheus_data:
+  wireguard_config:
+  knot_data:
+  pg_data:
+  caddy_config:
+  caddy_data:
+  hugo_public:       
+
+
+
+
+
+# ─────────────────────────── Servicios ────────────────────────────────
+services:
+  # 0) Broker MQTT (EMQX) ──────────────────────────────────────────────
+  emqx:
+    image: emqx:5
+    container_name: emqx_broker
+    networks: [trix-net]
+    environment:
+      - EMQX_NODE__NAME=emqx@127.0.0.1
+      - EMQX_DASHBOARD__DEFAULT_USERNAME=admin
+      - EMQX_DASHBOARD__DEFAULT_PASSWORD=trix1234
+      - EMQX_LISTENERS__TCP__DEFAULT__BIND=0.0.0.0:1883
+      - EMQX_LISTENERS__WS__DEFAULT__BIND=0.0.0.0:8083
+      - EMQX_MQTT__MAX_PACKET_SIZE=10MB
+    volumes:
+      - emqx_data:/opt/emqx/data
+      - emqx_log:/opt/emqx/log
+    ports:
+      - "1883:1883"
+      - "8083:8083"
+      - "18083:18083"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "sh", "-c", "nc -z 127.0.0.1 1883 || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 20
+
+  # 1) UI Flask  ───────────────────────────────────────────────────────
+  ui:
+    build:
+      context: ./2025_DOCKER-dronui
+    image: flask_ui_robot
+    container_name: flask_ui_encoder_robot
+    networks: [trix-net]
+    ports:
+      - "5000:5000"
+      - "5002:5002/udp"
+    environment:
+      - ROS_DISTRO=humble
+      - ROS_DOMAIN_ID=0
+      - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+      - ROS_LOCALHOST_ONLY=0
+      - PROJECT_PATH=/esp2024
+      - UDP_PORT=5002
+      - PYTHONUNBUFFERED=1
+      - FLASK_DEBUG=0
+      - MQTT_URL=mqtt://emqx:1883
+      - MQTT_WS_URL=ws://emqx:8083/mqtt
+      - MQTT_USER=admin
+      - MQTT_PASS=trix1234
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=trixredis123
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    entrypoint: ["/ros_entrypoint.sh"]
+    command: ["hypercorn","-b","0.0.0.0:5000","app:app"]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./2025_DOCKER-dronui:/app
+      - ui_tmp:/tmp
+    restart: always
+    stdin_open: true
+    tty: true
+    depends_on:
+      - emqx
+      - redis
+
+  net_sensor_cdmx:
+    build:
+      context: ./net-sensor
+    image: net-sensor:local
+    container_name: net_sensor_cdmx
+    network_mode: host
+    cap_add:
+      - NET_RAW
+    environment:
+      - REDIS_URL=redis://:trixredis123@127.0.0.1:6379/0
+      - REDIS_HOST=127.0.0.1
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=trixredis123
+      - REDIS_DB=0
+      - REDIS_KEY_DEVICES=trix:udp:devices:last
+      - LAN_NETS=192.168.0.0/24
+      - SUBNETS_EXTRA=192.168.0.0/24
+      - ARP_MAX_HOSTS=4096
+      - SENSOR_NAME=cdmx-lab
+    restart: unless-stopped
+
+
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres_trix
+    networks: [trix-net]
+    environment:
+      - POSTGRES_DB=trixdb
+      - POSTGRES_USER=trix
+      - POSTGRES_PASSWORD=trixpass
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - pg_data:/var/lib/postgresql/data/pgdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB -h 127.0.0.1 -p 5432 || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 20s
+    restart: unless-stopped
+
+
+
+  # (Nuevo) ERP — ahora con su propio .env aislado ─────────────────────
+  trix-erp:
+    build:
+      context: ./trix-erp
+
+    networks:               # 👈 ESTA clave va dentro del servicio
+      trix-net:             # 👈 nombre de la red definida a nivel top
+        aliases:
+          - trix-erp        # 👈 nombre que usa Kong en kong.yml
+    env_file:
+      - ./trix-erp/.env.trix_erp        # 👈 .env exclusivo de este servicio
+    environment:
+      - PORT=6800                       # overrides puntuales si hace falta
+    ports:
+      - "6800:6800"
+    restart: unless-stopped
+    volumes:
+      # Si tu app (Flask/FastAPI/etc.) usa python-dotenv dentro del contenedor,
+      # monta el mismo archivo como /app/.env (ajusta ruta si tu WORKDIR es otro):
+      - ./trix-erp/.env.trix_erp:/app/.env:ro
+    depends_on:
+      postgres:
+        condition: service_healthy 
+  
+  trixweb:
+    build:
+      context: ./trix-web
+    container_name: trix-pagina
+    user: "0:0"            
+    ports:
+      - "8030:8030"
+    tmpfs:
+      - /var/cache/nginx   
+      - /var/run            
+    volumes:
+      - ./trix-web/nginx/mime.types:/etc/nginx/mime.types:ro
+    networks: [trix-net]
+
+
+
+
+  # 2) Robot ESP-IDF + ROS 2 ───────────────────────────────────────────
+  robot_encoder:
+    build:
+      context: ./esp-docker-jetson-encoder_motor_ui
+      dockerfile: Dockerfile
+    image: ubuntu:robot_encoder
+    container_name: ros_relevadores_y_encoder
+    privileged: true
+    devices:
+      - "/dev/ttyUSB0:/dev/ttyUSB0"
+    environment:
+      <<: *common_env
+      RMW_IMPLEMENTATION: rmw_microxrcedds
+      IDF_PATH: /opt/esp-idf
+    volumes:
+      - /dev/bus/usb:/dev/bus/usb
+      - /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0:/dev/ttyUSB0
+      - ./esp-docker-jetson-encoder_motor_ui/main:/esp2024/main
+      - ./esp-docker-jetson-encoder_motor_ui/components:/esp2024/components
+      - ccache:/ccache
+      - /opt/vc/lib:/opt/vc/lib
+    networks: [trix-net]
+    stdin_open: true
+    tty: true
+    restart: "no"
+    group_add:
+      - dialout
+
+  # 3) micro-ROS Agent ─────────────────────────────────────────────────
+  micro_ros_agent_hmi:
+    image: microros/micro-ros-agent:humble
+    container_name: micro_ros_agent_HMI2
+    networks: [trix-net]
+    command: ["udp4","--port","9999","-v6"]
+    ports:
+      - "9999:9999/udp"
+    environment:
+      - ROS_DOMAIN_ID=0
+      - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+      - ROS_LOCALHOST_ONLY=0
+    restart: unless-stopped
+
+  # 4) Node-RED ────────────────────────────────────────────────────────
+  node_red:
+    build:
+      context: ./node-red
+    image: trix/node-red:latest
+    container_name: node_red_trix
+    networks: [trix-net]
+    environment:
+      - TZ=America/Mexico_City
+      - FLOWS=flows.json
+      - NODE_OPTIONS=--max-old-space-size=256
+      - MQTT_BROKER_HOST=emqx
+      - MQTT_BROKER_PORT=1883
+      - MQTT_USER=admin
+      - MQTT_PASS=trix1234
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=trixredis123
+    volumes:
+      - node_red_data:/data
+    ports:
+      - "1880:1880"
+    restart: unless-stopped
+    depends_on:
+      - emqx
+      - ui
+      - redis
+
+  # 5) API Spring Boot ────────────────────────────────────────────────
+  springboot_api:
+    build:
+      context: ./springboot-app
+      dockerfile: Dockerfile
+      args:
+        JAVA_VERSION: 21
+    image: trix/springboot-api:latest
+    container_name: springboot_api
+    networks: [trix-net]
+    environment:
+      - JAVA_OPTS=-Xms256m -Xmx512m
+      - SERVER_PORT=8080
+      - MQTT_BROKER_URL=tcp://emqx:1883
+      - MQTT_USER=admin
+      - MQTT_PASS=trix1234
+      - CONTAINER_BACKEND=docker
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=trixredis123
+    volumes:
+      - ./springboot-app/src/main/resources/static/models:/app/models:ro
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    depends_on:
+      - emqx
+      - redis
+
+  # 6) Kong (DB-less) ─────────────────────────────────────────────────
+  kong:
+    build:
+      context: ./kong
+    image: trix/kong:latest
+    container_name: kong_db_less
+    networks: [trix-net]
+    volumes:
+      - ./kong/kong.yml:/etc/kong/kong.yml:ro
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: "/etc/kong/kong.yml"
+      KONG_STATUS_LISTEN: "0.0.0.0:8100"
+      KONG_PROXY_LISTEN: "0.0.0.0:8000"
+      KONG_ADMIN_LISTEN: "off"
+      KONG_PROXY_ACCESS_LOG: "/dev/stdout"
+      KONG_PROXY_ERROR_LOG: "/dev/stderr"
+      KONG_PROXY_STREAM_ACCESS_LOG: "/dev/stdout basic"
+      KONG_PROXY_STREAM_ERROR_LOG: "/dev/stderr"
+      KONG_DNS_ORDER: "LAST,A,CNAME,SRV"
+    ports:
+      - "30080:8000"
+      - "8100:8100"
+    depends_on:
+      - ui
+      - micro_ros_agent_hmi
+    restart: unless-stopped
+
+  kiali:
+    build:
+      context: ./kiali
+    container_name: kiali
+    environment:
+      - CONFIG_FILE=/opt/kiali/config.yaml
+    command: ["-config","/opt/kiali/config.yaml"]
+    volumes:
+      - /home/jose/.kube:/home/kiali/.kube:ro
+      - ./kiali/config.yaml:/opt/kiali/config.yaml:ro
+    ports:
+      - "20001:20001"
+    depends_on:
+      - prometheus
+      - grafana
+    networks: [trix-net]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS -o /dev/null -w '%{http_code}' http://localhost:20001/kiali/ | egrep -q '^(200|302)$'"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # 7) Grafana ───────────────────────────────────────────────────────
+  grafana:
+    image: grafana/grafana:10.4.6
+    container_name: grafana_trix
+    networks: [trix-net]
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=trix1234
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_ROOT_URL=http://localhost:30080/grafana
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+      - GF_METRICS_ENABLED=true
+      - GF_SERVER_HTTP_ADDR=0.0.0.0
+      - GF_SERVER_HTTP_PORT=3000
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    depends_on:
+      - emqx
+
+  # 8) Redis ──────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: redis_trix
+    networks: [trix-net]
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "trixredis123"]
+    environment:
+      - REDIS_PASSWORD=trixredis123
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a $$REDIS_PASSWORD ping | grep PONG"]
+      interval: 10s
+      timeout: 3s
+      retries: 20
+
+     # 8.1) Redis Exporter ────────────────────────────────────────────────
+  redis_exporter:
+    image: oliver006/redis_exporter:latest
+    container_name: redis_exporter
+    networks: [trix-net]
+    environment:
+      # Usa la URL interna del servicio Redis (con password)
+      REDIS_ADDR: "redis://:trixredis123@redis:6379"
+      # Si quieres habilitar métricas de latencia por comando:
+      # REDIS_EXPORTER_DEBUG: "false"
+      # REDIS_EXPORTER_INCL_SYSTEM_METRICS: "true"
+    ports:
+      - "9121:9121"   # expone /metrics
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+
+
+
+  # 9) Prometheus ─────────────────────────────────────────────────────
+  prometheus:
+    build:
+      context: ./prometheus
+    image: trix/prometheus:latest
+    container_name: prometheus_trix
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks: [trix-net]
+    volumes:
+      - prometheus_data:/prometheus
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+    depends_on:
+      - grafana
+      - kong
+      - emqx
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.enable-lifecycle
+      - --web.cors.origin=http://localhost:30080
+
+  node_exporter:
+    image: prom/node-exporter:v1.8.1
+    container_name: node_exporter
+    networks: [trix-net]
+    pid: host
+    restart: unless-stopped
+    command: ['--path.rootfs=/host']
+ 
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    container_name: cadvisor
+    networks: [trix-net]
+    restart: unless-stopped
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+
+
+
+ 
+
+  # 10) Git (observación) ─────────────────────────────────────────────
+  git:
+    build:
+      context: ./git
+    image: alpine/git:latest
+    container_name: git_observer
+    networks:
+      trix-net:
+        aliases: [git]
+    environment:
+      GIT_AUTHOR_NAME: "TRIX Bot"
+      GIT_AUTHOR_EMAIL: "bot@trix.local"
+      GIT_COMMITTER_NAME: "TRIX Bot"
+      GIT_COMMITTER_EMAIL: "bot@trix.local"
+    volumes:
+      - ./springboot-app/src/main/resources/static/models:/repo
+      - ./git/data:/data
+    command: ["sh", "-c", "sleep infinity"]
+    ports:
+      - "7011:7011"
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+
+
+
+  knot:
+    build:
+      context: ./knot_dns
+    container_name: knot
+    restart: unless-stopped
+    ports:
+      - "1053:1053/udp"
+      - "1053:1053/tcp"
+
+    volumes:
+      - ./knot_dns/knot.conf:/etc/knot/knot.conf:ro
+      - ./knot_dns/zones:/zones:ro
+      - knot_data:/var/lib/knot
+    cap_add:
+      - NET_BIND_SERVICE   # opcional aquí; no es estrictamente necesario con 1053
+    healthcheck:
+      test: ["CMD", "kdig", "@127.0.0.1", "-p", "1053", "example.test", "SOA", "+time=2", "+retry=0"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    networks: [trix-net]
+
+
+  hugo_build:
+   build:
+    context: ./hugo_builder
+    args:
+      HUGO_VERSION: "0.135.0"
+   platform: linux/arm64/v8
+   container_name: hugo_build
+   working_dir: /src
+   command: ["sh","-lc","cd /src && hugo --minify --cleanDestinationDir --destination /public"]
+   volumes:
+    - ./trix-web:/src
+    - hugo_public:/public
+   networks: [web-net]
+   restart: "no"
+   pull_policy: never
+
+ 
+
+  
+  # 2) Caddy público (sirve el sitio y proxys opcionales) ────────────
+  caddy:
+    build:
+      context: ./caddy
+    container_name: caddy_public
+    depends_on:
+      - hugo_build
+    networks:
+      - web-net
+      - trix-net        # útil si luego proxéas servicios internos (/grafana, /prometheus)
+    ports:
+      - "80:80"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+      - hugo_public:/srv:ro      # aquí Caddy ve tu sitio estático
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL","curl -fsS http://localhost/ >/dev/null"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  cloudflare_tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflare_tunnel     # ← añade esto
+    network_mode: "host"
+    command: tunnel --no-autoupdate --url http://127.0.0.1:8030
+    restart: unless-stopped
+    depends_on:
+      - trixweb   # (tu servicio "trix-pagina")
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,185 @@
+[3.266s] DEBUG:colcon:Command line arguments: ['/usr/bin/colcon', 'build', '--symlink-install', '--packages-select', 'robotio_description', 'robotio_bridge']
+[3.266s] DEBUG:colcon:Parsed command line arguments: Namespace(log_base=None, log_level=None, verb_name='build', build_base='build', install_base='install', merge_install=False, symlink_install=True, test_result_base=None, continue_on_error=False, executor='parallel', parallel_workers=4, event_handlers=None, ignore_user_meta=False, metas=['./colcon.meta'], base_paths=['.'], packages_ignore=None, packages_ignore_regex=None, paths=None, packages_up_to=None, packages_up_to_regex=None, packages_above=None, packages_above_and_dependencies=None, packages_above_depth=None, packages_select_by_dep=None, packages_skip_by_dep=None, packages_skip_up_to=None, packages_select_build_failed=False, packages_skip_build_finished=False, packages_select_test_failures=False, packages_skip_test_passed=False, packages_select=['robotio_description', 'robotio_bridge'], packages_skip=None, packages_select_regex=None, packages_skip_regex=None, packages_start=None, packages_end=None, cmake_args=None, cmake_target=None, cmake_target_skip_unavailable=False, cmake_clean_cache=False, cmake_clean_first=False, cmake_force_configure=False, ament_cmake_args=None, catkin_cmake_args=None, catkin_skip_building_tests=False, mixin_files=None, mixin=None, verb_parser=<colcon_mixin.mixin.mixin_argument.MixinArgumentDecorator object at 0x7f0d04b4f940>, verb_extension=<colcon_core.verb.build.BuildVerb object at 0x7f0d04b4eec0>, main=<bound method BuildVerb.main of <colcon_core.verb.build.BuildVerb object at 0x7f0d04b4eec0>>, mixin_verb=('build',))
+[7.093s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) check parameters
+[7.111s] INFO:colcon.colcon_metadata.package_discovery.colcon_meta:Using configuration from '/root/.colcon/metadata/default/Gazebo.meta'
+[7.114s] INFO:colcon.colcon_metadata.package_discovery.colcon_meta:Using configuration from '/root/.colcon/metadata/default/fastdds.meta'
+[7.117s] INFO:colcon.colcon_metadata.package_discovery.colcon_meta:Using configuration from '/root/.colcon/metadata/default/fastrtps.meta'
+[7.117s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) check parameters
+[7.117s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) check parameters
+[7.117s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) check parameters
+[7.117s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) discover
+[7.117s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) discover
+[7.118s] INFO:colcon.colcon_core.package_discovery:Crawling recursively for packages in '/ws'
+[7.118s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ignore', 'ignore_ament_install']
+[7.118s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore'
+[7.119s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore_ament_install'
+[7.119s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_pkg']
+[7.119s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_pkg'
+[7.119s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_meta']
+[7.119s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_meta'
+[7.120s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ros']
+[7.120s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ros'
+[7.223s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['cmake', 'python']
+[7.223s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'cmake'
+[7.223s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python'
+[7.223s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['python_setup_py']
+[7.223s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python_setup_py'
+[7.223s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extensions ['ignore', 'ignore_ament_install']
+[7.223s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extension 'ignore'
+[7.223s] Level 1:colcon.colcon_core.package_identification:_identify(build) ignored
+[7.224s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extensions ['ignore', 'ignore_ament_install']
+[7.224s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extension 'ignore'
+[7.224s] Level 1:colcon.colcon_core.package_identification:_identify(install) ignored
+[7.224s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extensions ['ignore', 'ignore_ament_install']
+[7.224s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extension 'ignore'
+[7.224s] Level 1:colcon.colcon_core.package_identification:_identify(log) ignored
+[7.245s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['ignore', 'ignore_ament_install']
+[7.245s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ignore'
+[7.245s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ignore_ament_install'
+[7.246s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['colcon_pkg']
+[7.246s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'colcon_pkg'
+[7.246s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['colcon_meta']
+[7.246s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'colcon_meta'
+[7.246s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['ros']
+[7.246s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ros'
+[7.247s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['cmake', 'python']
+[7.247s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'cmake'
+[7.247s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'python'
+[7.247s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['python_setup_py']
+[7.247s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'python_setup_py'
+[7.248s] Level 1:colcon.colcon_core.package_identification:_identify(src/robotio_bridge) by extensions ['ignore', 'ignore_ament_install']
+[7.248s] Level 1:colcon.colcon_core.package_identification:_identify(src/robotio_bridge) by extension 'ignore'
+[7.248s] Level 1:colcon.colcon_core.package_identification:_identify(src/robotio_bridge) by extension 'ignore_ament_install'
+[7.249s] Level 1:colcon.colcon_core.package_identification:_identify(src/robotio_bridge) by extensions ['colcon_pkg']
+[7.249s] Level 1:colcon.colcon_core.package_identification:_identify(src/robotio_bridge) by extension 'colcon_pkg'
+[7.249s] Level 1:colcon.colcon_core.package_identification:_identify(src/robotio_bridge) by extensions ['colcon_meta']
+[7.249s] Level 1:colcon.colcon_core.package_identification:_identify(src/robotio_bridge) by extension 'colcon_meta'
+[7.249s] Level 1:colcon.colcon_core.package_identification:_identify(src/robotio_bridge) by extensions ['ros']
+[7.249s] Level 1:colcon.colcon_core.package_identification:_identify(src/robotio_bridge) by extension 'ros'
+[7.299s] DEBUG:colcon.colcon_core.package_identification:Package 'src/robotio_bridge' with type 'ros.ament_python' and name 'robotio_bridge'
+[7.300s] Level 1:colcon.colcon_core.package_identification:_identify(src/robotio_description) by extensions ['ignore', 'ignore_ament_install']
+[7.300s] Level 1:colcon.colcon_core.package_identification:_identify(src/robotio_description) by extension 'ignore'
+[7.300s] Level 1:colcon.colcon_core.package_identification:_identify(src/robotio_description) by extension 'ignore_ament_install'
+[7.301s] Level 1:colcon.colcon_core.package_identification:_identify(src/robotio_description) by extensions ['colcon_pkg']
+[7.301s] Level 1:colcon.colcon_core.package_identification:_identify(src/robotio_description) by extension 'colcon_pkg'
+[7.301s] Level 1:colcon.colcon_core.package_identification:_identify(src/robotio_description) by extensions ['colcon_meta']
+[7.301s] Level 1:colcon.colcon_core.package_identification:_identify(src/robotio_description) by extension 'colcon_meta'
+[7.301s] Level 1:colcon.colcon_core.package_identification:_identify(src/robotio_description) by extensions ['ros']
+[7.302s] Level 1:colcon.colcon_core.package_identification:_identify(src/robotio_description) by extension 'ros'
+[7.304s] DEBUG:colcon.colcon_core.package_identification:Package 'src/robotio_description' with type 'ros.ament_python' and name 'robotio_description'
+[7.304s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) using defaults
+[7.304s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) discover
+[7.304s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) using defaults
+[7.304s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) discover
+[7.304s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) using defaults
+[7.611s] Level 5:colcon.colcon_core.verb:set package 'robotio_bridge' build argument 'cmake_args' from command line to 'None'
+[7.611s] Level 5:colcon.colcon_core.verb:set package 'robotio_bridge' build argument 'cmake_target' from command line to 'None'
+[7.611s] Level 5:colcon.colcon_core.verb:set package 'robotio_bridge' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[7.611s] Level 5:colcon.colcon_core.verb:set package 'robotio_bridge' build argument 'cmake_clean_cache' from command line to 'False'
+[7.611s] Level 5:colcon.colcon_core.verb:set package 'robotio_bridge' build argument 'cmake_clean_first' from command line to 'False'
+[7.611s] Level 5:colcon.colcon_core.verb:set package 'robotio_bridge' build argument 'cmake_force_configure' from command line to 'False'
+[7.611s] Level 5:colcon.colcon_core.verb:set package 'robotio_bridge' build argument 'ament_cmake_args' from command line to 'None'
+[7.612s] Level 5:colcon.colcon_core.verb:set package 'robotio_bridge' build argument 'catkin_cmake_args' from command line to 'None'
+[7.612s] Level 5:colcon.colcon_core.verb:set package 'robotio_bridge' build argument 'catkin_skip_building_tests' from command line to 'False'
+[7.612s] DEBUG:colcon.colcon_core.verb:Building package 'robotio_bridge' with the following arguments: {'ament_cmake_args': None, 'build_base': '/ws/build/robotio_bridge', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/ws/install/robotio_bridge', 'merge_install': False, 'path': '/ws/src/robotio_bridge', 'symlink_install': True, 'test_result_base': None}
+[7.614s] Level 5:colcon.colcon_core.verb:set package 'robotio_description' build argument 'cmake_args' from command line to 'None'
+[7.614s] Level 5:colcon.colcon_core.verb:set package 'robotio_description' build argument 'cmake_target' from command line to 'None'
+[7.614s] Level 5:colcon.colcon_core.verb:set package 'robotio_description' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[7.614s] Level 5:colcon.colcon_core.verb:set package 'robotio_description' build argument 'cmake_clean_cache' from command line to 'False'
+[7.614s] Level 5:colcon.colcon_core.verb:set package 'robotio_description' build argument 'cmake_clean_first' from command line to 'False'
+[7.614s] Level 5:colcon.colcon_core.verb:set package 'robotio_description' build argument 'cmake_force_configure' from command line to 'False'
+[7.614s] Level 5:colcon.colcon_core.verb:set package 'robotio_description' build argument 'ament_cmake_args' from command line to 'None'
+[7.614s] Level 5:colcon.colcon_core.verb:set package 'robotio_description' build argument 'catkin_cmake_args' from command line to 'None'
+[7.614s] Level 5:colcon.colcon_core.verb:set package 'robotio_description' build argument 'catkin_skip_building_tests' from command line to 'False'
+[7.614s] DEBUG:colcon.colcon_core.verb:Building package 'robotio_description' with the following arguments: {'ament_cmake_args': None, 'build_base': '/ws/build/robotio_description', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/ws/install/robotio_description', 'merge_install': False, 'path': '/ws/src/robotio_description', 'symlink_install': True, 'test_result_base': None}
+[7.614s] INFO:colcon.colcon_core.executor:Executing jobs using 'parallel' executor
+[7.617s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete
+[7.617s] INFO:colcon.colcon_ros.task.ament_python.build:Building ROS package in '/ws/src/robotio_bridge' with build type 'ament_python'
+[7.617s] Level 1:colcon.colcon_core.shell:create_environment_hook('robotio_bridge', 'ament_prefix_path')
+[7.675s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_core.shell.bat': Not used on non-Windows systems
+[7.676s] INFO:colcon.colcon_core.shell:Creating environment hook '/ws/install/robotio_bridge/share/robotio_bridge/hook/ament_prefix_path.ps1'
+[7.678s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/ws/install/robotio_bridge/share/robotio_bridge/hook/ament_prefix_path.dsv'
+[7.680s] INFO:colcon.colcon_core.shell:Creating environment hook '/ws/install/robotio_bridge/share/robotio_bridge/hook/ament_prefix_path.sh'
+[7.683s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[7.683s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[7.703s] INFO:colcon.colcon_ros.task.ament_python.build:Building ROS package in '/ws/src/robotio_description' with build type 'ament_python'
+[7.703s] Level 1:colcon.colcon_core.shell:create_environment_hook('robotio_description', 'ament_prefix_path')
+[7.704s] INFO:colcon.colcon_core.shell:Creating environment hook '/ws/install/robotio_description/share/robotio_description/hook/ament_prefix_path.ps1'
+[7.705s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/ws/install/robotio_description/share/robotio_description/hook/ament_prefix_path.dsv'
+[7.706s] INFO:colcon.colcon_core.shell:Creating environment hook '/ws/install/robotio_description/share/robotio_description/hook/ament_prefix_path.sh'
+[7.707s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[7.707s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[8.191s] INFO:colcon.colcon_core.task.python.build:Building Python package in '/ws/src/robotio_bridge'
+[8.192s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[8.192s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[8.638s] INFO:colcon.colcon_core.task.python.build:Building Python package in '/ws/src/robotio_description'
+[8.640s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[8.640s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[10.176s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/ws/build/robotio_bridge': PYTHONPATH=/ws/build/robotio_bridge/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/ws/install/robotio_bridge/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /ws/build/robotio_bridge/build --no-deps symlink_data
+[10.246s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/ws/build/robotio_description': PYTHONPATH=/ws/build/robotio_description/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/ws/install/robotio_description/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /ws/build/robotio_description/build --no-deps symlink_data
+[11.044s] Level 1:colcon.colcon_core.shell:create_environment_hook('robotio_description', 'pythonpath_develop')
+[11.044s] INFO:colcon.colcon_core.shell:Creating environment hook '/ws/build/robotio_description/share/robotio_description/hook/pythonpath_develop.ps1'
+[11.045s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/ws/build/robotio_description' returned '0': PYTHONPATH=/ws/build/robotio_description/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/ws/install/robotio_description/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /ws/build/robotio_description/build --no-deps symlink_data
+[11.046s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/ws/build/robotio_description/share/robotio_description/hook/pythonpath_develop.dsv'
+[11.047s] INFO:colcon.colcon_core.shell:Creating environment hook '/ws/build/robotio_description/share/robotio_description/hook/pythonpath_develop.sh'
+[11.120s] Level 1:colcon.colcon_core.environment:checking '/ws/install/robotio_description' for CMake module files
+[11.121s] Level 1:colcon.colcon_core.environment:checking '/ws/install/robotio_description' for CMake config files
+[11.123s] Level 1:colcon.colcon_core.environment:checking '/ws/install/robotio_description/lib'
+[11.124s] Level 1:colcon.colcon_core.environment:checking '/ws/install/robotio_description/bin'
+[11.124s] Level 1:colcon.colcon_core.environment:checking '/ws/install/robotio_description/lib/pkgconfig/robotio_description.pc'
+[11.125s] Level 1:colcon.colcon_core.environment:checking '/ws/install/robotio_description/lib/python3.10/site-packages'
+[11.125s] Level 1:colcon.colcon_core.shell:create_environment_hook('robotio_description', 'pythonpath')
+[11.126s] INFO:colcon.colcon_core.shell:Creating environment hook '/ws/install/robotio_description/share/robotio_description/hook/pythonpath.ps1'
+[11.127s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/ws/install/robotio_description/share/robotio_description/hook/pythonpath.dsv'
+[11.128s] INFO:colcon.colcon_core.shell:Creating environment hook '/ws/install/robotio_description/share/robotio_description/hook/pythonpath.sh'
+[11.130s] Level 1:colcon.colcon_core.environment:checking '/ws/install/robotio_description/bin'
+[11.130s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(robotio_description)
+[11.131s] INFO:colcon.colcon_core.shell:Creating package script '/ws/install/robotio_description/share/robotio_description/package.ps1'
+[11.135s] INFO:colcon.colcon_core.shell:Creating package descriptor '/ws/install/robotio_description/share/robotio_description/package.dsv'
+[11.145s] INFO:colcon.colcon_core.shell:Creating package script '/ws/install/robotio_description/share/robotio_description/package.sh'
+[11.147s] INFO:colcon.colcon_core.shell:Creating package script '/ws/install/robotio_description/share/robotio_description/package.bash'
+[11.171s] INFO:colcon.colcon_core.shell:Creating package script '/ws/install/robotio_description/share/robotio_description/package.zsh'
+[11.199s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/ws/install/robotio_description/share/colcon-core/packages/robotio_description)
+[11.203s] Level 1:colcon.colcon_core.shell:create_environment_hook('robotio_bridge', 'pythonpath_develop')
+[11.204s] INFO:colcon.colcon_core.shell:Creating environment hook '/ws/build/robotio_bridge/share/robotio_bridge/hook/pythonpath_develop.ps1'
+[11.206s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/ws/build/robotio_bridge' returned '0': PYTHONPATH=/ws/build/robotio_bridge/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/ws/install/robotio_bridge/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /ws/build/robotio_bridge/build --no-deps symlink_data
+[11.207s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/ws/build/robotio_bridge/share/robotio_bridge/hook/pythonpath_develop.dsv'
+[11.207s] INFO:colcon.colcon_core.shell:Creating environment hook '/ws/build/robotio_bridge/share/robotio_bridge/hook/pythonpath_develop.sh'
+[11.208s] Level 1:colcon.colcon_core.environment:checking '/ws/install/robotio_bridge' for CMake module files
+[11.209s] Level 1:colcon.colcon_core.environment:checking '/ws/install/robotio_bridge' for CMake config files
+[11.210s] Level 1:colcon.colcon_core.environment:checking '/ws/install/robotio_bridge/lib'
+[11.210s] Level 1:colcon.colcon_core.environment:checking '/ws/install/robotio_bridge/bin'
+[11.210s] Level 1:colcon.colcon_core.environment:checking '/ws/install/robotio_bridge/lib/pkgconfig/robotio_bridge.pc'
+[11.211s] Level 1:colcon.colcon_core.environment:checking '/ws/install/robotio_bridge/lib/python3.10/site-packages'
+[11.211s] Level 1:colcon.colcon_core.shell:create_environment_hook('robotio_bridge', 'pythonpath')
+[11.211s] INFO:colcon.colcon_core.shell:Creating environment hook '/ws/install/robotio_bridge/share/robotio_bridge/hook/pythonpath.ps1'
+[11.212s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/ws/install/robotio_bridge/share/robotio_bridge/hook/pythonpath.dsv'
+[11.213s] INFO:colcon.colcon_core.shell:Creating environment hook '/ws/install/robotio_bridge/share/robotio_bridge/hook/pythonpath.sh'
+[11.214s] Level 1:colcon.colcon_core.environment:checking '/ws/install/robotio_bridge/bin'
+[11.214s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(robotio_bridge)
+[11.216s] INFO:colcon.colcon_core.shell:Creating package script '/ws/install/robotio_bridge/share/robotio_bridge/package.ps1'
+[11.217s] INFO:colcon.colcon_core.shell:Creating package descriptor '/ws/install/robotio_bridge/share/robotio_bridge/package.dsv'
+[11.218s] INFO:colcon.colcon_core.shell:Creating package script '/ws/install/robotio_bridge/share/robotio_bridge/package.sh'
+[11.219s] INFO:colcon.colcon_core.shell:Creating package script '/ws/install/robotio_bridge/share/robotio_bridge/package.bash'
+[11.220s] INFO:colcon.colcon_core.shell:Creating package script '/ws/install/robotio_bridge/share/robotio_bridge/package.zsh'
+[11.220s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/ws/install/robotio_bridge/share/colcon-core/packages/robotio_bridge)
+[11.221s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:closing loop
+[11.222s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:loop closed
+[11.223s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete finished with '0'
+[11.223s] DEBUG:colcon.colcon_core.event_reactor:joining thread
+[11.523s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.notify_send': Could not find 'notify-send'
+[11.524s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.terminal_notifier': Not used on non-Darwin systems
+[11.524s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.win32': Not used on non-Windows systems
+[11.524s] INFO:colcon.colcon_notification.desktop_notification:Sending desktop notification using 'notify2'
+[11.524s] DEBUG:colcon.colcon_notification.desktop_notification.notify2:Failed to initialize notify2: org.freedesktop.DBus.Error.NotSupported: Unable to autolaunch a dbus-daemon without a $DISPLAY for X11
+[11.524s] DEBUG:colcon.colcon_core.event_reactor:joined thread
+[11.525s] INFO:colcon.colcon_core.shell:Creating prefix script '/ws/install/local_setup.ps1'
+[11.536s] INFO:colcon.colcon_core.shell:Creating prefix util module '/ws/install/_local_setup_util_ps1.py'
+[11.550s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/ws/install/setup.ps1'
+[11.558s] INFO:colcon.colcon_core.shell:Creating prefix script '/ws/install/local_setup.sh'
+[11.561s] INFO:colcon.colcon_core.shell:Creating prefix util module '/ws/install/_local_setup_util_sh.py'
+[11.563s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/ws/install/setup.sh'
+[11.567s] INFO:colcon.colcon_core.shell:Creating prefix script '/ws/install/local_setup.bash'
+[11.580s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/ws/install/setup.bash'
+[11.583s] INFO:colcon.colcon_core.shell:Creating prefix script '/ws/install/local_setup.zsh'
+[11.585s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/ws/install/setup.zsh'

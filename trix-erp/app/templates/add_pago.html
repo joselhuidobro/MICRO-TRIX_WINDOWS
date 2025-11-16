@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %} Agregar contacto {% endblock %}
+
+{% block body %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tablas.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/formulario.css') }}">
+
+ 
+{% with messages = get_flashed_messages () %}
+{% if messages %}
+{% for message in messages %}
+    <p>{{message}}</p>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+ 
+ <form action="/agregar_pago" method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    
+      <p>Agregar</p>
+
+      <input type="text" name="Semana" placeholder="Semana">
+       <input type="text" name="Concepto" placeholder="Concepto">
+       <input type="text" name="Cantidad" placeholder="Cantidad">
+       <input type="text" name="Precio_Unitario" placeholder="Precio Unitario">
+       <input type="text" name="T_bruto" placeholder="Total Bruto">
+       <input type="text" name="iva" placeholder="iva">
+       <input type="text" name="T_neto" placeholder="Total Neto">
+     
+       <input type="text" name="Fecha" placeholder="Fecha"  id="fecha" readonly>
+       <select id="Categoria" name="Categoria" placeholder="Categoria">
+                      <option value="Nomina">Nómina</option>
+                      <option value="Comision">Comision</option>
+                      <option value="Motor">Ferretería</option>
+                      <option value="Mtto">Taller</option>
+                      <option value="Taller">Electronica</option>
+                      <option value="Ajuste">Herramienta</option>
+                      <option value="Refacción">Motor</option>
+                      <option value="Herreria">Herreria</option>
+                      <option value="Electronica">Fierro</option>
+                      <option value="Rodamientos">Rodamientos y Tejuelos/Biveles</option>
+                      <option value="Diesel">Diesel</option>
+                      <option value="Gasolina">Gasolina</option>   
+                      <option value="Transporte">Transporte</option>   
+                      <option value="Salidas_proveedores">Salidas para pagos a proveedores</option>    
+                      <option value="Salidas_gastos_administrativos">Salidas para gastos generales y administrativos</option> 
+                      <option value="Salidas_intereses">Salidas por intereses</option> 
+                      <option value="Salidas_impuestos">Salidas por impuestos</option> 
+                      <option value="Seguro_social">Seguro Social</option> 
+                      
+                           
+        </select>
+       <input type="text" name="Proveedor" placeholder="Proveedor">
+       <select id="Forma_de_pago" name="Forma_de_pago" placeholder="Forma de pago">
+        <option value="Transferencia">Transferencia</option>
+        <option value="Efectivo">Efectivo</option>
+       </select>
+       
+                
+<button type="submit">Guardar </button>
+<button type="button">Cierre de semana</button>
+  
+    </form>
+
+<script>
+    document.getElementById("fecha").value = new Date().toISOString().slice(0, 10);
+</script>
+
+
+
+
+<h1>Tabla de Pagos Semana Actual </h1>
+
+<table Class="Tabla">
+    <thead>
+        <tr> 
+            <th>ID</th>
+            <th>Semana</th>
+            <th>Concepto</th>
+            <th>Cantidad</th>
+            <th>Precio Unitario</th>
+            <th>Total Bruto</th>
+            <th>iva</th>
+            <th>Total neto</th>
+            <th>Fecha</th>
+            <th>Categoria</th>
+            <th>Proveedor</th>
+            <th>Forma de pago</th>
+            <th>Acción</th>
+          </tr>
+    </thead>
+<tbody>
+    {% for semana in semanas_p %}
+      <tr>
+        <td>{{semana.0}}</td>
+        <td>{{semana.1}}</td>
+        <td>{{semana.2}}</td>
+        <td>{{semana.3}}</td>
+        <td>{{semana.4}}</td>
+        <td>{{semana.5}}</td>
+        <td>{{semana.6}}</td>
+        <td>{{semana.7}}</td>
+        <td>{{semana.8}}</td>
+        <td>{{semana.9}}</td>
+        <td>{{semana.10}}</td>
+        <td>{{semana.11}}</td>
+
+        
+      <td>
+        <form action="/edit_p/{{semana.0}}" method="GET"  style="display:inline;">
+          <button type="submit">Editar</button>
+      </form>
+      
+      <form action="/borrar_pago/{{semana.0}}" method="POST"  style="display:inline;">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit">Borrar</button>
+      </form>
+      </td>
+
+
+</tr>
+
+    {% endfor%}
+</tbody>
+
+</table>
+
+{% endblock %}

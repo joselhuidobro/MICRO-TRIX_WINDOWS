@@ -1,0 +1,23 @@
+[Interface]
+Address    = {{ wg_address }}
+ListenPort = {{ wg_listen_port }}
+PrivateKey = {{ wg_private_key }}
+MTU        = {{ wg_mtu }}
+
+# ---- NAT/forward con iptables (Jetson) ----
+PostUp   = iptables -t nat -A POSTROUTING -o {{ wg_nat_egress_iface_final }} -j MASQUERADE
+PostUp   = iptables -A FORWARD -i {{ wg_interface }} -o {{ wg_nat_egress_iface_final }} -j ACCEPT
+PostUp   = iptables -A FORWARD -i {{ wg_nat_egress_iface_final }} -o {{ wg_interface }} -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+
+# Usa PreDown para borrar y que no truene si ya no existen (|| true)
+PreDown  = iptables -t nat -D POSTROUTING -o {{ wg_nat_egress_iface_final }} -j MASQUERADE || true
+PreDown  = iptables -D FORWARD -i {{ wg_interface }} -o {{ wg_nat_egress_iface_final }} -j ACCEPT || true
+PreDown  = iptables -D FORWARD -i {{ wg_nat_egress_iface_final }} -o {{ wg_interface }} -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT || true
+
+{% for p in wg_peers %}
+[Peer]
+PublicKey = {{ p.public_key }}
+AllowedIPs = {{ p.allowed_ips }}
+PersistentKeepalive = {{ wg_persistent_keepalive }}
+{% endfor %}
+

@@ -1,0 +1,9 @@
+# idf_component.yml (proyecto)
+dependencies:
+  # micro-ROS para ESP-IDF (usa una versión estable)
+  micro_ros_espidf_component: "^3.0.0"
+
+
+  # SOLUCIÓN: Añadir explícitamente la dependencia oficial para resolver la ambigüedad.
+  # El "*" significa "cualquier versión compatible".
+  espressif/pid_ctrl: "*"

@@ -1,0 +1,67 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_IMAGE = "joselhuidobro/trix-svm:v12024-2025"
+        HEROKU_APP = "trix-svm-backend"
+        HEROKU_REGISTRY = "registry.heroku.com/${HEROKU_APP}/web"
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                // Clona el repositorio desde GitHub
+                git branch: 'main', url: 'https://github.com/joselhuidobro/trix-svm.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    sh """
+                    docker build -t ${DOCKER_IMAGE} .
+                    docker tag ${DOCKER_IMAGE} ${HEROKU_REGISTRY}
+                    """
+                }
+            }
+        }
+
+        stage('Push Docker Image to Heroku') {
+            steps {
+                script {
+                    sh '''
+                    heroku container:login
+                    docker push ${HEROKU_REGISTRY}
+                    '''
+                }
+            }
+        }
+
+        stage('Release Application') {
+            steps {
+                script {
+                    sh '''
+                    heroku container:release web -a ${HEROKU_APP}
+                    heroku config:set FLASK_APP=run.py FLASK_ENV=production --app ${HEROKU_APP}
+                    '''
+                }
+            }
+        }
+
+        stage('Show Logs') {
+            steps {
+                script {
+                    sh '''
+                    heroku logs --tail --app ${HEROKU_APP}
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline ejecutado."
+        }
+    }
+}

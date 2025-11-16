@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block title %}Building 0 TRIX{% endblock %}
+
+{% block body %}
+<!-- Librerías y CSS externos -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/formulario.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tabla_ventas.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tabla_deptos.css') }}">
+
+
+<!-- Contenedor con formulario y tabla en la misma fila -->
+<div class="row">
+    
+    <h1>Seleccione un Edificio</h1>
+
+
+    <form method="GET" action="{{ url_for('building.building_register') }}"> 
+        <button type="submit">Agregar Edificio</button>
+    </form>
+    
+
+<table class="Tabla_V">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Dirección</th>
+            <th>RFC</th>
+            <th>Administrador</th>
+            <th>Num Predial</th>
+            <th>Cel</th>
+            <th>CP</th>
+            <th>No. Deptos</th>
+            <th>No. Pisos</th>
+            <th>Accesos Peatonales</th>
+            <th>Accesos Vehiculares</th>
+            <th>Lugares Estacionamiento</th>
+            <th>Lat</th>
+            <th>Lon</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for b in Building %}
+        <tr>
+            <td>{{ b.id }}</td>
+            <td>{{ b.direccion }}</td>
+            <td>{{ b.rfc }}</td>
+            <td>{{ b.num_predial }}</td>
+            <td>{{ b.cel }}</td>
+            <td>{{ b.cp }}</td>
+            <td>{{ b.no_deptos }}</td>
+            <td>{{ b.no_pisos }}</td>
+            <td>{{ b.accesos_peatonales }}</td>
+            <td>{{ b.accesos_vehiculares }}</td>
+            <td>{{ b.lugares_estacionamiento }}</td>
+            <td>{{ b.lat }}</td>
+            <td>{{ b.lon }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Columna con formulario y datos -->
+<div class="col">
+ 
+    <h2>Datos generales Edificio Seleccionado:</h2>
+
+    <div id="selected-data" class="form-section">
+        <p><strong>ID:</strong> <span id="selected-id">N/A</span></p>
+        <p><strong>Dirección:</strong> <span id="selected-direccion">N/A</span></p>
+        <p><strong>No. Deptos:</strong> <span id="selected-no_deptos">N/A</span></p>
+        <button type="submit">Finanzas Edificio</button>
+        <button type="submit">Mantenimiento</button>
+        <button type="submit">Controladores</button>
+<!-- DAtos del vecino al seleccionarlo en tabla -->
+
+ <!-- Datos del vecino al seleccionarlo en tabla -->
+    <h3>Datos del Vecino seleccionado:</h3>
+    <div id="vecino-data">
+     <p><strong>ID Vecino:</strong> <span id="selected-id_vecino">N/A</span></p>
+     <p><strong>Correo Vecino:</strong> <span id="selected-correo_vecino">N/A</span></p>
+     <p><strong>RFC Vecino:</strong> <span id="selected-rfc_vecino">N/A</span></p>
+ </div>
+</div>
+
+<h2>Departamentos Edificio Seleccionado:</h2>
+<button type="submit">Agregar Departamento</button>
+
+    <div class="col">
+        <table id="top-table" class="Tabla_deptos">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Depto</th>
+                    <th>Piso</th>
+                    <th>Cel</th>
+                    <th>Dueño</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Aquí irán las filas con los datos de la tabla superior -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function(){
+        // Manejar el clic en las filas de la tabla de edificios (Tabla_V)
+        $('.Tabla_V tbody tr').on('click', function(){
+            $('.Tabla_V tbody tr').removeClass('selected');
+            $(this).addClass('selected');
+            
+            var edificioId = $(this).find('td:eq(0)').text();   // 1ª columna: ID
+            var direccion = $(this).find('td:eq(1)').text(); // 2ª columna: Dirección 
+
+            // Actualizar datos del edificio en el contenedor
+            $('#selected-id').text(edificioId);
+            $('#selected-direccion').text(direccion);
+            $('#selected-no_deptos').text($(this).find('td:eq(7)').text()); // No. Deptos en la columna 7
+
+            // Limpiar la tabla de departamentos
+            var tbodyDeptos = $('#top-table tbody');
+            tbodyDeptos.empty();
+
+            // Petición AJAX para obtener departamentos del edificio seleccionado
+            $.ajax({
+                url: '/building/get_departamentos/' + edificioId,
+                type: 'GET',
+                success: function(deptos) {
+                    if (deptos && deptos.length > 0) {
+                        // Recorrer cada departamento y construir filas con data-depto-id
+                        deptos.forEach(function(dep) {
+                            var fila = '<tr data-depto-id="' + dep.id + '">' +
+                                        '<td>' + dep.id + '</td>' +
+                                        '<td>' + dep.no_del_depto + '</td>' +
+                                        '<td>' + dep.piso + '</td>' +
+                                        '<td>' + dep.cel + '</td>' +
+                                        '<td>' + dep.contacto + '</td>' +
+                                       '</tr>';
+                            tbodyDeptos.append(fila);
+                        });
+                    } else {
+                        // Si no hay departamentos, agregar una fila con valores predeterminados
+                        var fila = '<tr>' +
+                                    '<td colspan="5" style="text-align: center; color: #888;">-- -- --</td>' +
+                                   '</tr>';
+                        tbodyDeptos.append(fila);
+                    }
+                },
+                error: function(error) {
+                    console.log('Error al cargar departamentos:', error);
+                    // Mostrar un mensaje de error en la tabla
+                    var fila = '<tr>' +
+                                '<td colspan="5" style="text-align: center; color: red;">Error al cargar datos</td>' +
+                               '</tr>';
+                    tbodyDeptos.append(fila);
+                }
+            });
+        });
+
+        // Manejar el clic en las filas de la tabla de departamentos (Tabla_deptos)
+        $('#top-table').on('click', 'tbody tr', function(){
+            $('#top-table tbody tr').removeClass('selected');
+            $(this).addClass('selected');
+
+            var deptoId = $(this).data('depto-id');
+
+            // Petición AJAX para obtener vecinos del departamento seleccionado
+            $.ajax({
+                url: '/departamento/get_vecinos/' + deptoId,
+                type: 'GET',
+                success: function(vecinos) {
+                    if (vecinos && vecinos.length > 0) {
+                        // Asumimos que hay un vecino principal o mostramos el primero
+                        // Puedes ajustar esto para manejar múltiples vecinos
+                        var vecino = vecinos[0]; // Por ejemplo, el primero
+
+                        // Actualizar datos del vecino en el contenedor
+                        $('#selected-id_vecino').text(vecino.id);
+                        $('#selected-correo_vecino').text(vecino.correo || 'N/A');
+                        $('#selected-rfc_vecino').text(vecino.rfc || 'N/A');
+                    } else {
+                        // Si no hay vecinos, mostrar N/A
+                        $('#selected-id_vecino').text('N/A');
+                        $('#selected-correo_vecino').text('N/A');
+                        $('#selected-rfc_vecino').text('N/A');
+                    }
+                },
+                error: function(error) {
+                    console.log('Error al cargar vecinos:', error);
+                    // Mostrar un mensaje de error en los campos de vecino
+                    $('#selected-id_vecino').text('Error');
+                    $('#selected-correo_vecino').text('Error');
+                    $('#selected-rfc_vecino').text('Error');
+                }
+            });
+        });
+
+        // Opcional: Mostrar fila predeterminada en la tabla de departamentos al cargar la página
+        var initialTbodyDeptos = $('#top-table tbody');
+        initialTbodyDeptos.append('<tr><td colspan="5" style="text-align: center; color: #888;">-- -- --</td></tr>');
+    });
+</script>
+
+
+
+
+{% endblock %}

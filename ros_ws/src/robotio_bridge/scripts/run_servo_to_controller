@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Wrapper que ejecuta tu nodo Python como módulo
+exec python3 -m robotio_bridge.servo_to_controller "$@"

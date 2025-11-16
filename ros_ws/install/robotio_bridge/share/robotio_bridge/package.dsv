@@ -1,0 +1,9 @@
+source;share/robotio_bridge/hook/pythonpath.ps1
+source;share/robotio_bridge/hook/pythonpath.dsv
+source;share/robotio_bridge/hook/pythonpath.sh
+source;share/robotio_bridge/hook/ament_prefix_path.ps1
+source;share/robotio_bridge/hook/ament_prefix_path.dsv
+source;share/robotio_bridge/hook/ament_prefix_path.sh
+source;../../build/robotio_bridge/share/robotio_bridge/hook/pythonpath_develop.ps1
+source;../../build/robotio_bridge/share/robotio_bridge/hook/pythonpath_develop.dsv
+source;../../build/robotio_bridge/share/robotio_bridge/hook/pythonpath_develop.sh

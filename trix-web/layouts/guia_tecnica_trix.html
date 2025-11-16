@@ -1,0 +1,1291 @@
+<!DOCTYPE html><html lang="es"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Documento de Desarrollo: TRIX Stack</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tiempos+Headline:wght@400;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-light: #14b8a6;
+            --accent: #f59e0b;
+            --neutral-50: #fafaf9;
+            --neutral-100: #f5f5f4;
+            --neutral-200: #e7e5e4;
+            --neutral-600: #57534e;
+            --neutral-800: #292524;
+            --neutral-900: #1c1917;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--neutral-800);
+            background: var(--neutral-50);
+            overflow-x: hidden;
+        }
+        
+        .serif {
+            font-family: 'Tiempos Headline', serif;
+        }
+        
+        .toc {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: white;
+            border-right: 1px solid var(--neutral-200);
+            overflow-y: auto;
+            z-index: 50;
+            padding: 2rem 1.5rem;
+        }
+        
+        .main-content {
+            margin-left: 280px;
+            min-height: 100vh;
+        }
+        
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            align-items: center;
+            min-height: 60vh;
+        }
+        
+        .hero-title {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            line-height: 1.1;
+            font-weight: 700;
+            color: var(--neutral-900);
+            word-break: break-word;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--neutral-600);
+            margin-top: 1rem;
+            font-style: italic;
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 400;
+            color: var(--neutral-900);
+            margin-bottom: 2rem;
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 0.5rem;
+        }
+        
+        .subsection-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin: 2.5rem 0 1.5rem 0;
+        }
+        
+        .component-card {
+            background: white;
+            border: 1px solid var(--neutral-200);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .component-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-color: var(--primary-light);
+        }
+        
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.875rem;
+            margin: 1.5rem 0;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+            border-left: 4px solid var(--primary);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 0.5rem 0.5rem 0;
+        }
+        
+        .warning-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-left: 4px solid var(--accent);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 0.5rem 0.5rem 0;
+        }
+        
+        .toc a {
+            display: block;
+            padding: 0.5rem 0;
+            color: var(--neutral-600);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+        
+        .toc a:hover {
+            color: var(--primary);
+            border-bottom-color: var(--primary-light);
+        }
+        
+        .toc a.active {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .network-diagram {
+            background: white;
+            border: 2px solid var(--neutral-200);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin: 2rem 0;
+            position: relative;
+        }
+        
+        .network-node {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .network-connection {
+            position: absolute;
+            height: 2px;
+            background: var(--primary-light);
+            transform-origin: left center;
+        }
+        
+    @media (max-width: 1024px) {
+        .toc {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .toc.open {
+            transform: translateX(0);
+        }
+        
+        .main-content {
+            margin-left: 0;
+        }
+        
+        .hero-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+    }
+    
+    .toc-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 45;
+    }
+    
+    .toc-overlay.open {
+        display: block;
+    }
+    
+    @media (max-width: 768px) {
+        .max-w-6xl, .max-w-7xl {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        
+        .hero-grid {
+            min-height: auto;
+        }
+        
+        .hero-title {
+            font-size: 2.5rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1rem;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+        }
+        
+        .subsection-title {
+            font-size: 1.5rem;
+        }
+        
+        .component-card {
+            padding: 1.5rem;
+        }
+        
+        .code-block {
+            padding: 1rem;
+            font-size: 0.75rem;
+        }
+        
+        .network-diagram {
+            padding: 1.5rem;
+        }
+    }
+    
+    @media (max-width: 640px) {
+        .hero-title {
+            font-size: 2rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 0.9rem;
+        }
+        
+        .section-title {
+            font-size: 1.75rem;
+        }
+        
+        .subsection-title {
+            font-size: 1.25rem;
+        }
+    }
+    
+    @media (max-width: 390px) {
+        .hero-title {
+            font-size: 1.75rem;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+        }
+        
+        .subsection-title {
+            font-size: 1.1rem;
+        }
+    }
+</style>
+  <base target="_blank">
+</head>
+
+  <body>
+    <!-- Table of Contents -->
+    <nav class="toc">
+      <div class="mb-8">
+        <h3 class="serif text-xl font-bold text-neutral-900 mb-4">Índice</h3>
+        <div class="w-12 h-0.5 bg-primary mb-6"></div>
+      </div>
+
+      <a class="active" href="#arquitectura">Arquitectura y Objetivos</a>
+      <a href="#componentes">Componentes Principales</a>
+      <a href="#redes">Modelo de Red</a>
+      <a href="#objetivos">Objetivos Clave</a>
+      <a href="#ui-radar">UI &#34;Radar&#34; y Accesos</a>
+      <a href="#ros-integration">Integración ROS 2/micro-ROS</a>
+      <a href="#modbus">Configuración Modbus</a>
+      <a href="#observabilidad">Stack de Observabilidad</a>
+      <a href="#redis">Gestión Redis</a>
+      <a href="#wireguard">Configuración VPN</a>
+      <a href="#esp32">Desarrollo ESP32</a>
+      <a href="#mantenimiento">Limpieza y Mantenimiento</a>
+      <a href="#seguridad">Seguridad y Buenas Prácticas</a>
+
+      <div class="mt-8 pt-6 border-t border-neutral-200">
+        <p class="text-xs text-neutral-500 mb-2">Sistema TRIX Stack</p>
+        <p class="text-xs text-neutral-400">Documentación técnica completa</p>
+      </div>
+    </nav>
+
+    <!-- Overlay for mobile TOC -->
+    <div class="toc-overlay"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Hero Section with Bento Grid -->
+      <section class="bg-white border-b border-neutral-200">
+        <div class="max-w-7xl mx-auto px-8 py-16">
+          <div class="hero-grid">
+            <div>
+              <h1 class="hero-title serif">
+                <span class="block text-primary">TRIX Stack</span>
+                <span class="block">Documento de Desarrollo</span>
+              </h1>
+              <p class="hero-subtitle">
+                Arquitectura de microservicios para la gestión de sistemas robóticos e IoT.
+                Una solución integral, segura y escalable para el control y visualización de infraestructuras complejas.
+              </p>
+              <div class="flex items-center mt-8 space-x-6">
+                <div class="flex items-center text-sm text-neutral-600">
+                  <i class="fas fa-shield-alt mr-2 text-primary"></i>
+                  <span>Seguridad por diseño</span>
+                </div>
+                <div class="flex items-center text-sm text-neutral-600">
+                  <i class="fas fa-network-wired mr-2 text-primary"></i>
+                  <span>Redes segmentadas</span>
+                </div>
+                <div class="flex items-center text-sm text-neutral-600">
+                  <i class="fas fa-eye mr-2 text-primary"></i>
+                  <span>Observabilidad completa</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div class="bg-gradient-to-br from-teal-50 to-teal-100 p-6 rounded-lg">
+                <i class="fas fa-robot text-3xl text-primary mb-4"></i>
+                <h3 class="font-semibold text-neutral-900 mb-2">ROS 2 Integration</h3>
+                <p class="text-sm text-neutral-600">Comunicación fluida entre sistemas de alto y bajo nivel</p>
+              </div>
+              <div class="bg-gradient-to-br from-amber-50 to-amber-100 p-6 rounded-lg">
+                <i class="fas fa-chart-line text-3xl text-accent mb-4"></i>
+                <h3 class="font-semibold text-neutral-900 mb-2">Visualización Unificada</h3>
+                <p class="text-sm text-neutral-600">Vista holística de LAN y contenedores Docker</p>
+              </div>
+              <div class="bg-gradient-to-br from-slate-50 to-slate-100 p-6 rounded-lg">
+                <i class="fas fa-lock text-3xl text-neutral-700 mb-4"></i>
+                <h3 class="font-semibold text-neutral-900 mb-2">VPN Segura</h3>
+                <p class="text-sm text-neutral-600">Acceso remoto cifrado con WireGuard</p>
+              </div>
+              <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-lg">
+                <i class="fas fa-cogs text-3xl text-blue-600 mb-4"></i>
+                <h3 class="font-semibold text-neutral-900 mb-2">Modularidad</h3>
+                <p class="text-sm text-neutral-600">Componentes desacoplados y reemplazables</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Architecture Section -->
+      <section class="max-w-6xl mx-auto px-8 py-16" id="arquitectura">
+        <h2 class="section-title serif">1. Arquitectura y Objetivos del Sistema</h2>
+
+        <div class="highlight-box">
+          <p class="text-lg leading-relaxed">
+            La arquitectura del TRIX Stack está diseñada para proporcionar una solución integral, segura y escalable para la gestión y visualización de sistemas de robótica e IoT. El diseño se basa en una estructura de microservicios orquestada mediante Docker, que permite una clara segmentación entre los servicios expuestos a Internet y los componentes internos de la infraestructura.
+          </p>
+        </div>
+
+        <!-- Network Diagram -->
+        <div class="network-diagram">
+          <h3 class="text-xl font-semibold mb-6 text-center">Diagrama de Arquitectura de Red</h3>
+          <div class="relative h-96 flex items-center justify-center">
+            <div class="grid grid-cols-3 gap-8 w-full max-w-4xl">
+              <!-- Left Column: External -->
+              <div class="space-y-4">
+                <div class="network-node bg-blue-600">Caddy (Edge Público)</div>
+                <div class="text-center text-sm text-neutral-600">Puertos: 80, 443</div>
+                <div class="text-center text-sm text-neutral-600">TLS/HTTP3</div>
+              </div>
+
+              <!-- Middle Column: DMZ -->
+              <div class="space-y-4">
+                <div class="network-node bg-teal-600">Kong API Gateway</div>
+                <div class="network-node bg-teal-500">Nginx Estático</div>
+                <div class="text-center text-sm text-neutral-600">Red: web-net</div>
+              </div>
+
+              <!-- Right Column: Internal -->
+              <div class="space-y-4">
+                <div class="network-node bg-amber-600">Microservicios</div>
+                <div class="network-node bg-amber-500">ROS 2</div>
+                <div class="network-node bg-amber-500">Redis</div>
+                <div class="network-node bg-amber-500">Node-RED</div>
+                <div class="text-center text-sm text-neutral-600">Red: trix-net (172.18.x.x)</div>
+              </div>
+            </div>
+
+            <!-- Connection Lines -->
+            <div class="network-connection" style="width: 200px; left: 33%; top: 50%; transform: rotate(0deg);"></div>
+            <div class="network-connection" style="width: 180px; left: 66%; top: 40%; transform: rotate(-10deg);"></div>
+          </div>
+        </div>
+
+        <div class="component-card">
+          <h3 class="subsection-title serif">1.1. Visión General de la Arquitectura</h3>
+          <p class="mb-4">
+            El TRIX Stack implementa una arquitectura de microservicios con múltiples capas de seguridad y segmentación. El punto de entrada único es el servidor web <strong>Caddy</strong>, que actúa como un &#34;edge público&#34; avanzado, gestionando la terminación de TLS/HTTP3 y el enrutamiento hacia los servicios internos.
+          </p>
+          <p>
+            La seguridad se refuerza con la implementación de una VPN basada en <strong>WireGuard</strong>, que ofrece acceso administrativo seguro a toda la malla de servicios internos, permitiendo operaciones y diagnósticos como si se estuviera en una red local (LAN).
+          </p>
+        </div>
+      </section>
+
+      <!-- Main Components -->
+      <section class="max-w-6xl mx-auto px-8 py-12" id="componentes">
+        <h2 class="subsection-title serif">1.2. Componentes Principales del Stack</h2>
+
+        <div class="grid md:grid-cols-2 gap-6 mt-8">
+          <div class="component-card">
+            <div class="flex items-center mb-4">
+              <i class="fas fa-server text-2xl text-primary mr-3"></i>
+              <h4 class="text-xl font-semibold">Caddy: Edge Público</h4>
+            </div>
+            <p class="text-neutral-600 mb-4">
+              Servidor web seguro que actúa como proxy inverso y punto de entrada único. Gestiona automáticamente certificados SSL/TLS y soporta HTTP/3, enrutando tráfico a Nginx y Kong.
+            </p>
+            <div class="flex items-center text-sm text-primary">
+              <i class="fas fa-check-circle mr-2"></i>
+              <span>Único punto de entrada, certificados automáticos</span>
+            </div>
+          </div>
+
+          <div class="component-card">
+            <div class="flex items-center mb-4">
+              <i class="fas fa-cube text-2xl text-teal-600 mr-3"></i>
+              <h4 class="text-xl font-semibold">Nginx &#34;trixweb&#34;</h4>
+            </div>
+            <p class="text-neutral-600 mb-4">
+              Servidor de contenido estático que sirve el sitio TRIX generado por Hugo. No expone puertos directamente al host, solo es accesible a través de Caddy.
+            </p>
+            <div class="flex items-center text-sm text-teal-600">
+              <i class="fas fa-check-circle mr-2"></i>
+              <span>Contenido estático, desacoplamiento del edge</span>
+            </div>
+          </div>
+
+          <div class="component-card">
+            <div class="flex items-center mb-4">
+              <i class="fas fa-code text-2xl text-blue-600 mr-3"></i>
+              <h4 class="text-xl font-semibold">Hugo Builder</h4>
+            </div>
+            <p class="text-neutral-600 mb-4">
+              Generador de sitios estáticos que compila el repositorio Hugo y genera archivos HTML/CSS/JS en la carpeta public/. Se ejecuta bajo demanda o en CI/CD.
+            </p>
+            <div class="flex items-center text-sm text-blue-600">
+              <i class="fas fa-check-circle mr-2"></i>
+              <span>Despliegue reproducible, toolchain encapsulada</span>
+            </div>
+          </div>
+
+          <div class="component-card">
+            <div class="flex items-center mb-4">
+              <i class="fas fa-gateway text-2xl text-purple-600 mr-3"></i>
+              <h4 class="text-xl font-semibold">Kong API Gateway</h4>
+            </div>
+            <p class="text-neutral-600 mb-4">
+              Gateway de API interno que distribuye peticiones a microservicios. Proporciona plugins para autenticación, rate-limiting y logging centralizado.
+            </p>
+            <div class="flex items-center text-sm text-purple-600">
+              <i class="fas fa-check-circle mr-2"></i>
+              <span>Versión única, plugins centralizados</span>
+            </div>
+          </div>
+
+          <div class="component-card">
+            <div class="flex items-center mb-4">
+              <i class="fas fa-shield-alt text-2xl text-green-600 mr-3"></i>
+              <h4 class="text-xl font-semibold">WireGuard VPN</h4>
+            </div>
+            <p class="text-neutral-600 mb-4">
+              VPN segura que proporciona acceso administrativo privado a la malla de servicios internos. Cifrado de extremo a extremo con conectividad LAN.
+            </p>
+            <div class="flex items-center text-sm text-green-600">
+              <i class="fas fa-check-circle mr-2"></i>
+              <span>Acceso remoto seguro, operación como LAN</span>
+            </div>
+          </div>
+
+          <div class="component-card">
+            <div class="flex items-center mb-4">
+              <i class="fas fa-network-wired text-2xl text-amber-600 mr-3"></i>
+              <h4 class="text-xl font-semibold">Knot DNS (Opcional)</h4>
+            </div>
+            <p class="text-neutral-600 mb-4">
+              Servidor DNS autoritativo para dominios públicos o resolución interna dentro de la VPN. Simplifica comunicación entre contenedores.
+            </p>
+            <div class="flex items-center text-sm text-amber-600">
+              <i class="fas fa-check-circle mr-2"></i>
+              <span>Resolución de nombres, gestión flexible</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Network Model -->
+      <section class="max-w-6xl mx-auto px-8 py-12" id="redes">
+        <h2 class="subsection-title serif">1.3. Modelo de Red y Segmentación</h2>
+
+        <div class="grid md:grid-cols-2 gap-8 mt-6">
+          <div class="bg-white border border-neutral-200 rounded-lg p-6">
+            <h4 class="text-lg font-semibold mb-3 text-primary">Red web-net (Pública Mínima)</h4>
+            <p class="text-neutral-600 mb-4">
+              Superficie pública mínima que conecta Caddy con el builder de Hugo. Aisla componentes críticos para reducir la posibilidad de ataques.
+            </p>
+            <div class="bg-teal-50 p-3 rounded text-sm">
+              <strong>Beneficio:</strong> Seguridad adicional mediante aislamiento
+            </div>
+          </div>
+
+          <div class="bg-white border border-neutral-200 rounded-lg p-6">
+            <h4 class="text-lg font-semibold mb-3 text-primary">Red trix-net (Servicios Internos)</h4>
+            <p class="text-neutral-600 mb-4">
+              Malla principal donde residen todos los servicios internos. Utiliza rango 172.18.x.x, completamente aislado de la red del host.
+            </p>
+            <div class="bg-amber-50 p-3 rounded text-sm">
+              <strong>Beneficio:</strong> Separación estricta entre público e interno
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Key Objectives -->
+      <section class="max-w-6xl mx-auto px-8 py-12" id="objetivos">
+        <h2 class="subsection-title serif">1.4. Objetivos Clave del Sistema</h2>
+
+        <div class="space-y-8 mt-6">
+          <div class="highlight-box">
+            <h4 class="text-xl font-semibold mb-3">
+              <i class="fas fa-eye mr-2 text-primary"></i>
+              Visualización Unificada de Redes
+            </h4>
+            <p class="mb-4">
+              Proporcionar una interfaz de usuario (&#34;Radar&#34;) que ofrezca una visualización unificada de todos los dispositivos y servicios conectados, fusionando la red física local (LAN, 192.168.x.x) y la red interna de Docker (trix-net, 172.18.x.x).
+            </p>
+            <div class="bg-white p-4 rounded-lg">
+              <strong>Endpoints clave:</strong>
+              <code class="block mt-2 bg-neutral-100 p-2 rounded text-sm">
+                            /udp/devices (JSON principal)<br/>
+                            /udp/devices/snapshot (instantánea)<br/>
+                            /udp/devices/debug?mode=lan|radar|trix (depuración)
+                        </code>
+            </div>
+          </div>
+
+          <div class="highlight-box">
+            <h4 class="text-xl font-semibold mb-3">
+              <i class="fas fa-robot mr-2 text-primary"></i>
+              Integración ROS 2/micro-ROS
+            </h4>
+            <p class="mb-4">
+              Asegurar que la UI/Flask, como nodo publicador en ROS 2, pueda enviar mensajes que sean recibidos correctamente por el micro-ROS Agent y transmitidos al ESP32 vía UDP.
+            </p>
+            <div class="bg-white p-4 rounded-lg">
+              <strong>Comandos de verificación:</strong>
+              <code class="block mt-2 bg-neutral-100 p-2 rounded text-sm">
+                            ros2 topic list<br/>
+                            ros2 topic info -v /servo_setpoint_deg<br/>
+                            rqt_graph (visualización)
+                        </code>
+            </div>
+          </div>
+
+          <div class="highlight-box">
+            <h4 class="text-xl font-semibold mb-3">
+              <i class="fas fa-lock mr-2 text-primary"></i>
+              Aislamiento de Comunicación Modbus
+            </h4>
+            <p class="mb-4">
+              Garantizar que la comunicación Modbus sea enviada exclusivamente al HMI designado, evitando el envío a otros dispositivos como el ESP32. Configuración mediante variables de entorno.
+            </p>
+            <div class="bg-white p-4 rounded-lg">
+              <strong>Variables de entorno:</strong>
+              <code class="block mt-2 bg-neutral-100 p-2 rounded text-sm">
+                            MODBUS_HMI_IP=192.168.1.100<br/>
+                            MODBUS_HMI_PORT=502
+                        </code>
+            </div>
+          </div>
+
+          <div class="highlight-box">
+            <h4 class="text-xl font-semibold mb-3">
+              <i class="fas fa-chart-line mr-2 text-primary"></i>
+              Observabilidad Completa
+            </h4>
+            <p class="mb-4">
+              Proporcionar visibilidad integral del estado del sistema a través de múltiples endpoints: Prometheus, Grafana, Node-RED, Redis, y endpoints de diagnóstico específicos.
+            </p>
+            <div class="bg-white p-4 rounded-lg">
+              <strong>Herramientas integradas:</strong>
+              <div class="grid grid-cols-2 gap-2 mt-2 text-sm">
+                <span>• Prometheus (métricas)</span>
+                <span>• Grafana (dashboards)</span>
+                <span>• Redis (estado)</span>
+                <span>• Node-RED (flujos)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- UI Radar Section -->
+      <section class="max-w-6xl mx-auto px-8 py-12" id="ui-radar">
+        <h2 class="section-title serif">2. UI &#34;Radar&#34; y Accesos</h2>
+
+        <div class="grid md:grid-cols-2 gap-8 mb-8">
+          <div class="component-card">
+            <h4 class="text-lg font-semibold mb-3">Acceso Local (localhost)</h4>
+            <p class="text-neutral-600 mb-4">
+              Desde la máquina local, todos los servicios son accesibles a través del puerto 30080 de Kong.
+            </p>
+            <div class="space-y-2">
+              <div class="bg-neutral-100 p-3 rounded">
+                <code>UI Principal: http://localhost:30080/ui</code>
+              </div>
+              <div class="bg-neutral-100 p-3 rounded">
+                <code>Grafana: http://localhost:30080/grafana</code>
+              </div>
+              <div class="bg-neutral-100 p-3 rounded">
+                <code>Node-RED: http://localhost:30080/nodered</code>
+              </div>
+            </div>
+          </div>
+
+          <div class="component-card">
+            <h4 class="text-lg font-semibold mb-3">Acceso VPN (WireGuard)</h4>
+            <p class="text-neutral-600 mb-4">
+              Conectando a la VPN, los servicios se acceden mediante la IP del servidor WireGuard (10.6.0.1).
+            </p>
+            <div class="space-y-2">
+              <div class="bg-neutral-100 p-3 rounded">
+                <code>UI via VPN: http://10.6.0.1:30080/ui</code>
+              </div>
+              <div class="bg-neutral-100 p-3 rounded">
+                <code>Prometheus: http://10.6.0.1:9090</code>
+              </div>
+              <div class="bg-neutral-100 p-3 rounded">
+                <code>Redis Health: http://10.6.0.1:30080/redis/health</code>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="warning-box">
+          <h4 class="font-semibold mb-2">
+            <i class="fas fa-exclamation-triangle mr-2"></i>
+            Nota sobre el uso de sudo
+          </h4>
+          <p>
+            Se antepone <code>sudo</code> a los comandos de Docker/administración. Para llamadas HTTP con
+            <code>curl</code>, <strong>no es necesario</strong>
+            <code>sudo</code> en la mayoría de los casos.
+          </p>
+        </div>
+      </section>
+
+      <!-- ROS 2 Integration -->
+      <section class="max-w-6xl mx-auto px-8 py-12" id="ros-integration">
+        <h2 class="section-title serif">3. Integración de ROS 2 y micro-ROS</h2>
+
+        <div class="component-card mb-8">
+          <h4 class="text-xl font-semibold mb-4">Flujo de Comunicación</h4>
+          <div class="flex items-center justify-between bg-neutral-100 p-6 rounded-lg">
+            <div class="text-center">
+              <i class="fas fa-desktop text-3xl text-blue-600 mb-2"></i>
+              <div class="font-semibold">ROS 2</div>
+              <div class="text-sm text-neutral-600">UI/Flask</div>
+            </div>
+            <i class="fas fa-arrow-right text-2xl text-neutral-400"></i>
+            <div class="text-center">
+              <i class="fas fa-exchange-alt text-3xl text-teal-600 mb-2"></i>
+              <div class="font-semibold">micro-ROS Agent</div>
+              <div class="text-sm text-neutral-600">Puente UDP</div>
+            </div>
+            <i class="fas fa-arrow-right text-2xl text-neutral-400"></i>
+            <div class="text-center">
+              <i class="fas fa-microchip text-3xl text-amber-600 mb-2"></i>
+              <div class="font-semibold">ESP32</div>
+              <div class="text-sm text-neutral-600">micro-ROS</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="component-card">
+            <h4 class="text-lg font-semibold mb-3">Verificación de Estado ROS 2</h4>
+            <div class="space-y-3">
+              <div>
+                <p class="text-sm font-medium mb-2">Listar tópicos disponibles:</p>
+                <div class="code-block">
+                  sudo docker exec -it flask_ui_encoder_robot bash -lc &#39;source /opt/ros/$ROS_DISTRO/setup.bash &amp;&amp; ros2 topic list&#39;
+                </div>
+              </div>
+              <div>
+                <p class="text-sm font-medium mb-2">Inspeccionar tópico específico:</p>
+                <div class="code-block">
+                  sudo docker exec -it flask_ui_encoder_robot bash -lc &#39;source /opt/ros/$ROS_DISTRO/setup.bash &amp;&amp; ros2 topic info -v /relevadores&#39;
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="component-card">
+            <h4 class="text-lg font-semibold mb-3">Visualización Gráfica</h4>
+            <p class="text-neutral-600 mb-4">
+              La herramienta
+              <code>rqt_graph</code> proporciona una representación visual de las conexiones entre nodos y tópicos.
+            </p>
+            <div class="code-block">
+              sudo docker exec -it flask_ui_encoder_robot bash -lc &#39;source /opt/ros/$ROS_DISTRO/setup.bash; rqt_graph&#39;
+            </div>
+            <p class="text-sm text-neutral-600 mt-2">
+              <i class="fas fa-info-circle mr-1"></i>
+              Nota: Si
+              <code>ros2</code> no se encuentra, confirme
+              <code>which ros2</code> y que se haya *sourcéado* el
+              <code>setup.bash</code>.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Modbus Configuration -->
+      <section class="max-w-6xl mx-auto px-8 py-12" id="modbus">
+        <h2 class="section-title serif">4. Configuración de Comunicación Modbus</h2>
+
+        <div class="highlight-box mb-8">
+          <h4 class="text-xl font-semibold mb-3">Principio de Aislamiento: Solo HMI</h4>
+          <p>
+            La comunicación Modbus debe ser enviada exclusivamente al dispositivo HMI designado. Esta política mejora la seguridad, reduce la complejidad de red y simplifica la lógica de la aplicación.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8">
+          <div class="component-card">
+            <h4 class="text-lg font-semibold mb-4">Variables de Entorno</h4>
+            <div class="space-y-4">
+              <div>
+                <p class="font-medium mb-2">Dirección IP del HMI:</p>
+                <div class="bg-neutral-100 p-3 rounded">
+                  <code>MODBUS_HMI_IP=192.168.1.100</code>
+                </div>
+              </div>
+              <div>
+                <p class="font-medium mb-2">Puerto del HMI:</p>
+                <div class="bg-neutral-100 p-3 rounded">
+                  <code>MODBUS_HMI_PORT=502</code>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="component-card">
+            <h4 class="text-lg font-semibold mb-4">Endpoints de la UI</h4>
+            <div class="space-y-4">
+              <div>
+                <p class="font-medium mb-2">
+                  <i class="fas fa-download mr-2 text-blue-600"></i>
+                  Obtener datos:
+                </p>
+                <div class="bg-blue-50 p-3 rounded">
+                  <code>GET /data</code>
+                </div>
+              </div>
+              <div>
+                <p class="font-medium mb-2">
+                  <i class="fas fa-upload mr-2 text-green-600"></i>
+                  Enviar setpoints:
+                </p>
+                <div class="bg-green-50 p-3 rounded">
+                  <code>POST /setpoint</code>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Observability Stack -->
+      <section class="max-w-6xl mx-auto px-8 py-12" id="observabilidad">
+        <h2 class="section-title serif">5. Stack de Observabilidad</h2>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div class="bg-white border border-neutral-200 rounded-lg p-6 text-center">
+            <i class="fas fa-chart-line text-3xl text-red-600 mb-4"></i>
+            <h4 class="font-semibold mb-2">Prometheus</h4>
+            <p class="text-sm text-neutral-600">Recolección y almacenamiento de métricas de tiempo de ejecución con consultas PromQL potentes.</p>
+          </div>
+          <div class="bg-white border border-neutral-200 rounded-lg p-6 text-center">
+            <i class="fas fa-chart-bar text-3xl text-orange-600 mb-4"></i>
+            <h4 class="font-semibold mb-2">Grafana</h4>
+            <p class="text-sm text-neutral-600">Visualización de métricas y creación de dashboards interactivos con alertas configurables.</p>
+          </div>
+          <div class="bg-white border border-neutral-200 rounded-lg p-6 text-center">
+            <i class="fas fa-database text-3xl text-blue-600 mb-4"></i>
+            <h4 class="font-semibold mb-2">Redis</h4>
+            <p class="text-sm text-neutral-600">Almacenamiento de estado, caché en memoria y cola de mensajes para rendimiento óptimo.</p>
+          </div>
+          <div class="bg-white border border-neutral-200 rounded-lg p-6 text-center">
+            <i class="fas fa-project-diagram text-3xl text-green-600 mb-4"></i>
+            <h4 class="font-semibold mb-2">Node-RED</h4>
+            <p class="text-sm text-neutral-600">Orquestación visual de flujos de datos y automatización de tareas sin necesidad de código.</p>
+          </div>
+        </div>
+
+        <div class="component-card">
+          <h4 class="text-lg font-semibold mb-4">Verificación de Servicios</h4>
+          <div class="grid md:grid-cols-2 gap-6">
+            <div>
+              <p class="font-medium mb-2">Check de disponibilidad Node-RED:</p>
+              <div class="code-block">
+                curl -I http://localhost:30080/nodered
+              </div>
+            </div>
+            <div>
+              <p class="font-medium mb-2">Estado de Grafana en Prometheus:</p>
+              <div class="code-block">
+                curl -G &#39;http://localhost:9090/api/v1/query&#39; --data-urlencode &#39;query=up{job=&#34;grafana&#34;}&#39;
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Redis Management -->
+      <section class="max-w-6xl mx-auto px-8 py-12" id="redis">
+        <h2 class="section-title serif">6. Gestión de Redis</h2>
+
+        <div class="grid md:grid-cols-2 gap-8">
+          <div class="component-card">
+            <h4 class="text-lg font-semibold mb-4">Consulta de Claves</h4>
+            <p class="text-neutral-600 mb-4">
+              Inspeccionar el estado de los datos almacenados en Redis utilizando la interfaz de línea de comandos
+              <code>redis-cli</code>.
+            </p>
+
+            <div class="space-y-3">
+              <div>
+                <p class="text-sm font-medium mb-1">Clave de dispositivos UDP:</p>
+                <div class="code-block">
+                  sudo docker exec -it redis_trix redis-cli -a trixredis123 GET trix:udp:devices:last
+                </div>
+              </div>
+
+              <div>
+                <p class="text-sm font-medium mb-1">Información de persistencia:</p>
+                <div class="code-block">
+                  sudo docker exec -it redis_trix redis-cli -a trixredis123 INFO persistence
+                </div>
+              </div>
+
+              <div>
+                <p class="text-sm font-medium mb-1">Estadísticas generales:</p>
+                <div class="code-block">
+                  sudo docker exec -it redis_trix redis-cli -a trixredis123 INFO stats
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="component-card">
+            <h4 class="text-lg font-semibold mb-4">Monitoreo</h4>
+            <p class="text-neutral-600 mb-4">
+              Endpoint de salud en la UI para monitoreo visual sin necesidad de línea de comandos.
+            </p>
+            <div class="bg-blue-50 p-4 rounded-lg">
+              <p class="font-medium mb-2">Endpoint de salud:</p>
+              <code class="block">http://localhost:30080/redis/health</code>
+            </div>
+            <p class="text-sm text-neutral-600 mt-3">
+              La clave
+              <code>trix:udp:devices:last</code> debe devolver un JSON/DICT con dispositivos &gt; 0.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- WireGuard VPN -->
+      <section class="max-w-6xl mx-auto px-8 py-12" id="wireguard">
+        <h2 class="section-title serif">7. Configuración y Gestión de VPN (WireGuard)</h2>
+
+        <div class="component-card mb-8">
+          <h4 class="text-lg font-semibold mb-4">Inspección del Servicio</h4>
+          <div class="grid md:grid-cols-2 gap-6">
+            <div>
+              <h5 class="font-medium mb-2">Verificación de contenedores:</h5>
+              <div class="code-block">
+                sudo docker ps --format &#34;{{.Names}} {{.Ports}}&#34; | grep wireguard
+              </div>
+            </div>
+            <div>
+              <h5 class="font-medium mb-2">Revisión de logs:</h5>
+              <div class="code-block">
+                sudo docker logs wireguard | tail -n 80
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8">
+          <div class="component-card">
+            <h4 class="text-lg font-semibold mb-4">Monitoreo de Interfaz</h4>
+            <div class="space-y-3">
+              <div>
+                <p class="text-sm font-medium mb-1">Estado de la interfaz wg0:</p>
+                <div class="code-block">
+                  sudo docker exec -it wireguard bash -lc &#39;wg show; wg show wg0 latest-handshakes&#39;
+                </div>
+              </div>
+              <div>
+                <p class="text-sm font-medium mb-1">Dirección IP asignada:</p>
+                <div class="code-block">
+                  sudo docker exec -it wireguard bash -lc &#39;ip addr show wg0; wg show&#39;
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="component-card">
+            <h4 class="text-lg font-semibold mb-4">Configuración de Cliente</h4>
+            <div class="space-y-3">
+              <div>
+                <p class="text-sm font-medium mb-1">Generación de código QR:</p>
+                <div class="code-block">
+                  qrencode -t ansiutf8 &lt; peer1.conf
+                </div>
+              </div>
+              <div class="bg-amber-50 p-3 rounded">
+                <p class="text-sm font-medium mb-1">Plantilla móvil:</p>
+                <div class="text-xs">
+                  <p><strong>Interface:</strong> Address: 10.6.0.2/32, DNS: 1.1.1.1</p>
+                  <p><strong>Peer:</strong> AllowedIPs: 10.6.0.0/24,192.168.0.0/24</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ESP32 Development -->
+      <section class="max-w-6xl mx-auto px-8 py-12" id="esp32">
+        <h2 class="section-title serif">8. Desarrollo ESP32 con ESP-IDF</h2>
+
+        <div class="grid md:grid-cols-3 gap-6 mb-8">
+          <div class="component-card text-center">
+            <i class="fas fa-hammer text-3xl text-blue-600 mb-4"></i>
+            <h4 class="text-lg font-semibold mb-3">Build</h4>
+            <p class="text-sm text-neutral-600 mb-4">Compilación limpia y reproducible del firmware</p>
+          </div>
+          <div class="component-card text-center">
+            <i class="fas fa-download text-3xl text-green-600 mb-4"></i>
+            <h4 class="text-lg font-semibold mb-3">Flash</h4>
+            <p class="text-sm text-neutral-600 mb-4">Programación del microcontrolador via USB</p>
+          </div>
+          <div class="component-card text-center">
+            <i class="fas fa-terminal text-3xl text-purple-600 mb-4"></i>
+            <h4 class="text-lg font-semibold mb-3">Monitor</h4>
+            <p class="text-sm text-neutral-600 mb-4">Monitoreo en tiempo real del puerto serial</p>
+          </div>
+        </div>
+
+        <div class="space-y-6">
+          <div class="component-card">
+            <h4 class="text-lg font-semibold mb-4">Proceso de Construcción (Build)</h4>
+            <div class="code-block">
+              sudo docker exec -it ros_relevadores_y_encoder bash -lc &#39;
+              if [ -f /opt/esp/idf/export.sh ]; then source /opt/esp/idf/export.sh;
+              elif [ -f /opt/esp-idf/export.sh ]; then source /opt/esp-idf/export.sh; fi;
+              cd /esp2024 &amp;&amp; idf.py fullclean &amp;&amp; idf.py build&#39;
+            </div>
+          </div>
+
+          <div class="component-card">
+            <h4 class="text-lg font-semibold mb-4">Proceso de Flasheo</h4>
+            <div class="code-block">
+              sudo docker exec -it ros_relevadores_y_encoder bash -lc &#39;
+              if [ -f /opt/esp/idf/export.sh ]; then source /opt/esp/idf/export.sh;
+              elif [ -f /opt/esp-idf/export.sh ]; then source /opt/esp-idf/export.sh; fi;
+              cd /esp2024 &amp;&amp; idf.py -p /dev/ttyUSB0 flash&#39;
+            </div>
+          </div>
+
+          <div class="component-card">
+            <h4 class="text-lg font-semibold mb-4">Monitoreo de Salida</h4>
+            <div class="code-block">
+              sudo docker exec -it ros_relevadores_y_encoder bash -lc &#39;
+              if [ -f /opt/esp/idf/export.sh ]; then source /opt/esp/idf/export.sh;
+              elif [ -f /opt/esp-idf/export.sh ]; then source /opt/esp-idf/export.sh; fi;
+              cd /esp2024 &amp;&amp; idf.py -p /dev/ttyUSB0 monitor&#39;
+            </div>
+          </div>
+
+          <div class="component-card">
+            <h4 class="text-lg font-semibold mb-4">Verificación de Permisos</h4>
+            <p class="text-neutral-600 mb-4">Antes de flashear, verifique que el contenedor tiene acceso al dispositivo:</p>
+            <div class="code-block">
+              sudo docker exec -it ros_relevadores_y_encoder bash -lc &#39;ls -l /dev/ttyUSB0; id; groups&#39;
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Maintenance -->
+      <section class="max-w-6xl mx-auto px-8 py-12" id="mantenimiento">
+        <h2 class="section-title serif">9. Limpieza y Mantenimiento</h2>
+
+        <div class="warning-box mb-8">
+          <h4 class="font-semibold mb-2">
+            <i class="fas fa-exclamation-triangle mr-2"></i>
+            Advertencia sobre comandos de limpieza
+          </h4>
+          <p>
+            Los comandos de limpieza de Docker son destructivos y eliminarán recursos no utilizados globalmente.
+            Revise si hay volúmenes/imágenes que deben conservarse antes de ejecutarlos.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8">
+          <div class="component-card">
+            <h4 class="text-lg font-semibold mb-4">Limpieza Básica</h4>
+            <div class="space-y-3">
+              <div>
+                <p class="text-sm font-medium mb-1">Parar todos los contenedores:</p>
+                <div class="code-block">
+                  sudo docker stop $(sudo docker ps -aq)
+                </div>
+              </div>
+              <div>
+                <p class="text-sm font-medium mb-1">Eliminar contenedores detenidos:</p>
+                <div class="code-block">
+                  sudo docker rm -f $(sudo docker ps -aq) 2&gt;/dev/null
+                </div>
+              </div>
+              <div>
+                <p class="text-sm font-medium mb-1">Eliminar volúmenes no usados:</p>
+                <div class="code-block">
+                  sudo docker volume rm $(sudo docker volume ls -q) 2&gt;/dev/null
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="component-card">
+            <h4 class="text-lg font-semibold mb-4">Limpieza Avanzada</h4>
+            <div class="space-y-3">
+              <div>
+                <p class="text-sm font-medium mb-1">Prune del sistema (imágenes y cachés):</p>
+                <div class="code-block">
+                  sudo docker system prune -af
+                </div>
+              </div>
+              <div>
+                <p class="text-sm font-medium mb-1">Prune completo (incluyendo volúmenes):</p>
+                <div class="code-block">
+                  sudo docker system prune -a --volumes
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 p-3 bg-red-50 border border-red-200 rounded">
+              <p class="text-sm text-red-700">
+                <i class="fas fa-exclamation-circle mr-2"></i>
+                <strong>Atención:</strong> Estos comandos eliminan recursos no utilizados globalmente.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Security and Best Practices -->
+      <section class="max-w-6xl mx-auto px-8 py-12" id="seguridad">
+        <h2 class="section-title serif">10. Seguridad y Buenas Prácticas</h2>
+
+        <div class="grid md:grid-cols-2 gap-8">
+          <div class="component-card">
+            <h4 class="text-lg font-semibold mb-4">Seguridad de Red</h4>
+            <ul class="space-y-3">
+              <li class="flex items-start">
+                <i class="fas fa-shield-alt text-green-600 mr-3 mt-1"></i>
+                <div>
+                  <strong>Modbus:</strong> Limitar al HMI; usar listas de control y segmentación si se expone.
+                </div>
+              </li>
+              <li class="flex items-start">
+                <i class="fas fa-lock text-blue-600 mr-3 mt-1"></i>
+                <div>
+                  <strong>Redis:</strong> Usar ACL/contraseñas fuertes y bind estricto si se accede más allá de localhost/VPN.
+                </div>
+              </li>
+              <li class="flex items-start">
+                <i class="fas fa-network-wired text-purple-600 mr-3 mt-1"></i>
+                <div>
+                  <strong>WireGuard:</strong> Fijar puerto (51820/UDP), monitorear handshakes y rotar claves periódicamente.
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="component-card">
+            <h4 class="text-lg font-semibold mb-4">Buenas Prácticas</h4>
+            <ul class="space-y-3">
+              <li class="flex items-start">
+                <i class="fas fa-cogs text-amber-600 mr-3 mt-1"></i>
+                <div>
+                  <strong>Kong:</strong> Proteger rutas con auth/rate-limit si se expone a internet; usar certificados válidos.
+                </div>
+              </li>
+              <li class="flex items-start">
+                <i class="fas fa-code text-teal-600 mr-3 mt-1"></i>
+                <div>
+                  <strong>Variables de entorno:</strong> Usar para configuración en lugar de valores hardcodeados en el código.
+                </div>
+              </li>
+              <li class="flex items-start">
+                <i class="fas fa-eye text-red-600 mr-3 mt-1"></i>
+                <div>
+                  <strong>Observabilidad:</strong> Monitorear métricas clave y configurar alertas proactivas.
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="highlight-box mt-8">
+          <h4 class="text-xl font-semibold mb-3">Principios de Seguridad por Diseño</h4>
+          <div class="grid md:grid-cols-3 gap-6">
+            <div class="text-center">
+              <i class="fas fa-lock text-3xl text-primary mb-3"></i>
+              <h5 class="font-semibold mb-2">Segmentación</h5>
+              <p class="text-sm text-neutral-600">Redes separadas para público e interno, superficie de ataque mínima</p>
+            </div>
+            <div class="text-center">
+              <i class="fas fa-key text-3xl text-primary mb-3"></i>
+              <h5 class="font-semibold mb-2">Cifrado</h5>
+              <p class="text-sm text-neutral-600">Comunicaciones cifradas (TLS, WireGuard) para confidencialidad</p>
+            </div>
+            <div class="text-center">
+              <i class="fas fa-eye text-3xl text-primary mb-3"></i>
+              <h5 class="font-semibold mb-2">Auditoría</h5>
+              <p class="text-sm text-neutral-600">Observabilidad completa para detección y respuesta a incidentes</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="bg-neutral-900 text-white py-12">
+        <div class="max-w-6xl mx-auto px-8">
+          <div class="grid md:grid-cols-3 gap-8">
+            <div>
+              <h4 class="serif text-xl font-bold mb-4">TRIX Stack</h4>
+              <p class="text-neutral-300 text-sm">
+                Arquitectura de microservicios para la gestión de sistemas robóticos e IoT.
+                Segura, escalable y observable por diseño.
+              </p>
+            </div>
+            <div>
+              <h4 class="font-semibold mb-4">Enlaces Rápidos</h4>
+              <ul class="space-y-2 text-sm text-neutral-300">
+                <li>
+                  <a class="hover:text-primary transition-colors" href="#arquitectura">Arquitectura</a>
+                </li>
+                <li>
+                  <a class="hover:text-primary transition-colors" href="#ui-radar">UI Radar</a>
+                </li>
+                <li>
+                  <a class="hover:text-primary transition-colors" href="#observabilidad">Observabilidad</a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 class="font-semibold mb-4">Accesos Directos</h4>
+              <ul class="space-y-2 text-sm text-neutral-300">
+                <li>UI: localhost:30080/ui</li>
+                <li>Grafana: localhost:30080/grafana</li>
+                <li>Prometheus: localhost:9090</li>
+              </ul>
+            </div>
+          </div>
+          <div class="border-t border-neutral-700 mt-8 pt-8 text-center text-sm text-neutral-400">
+            <p> 2025 TRIX Stack - Documentación Técnica Completa</p>
+          </div>
+        </div>
+      </footer>
+    </main>
+
+    <script>
+        // Table of Contents Active Link
+        const tocLinks = document.querySelectorAll('.toc a');
+        const sections = document.querySelectorAll('section[id]');
+        
+        function setActiveLink() {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (window.scrollY >= sectionTop) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            tocLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        }
+        
+        window.addEventListener('scroll', setActiveLink);
+        setActiveLink();
+        
+        // Smooth scrolling for TOC links
+        tocLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Mobile TOC toggle
+        const toc = document.querySelector('.toc');
+        const tocOverlay = document.querySelector('.toc-overlay');
+        const tocToggle = document.createElement('button');
+        tocToggle.innerHTML = '<i class="fas fa-bars"></i>';
+        tocToggle.className = 'toc-toggle fixed top-4 left-4 z-50 bg-white p-3 rounded-lg shadow-lg lg:hidden';
+        document.body.appendChild(tocToggle);
+
+        function openToc() {
+            toc.classList.add('open');
+            tocOverlay.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeToc() {
+            toc.classList.remove('open');
+            tocOverlay.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        tocToggle.addEventListener('click', function() {
+            if (toc.classList.contains('open')) {
+                closeToc();
+            } else {
+                openToc();
+            }
+        });
+
+        tocOverlay.addEventListener('click', closeToc);
+
+        // Close TOC when window is resized to desktop
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 1024) {
+                closeToc();
+            }
+        });
+    </script>
+
+  
+
+</body></html>

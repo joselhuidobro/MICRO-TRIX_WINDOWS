@@ -1,0 +1,41 @@
+<div id="modbus-data" class="panel">
+  <h3>Datos Modbus en Tiempo Real</h3>
+
+  <div class="data-row">
+    <label>Lw0:</label>
+    <span id="lw0">{{ lw0 }}</span>
+    <span id="lw0-indicator" class="indicator"></span>
+    <button id="toggleLw0Btn" class="btn btn-warning">Toggle Lw0</button>
+  </div>
+
+  <div class="data-row">
+    <label>Lw1:</label>
+    <span id="lw1">{{ lw1 }}</span>
+    <span id="lw1-indicator" class="indicator"></span>
+    <button id="toggleLw1Btn" class="btn btn-warning">Toggle Lw1</button>
+  </div>
+
+  <div class="data-row">
+    <label>Lw2:</label>
+    <span id="lw2">{{ lw2 }}</span>
+    <span id="lw2-indicator" class="indicator"></span>
+    <button id="toggleLw2Btn" class="btn btn-warning">Toggle Lw2</button>
+  </div>
+
+  <div class="data-row">
+    <label>LB105:</label>
+    <span id="lb105">{{ lb105 }}</span>
+    <span id="lb105-indicator" class="indicator"></span>
+  </div>
+
+  <div class="data-row">
+    <label>RB1.0:</label>
+    <span id="rb1_0">{{ rb1_0 }}</span>
+    <span id="rb1_0-indicator" class="indicator"></span>
+  </div>
+
+  <div class="controls-row gap-8" style="margin-top:8px">
+    <button id="modbusscan" class="btn btn-secondary">Modbus Scan</button>
+  </div>
+</div>
+

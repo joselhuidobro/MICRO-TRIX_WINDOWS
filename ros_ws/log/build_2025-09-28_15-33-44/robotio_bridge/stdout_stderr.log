@@ -1,0 +1,13 @@
+running develop
+running egg_info
+writing robotio_bridge.egg-info/PKG-INFO
+writing dependency_links to robotio_bridge.egg-info/dependency_links.txt
+writing requirements to robotio_bridge.egg-info/requires.txt
+writing top-level names to robotio_bridge.egg-info/top_level.txt
+reading manifest file 'robotio_bridge.egg-info/SOURCES.txt'
+writing manifest file 'robotio_bridge.egg-info/SOURCES.txt'
+running build_ext
+Creating /ws/install/robotio_bridge/lib/python3.10/site-packages/robotio-bridge.egg-link (link to .)
+
+Installed /ws/build/robotio_bridge
+running symlink_data

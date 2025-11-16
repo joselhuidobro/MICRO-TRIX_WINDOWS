@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<link rel="stylesheet" href="static/styles.css">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="https://automatizaciontrix.com.mx/img/logo48.ico" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Motores de Cremallera</title>
+
+</head>
+<body>
+    <header id="headerContainer"></header>
+
+     <main>
+           <!---------------- Barrera rápida------------------------->
+           <h2>Recomendaciones TRIX: Barreras Rápidas</h2>
+           <div class="servicio">
+           
+               <h4>¡Nos ajustamos a tu presupuesto!</h4>
+
+            <!-- Barrera Faac modelo 620 -->
+                <div class="servicio">
+                    <h3>Barrera Faac modelo 620</h3>
+                    <div class="product">
+                    <img class="img-product" src="img/faac-barrera-620.webp" alt="faac barrera 620" width="523" height="230" loading="lazy">
+                    <div class="product-info">
+                        <a href="#contacto" class="info-button">Más Información</a>
+                    </div>
+                  
+                    </div>
+                    <h4>Ficha técnica</h4>
+                    <p>Voltaje de Alimentación de 220 VAC</p>
+                    <p>Largo de barrera: 3.8 metros</p>
+                    <p>Tiempo de apertura : 3 segundos</p>
+                  
+                </div>
+
+           <div class="servicio">
+               <div class="container">
+                   <h3>Kit de barrera hidrualica B680 </h3>
+                   <div class="product">
+                       <img class="img-product" src="img/barrera-vehicular-b680.webp" alt="barrera vehicular b680"
+                           width="523" height="230" loading="lazy">
+                       <a href="#contacto" class="info-button">Más Información</a>
+                   </div>
+               </div>
+               <h4>Ficha técnica</h4>
+               <p> Voltaje de alimentación 100-240 VAC </p>
+              <p> Motor electrico Brushless de 36VDC</p>
+               <p>Largo de barrera: 4.3 metros</p>
+                
+              
+           </div>
+
+           <div class="servicio">
+               <div class="container">
+                   <h3>Kit Barrera Clasica 127V SEG</h3>
+                   <div class="product">
+                    <img class="logo-img" src="img/logo_trix_st.png" alt="Logo TRIX Automatización" loading="lazy">
+                       <img class="img-product" src="img/Kit-Barrera-Clasica-127V-SEG.png"
+                           alt="Kit Barrera Clasica 127V-SEG" width="500" height="200" loading="lazy">
+                       <a href="#contacto" class="info-button">Más Información</a>
+                   </div>
+               </div>
+           </div>
+       </div>
+   </div>
+       <!-- ------------------------ SCRIPTS ------------------------ -->
+  <script>
+    /** carga header y footer **/
+    Promise.all([
+      fetch('_includes/header.html').then(r => r.text()),
+      fetch('_includes/footer.html').then(r => r.text())
+    ]).then(([header, footer]) => {
+      document.getElementById('headerContainer').innerHTML  = header;
+      document.getElementById('footerContainer').innerHTML  = footer;
+
+      /* menú hamburguesa */
+      const btn = document.getElementById('menuButton');
+      if (btn) btn.addEventListener('click', () =>
+        document.getElementById('navList').classList.toggle('active')
+      );
+    });
+
+   
+  </script>
+
+
+
+<div class="servicio">
+    <div class="container">
+        <div class="product">
+            <img class="logo-img" src="img/logo_trix_st.png" alt="Logo TRIX Automatización" loading="lazy">
+        </div> 
+    </div>
+</div>
+
+
+</section>
+</main>
+
+
+<div id="asideContainer"></div>
+<div id="footerContainer"></div>
+</section>
+
+
+<script>
+    // Fetching and injecting content into the page
+    document.addEventListener('DOMContentLoaded', function () {
+        const sections = [
+            { url: 'footer.html', container: 'footerContainer' },
+            { url: 'aside.html', container: 'asideContainer' },
+
+
+        
+        ];
+
+        sections.forEach(section => {
+            fetch(section.url)
+                .then(response => response.text())
+                .then(content => {
+                    document.getElementById(section.container).innerHTML = content;
+                })
+                .catch(error => console.error('Error fetching content:', error));
+        });
+    });
+</script>
+
+</body>
+</html>

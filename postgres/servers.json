@@ -1,0 +1,16 @@
+{
+    "Servers": {
+        "1": {
+            "Name": "PostgreSQL Trix",
+            "Group": "Servers",
+            "Host": "postgres",
+            "Port": 5432,
+            "MaintenanceDB": "trixdb",
+            "Username": "trix",
+            "Password": "trixpass",
+            "SSLMode": "prefer",
+            "Timeout": 10,
+            "UseSSHTunnel": 0
+        }
+    }
+}

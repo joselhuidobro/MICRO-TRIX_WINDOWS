@@ -1,0 +1,770 @@
+{% extends "layout.html" %}
+{% block title %}TRIX{% endblock %}
+
+{% block customCSS %}
+<style>
+  .indicator{width:10px;height:10px;border-radius:50%;display:inline-block;margin-left:10px;background:#bbb}
+  .panel{margin:20px 0;padding:16px;border:1px solid #ddd;border-radius:8px;background:#f9f9f9}
+  .data-row{display:flex;align-items:center;gap:8px;margin:8px 0}
+  .btn{margin-left:8px}
+  #build-output{display:none;white-space:pre-wrap;background:#fff;border-left:4px solid #3b82f6}
+  /* NetInfo local */
+  #netinfo-section .card{padding:10px 12px;border:1px solid #f3f4f6;border-radius:12px;background:#fafafa}
+  #netinfo-section .v{display:flex;align-items:center;gap:6px;font-weight:600}
+  #netinfo-section .copy-btn{border:1px solid #e5e7eb;background:#fff;border-radius:8px;padding:2px 8px;cursor:pointer}
+  #netinfo-section .copy-btn:hover{background:#f9fafb}
+  #netinfo-section .hint{font-size:11px;color:#6b7280;margin-top:4px}
+  /* ROS Graph local */
+  #ros-graph .toolbar{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+  #ros-graph .pill{display:inline-flex;align-items:center;gap:.35rem;padding:.2rem .5rem;border:1px solid #e5e7eb;border-radius:999px;background:#fafafa;font-size:.85rem}
+  #ros-graph .muted{color:#6b7280}
+  #ros-graph .badge{display:inline-block;padding:.15rem .45rem;border-radius:.45rem;font-size:.75rem;background:#eef2ff;color:#3730a3;border:1px solid #e0e7ff}
+  #ros-graph .table{width:100%;border-collapse:collapse;background:#fff;border-radius:.5rem;overflow:hidden}
+  #ros-graph .table th,#ros-graph .table td{padding:.55rem .7rem;border-bottom:1px solid #f2f2f2;vertical-align:top}
+  #ros-graph .table thead th{background:#fafafa;text-align:left}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+
+<section id="trix-quick-links" style="padding:16px; font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;">
+  <h2 style="margin:0 0 12px;">TRIX — Accesos rápidos</h2>
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:10px;">
+    <a href="http://10.6.0.1:30080/ui" target="_blank" rel="noopener" style="padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; text-decoration:none;">Kong UI</a>
+    <a href="http://10.6.0.1:9090/targets?search=" target="_blank" rel="noopener" style="padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; text-decoration:none;">Prometheus Targets</a>
+    <a href="http://10.6.0.1:30080/redis/health" target="_blank" rel="noopener" style="padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; text-decoration:none;">Redis Health</a>
+    <a href="http://10.6.0.1:30080/nodered" target="_blank" rel="noopener" style="padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; text-decoration:none;">Node-RED</a>
+    <a href="http://10.6.0.1:8080/" target="_blank" rel="noopener" style="padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; text-decoration:none;">Servicio 8080</a>
+    <a href="http://10.6.0.1:30080/grafana" target="_blank" rel="noopener" style="padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; text-decoration:none;">Grafana</a>
+    <a href="http://10.6.0.1:6800/login/" target="_blank" rel="noopener" style="padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; text-decoration:none;">TRIX ERP / Login</a>
+    <a href="http://10.6.0.1/docs/" target="_blank" rel="noopener" style="padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; text-decoration:none;">Documentación</a>
+    <a href="http://10.6.0.1:9070/browser/" target="_blank" rel="noopener" style="padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; text-decoration:none;">Postgress Admin</a>
+    <a href="http://localhost:8929/users/sign_in" target="_blank" rel="noopener" style="padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; text-decoration:none;">Gitlab</a>
+    <a href="http://127.0.0.1:8030/" target="_blank" rel="noopener" style="padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;text-decoration:none;">127.0.0.1:8030 (UI local) </a>
+    
+  </div>
+</section>
+
+
+<section id="trix-local-tools" style="padding:16px;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;">
+
+  <!-- Links -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin-bottom:16px;">
+
+  </div>
+
+  <!-- Docker logs quick copy -->
+  <h3 style="margin:14px 0 8px;">Comandos rápidos — Docker logs</h3>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:10px;">
+    <button class="copy-cmd" data-cmd="sudo docker logs git_observer"
+      style="text-align:left;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;background:#fff;cursor:pointer;">
+      <strong>git_observer</strong><br><code>sudo docker logs git_observer</code>
+    </button>
+
+    <button class="copy-cmd" data-cmd="sudo docker logs -f net_sensor_cdmx"
+      style="text-align:left;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;background:#fff;cursor:pointer;">
+      <strong>net_sensor_cdmx (follow)</strong><br><code>sudo docker logs -f net_sensor_cdmx</code>
+    </button>
+
+    <button class="copy-cmd" data-cmd="sudo docker logs -n 50 net_sensor_cdmx"
+      style="text-align:left;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;background:#fff;cursor:pointer;">
+      <strong>net_sensor_cdmx (últimos 50)</strong><br><code>sudo docker logs -n 50 net_sensor_cdmx</code>
+    </button>
+
+    <button class="copy-cmd" data-cmd="sudo docker logs -f micro_ros_agent_HMI2"
+      style="text-align:left;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;background:#fff;cursor:pointer;">
+      <strong>micro_ros_agent_HMI2 (follow)</strong><br><code>sudo docker logs -f micro_ros_agent_HMI2</code>
+    </button>
+
+    <button class="copy-cmd" data-cmd="sudo docker logs flask_ui_encoder_robot"
+      style="text-align:left;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;background:#fff;cursor:pointer;">
+      <strong>flask_ui_encoder_robot</strong><br><code>sudo docker logs flask_ui_encoder_robot</code>
+    </button>
+
+    <button class="copy-cmd" data-cmd="sudo docker logs wireguard | tail -n 80"
+      style="text-align:left;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;background:#fff;cursor:pointer;">
+      <strong>wireguard (últimos 80)</strong><br><code>sudo docker logs wireguard | tail -n 80</code>
+    </button>
+  </div>
+
+  <p id="copy-status" aria-live="polite" style="margin-top:10px;color:#059669;display:none;">Copiado ✅</p>
+
+  <script>
+    (function () {
+      const status = document.getElementById('copy-status');
+      function showStatus(msg) {
+        if (!status) return;
+        status.textContent = msg || 'Copiado ✅';
+        status.style.display = 'block';
+        clearTimeout(window.__copyToast);
+        window.__copyToast = setTimeout(() => { status.style.display = 'none'; }, 1500);
+      }
+      function copy(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(() => showStatus('Copiado ✅'));
+        } else {
+          // fallback
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+          showStatus('Copiado ✅');
+        }
+      }
+      document.querySelectorAll('#trix-local-tools .copy-cmd').forEach(btn => {
+        btn.addEventListener('click', () => copy(btn.getAttribute('data-cmd')));
+        btn.title = 'Click para copiar';
+      });
+    })();
+  </script>
+</section>
+
+
+
+  <!-- ========== Net Info Card ========== -->
+  <section id="netinfo-section" aria-label="Estado de red"
+           style="max-width:800px;margin:24px auto;padding:16px;border:1px solid #e5e7eb;border-radius:16px;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,.06);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;">
+    <header style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+      <div>
+        <h2 style="margin:0;font-size:20px;font-weight:700;">Estado de Red</h2>
+        <div id="netinfo-status" style="font-size:12px;color:#6b7280;">Cargando…</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <label style="font-size:12px;color:#374151;display:flex;align-items:center;gap:6px;">
+          <input type="checkbox" id="netinfo-admin-toggle" aria-label="Admin mode (solo pruebas)">
+          Admin mode (solo pruebas)
+        </label>
+        <label style="font-size:12px;color:#374151;display:flex;align-items:center;gap:6px;">
+          <input type="checkbox" id="netinfo-autorefresh-toggle" aria-label="Auto-refresh">
+          Auto-refresh
+        </label>
+        <input id="netinfo-interval" type="number" min="5" value="30" title="Intervalo (seg)" style="width:64px;padding:6px 8px;border:1px solid #d1d5db;border-radius:8px;">
+        <button id="netinfo-refresh" style="padding:8px 12px;border:1px solid #111827;background:#111827;color:#fff;border-radius:10px;cursor:pointer;">Refrescar</button>
+      </div>
+    </header>
+
+    <hr style="border:none;border-top:1px solid #f3f4f6;margin:16px 0;">
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <!-- IP Pública -->
+      <div class="card">
+        <div class="k" style="font-size:12px;color:#6b7280;">IP pública (IPv4)</div>
+        <div class="v">
+          <span id="netinfo-public4">—</span>
+          <button data-copy="#netinfo-public4" class="copy-btn" title="Copiar IPv4 pública">⧉</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="k" style="font-size:12px;color:#6b7280;">IP pública (IPv6)</div>
+        <div class="v">
+          <span id="netinfo-public6">—</span>
+          <button data-copy="#netinfo-public6" class="copy-btn" title="Copiar IPv6 pública">⧉</button>
+        </div>
+      </div>
+
+      <!-- WireGuard -->
+      <div class="card">
+        <div class="k" style="font-size:12px;color:#6b7280;">WG server (IP interna)</div>
+        <div class="v">
+          <span id="netinfo-wg-ip">—</span>
+          <button data-copy="#netinfo-wg-ip" class="copy-btn" title="Copiar WG server IP">⧉</button>
+        </div>
+        <div class="hint">Acceso UI vía VPN: <code>http://10.6.0.1:30080</code></div>
+      </div>
+
+      <div class="card">
+        <div class="k" style="font-size:12px;color:#6b7280;">WG endpoint (host:puerto)</div>
+        <div class="v">
+          <span id="netinfo-wg-endpoint">—</span>
+          <button data-copy="#netinfo-wg-endpoint" class="copy-btn" title="Copiar WG endpoint">⧉</button>
+        </div>
+      </div>
+
+      <!-- LAN / Docker -->
+      <div class="card">
+        <div class="k" style="font-size:12px;color:#6b7280;">LAN IPv4 (host)</div>
+        <div class="v">
+          <span id="netinfo-lan-ipv4">—</span>
+          <button data-copy="#netinfo-lan-ipv4" class="copy-btn" title="Copiar LAN IPv4">⧉</button>
+        </div>
+        <div class="hint">Útil para HMI/Modbus en LAN.</div>
+      </div>
+
+      <div class="card">
+        <div class="k" style="font-size:12px;color:#6b7280;">Docker bridge (trix-net)</div>
+        <div class="v">
+          <span id="netinfo-docker-bridge">—</span>
+          <button data-copy="#netinfo-docker-bridge" class="copy-btn" title="Copiar Docker bridge">⧉</button>
+        </div>
+        <div class="hint">Servicios internos (172.18.x.x).</div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;font-size:12px;color:#6b7280;">
+      <span>Actualizado: <span id="netinfo-updated">—</span></span>
+      <span id="netinfo-admin-flag" style="margin-left:8px;padding:2px 6px;border-radius:6px;background:#eef2ff;color:#3730a3;display:none;">ADMIN</span>
+    </div>
+  </section>
+  <!-- ========== /Net Info Card ========== -->
+
+  <!-- ========== Dispositivos UDP ========== -->
+  <section id="udp-devices" class="panel" aria-label="Dispositivos UDP detectados" style="margin:1rem 0;">
+    <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;">
+      <h2 style="margin:0;">Dispositivos UDP detectados</h2>
+      <span id="dev-count" style="font-size:.9rem;color:#555;">— 0</span>
+      <input id="dev-filter" type="search" placeholder="Filtrar (IP, MAC, nombre, nodo, tópico…)"
+             style="flex:1;min-width:240px;padding:.5rem .6rem;border:1px solid #ddd;border-radius:.5rem;">
+    </div>
+
+    <div style="overflow:auto;border:1px solid #eee;border-radius:.75rem;margin-top:.5rem;">
+      <table id="dev-table" style="width:100%;border-collapse:collapse;font-size:.95rem;">
+        <thead style="background:#fafafa;">
+          <tr>
+            <th style="text-align:left;padding:.6rem;border-bottom:1px solid #eee;">Estado</th>
+            <th style="text-align:left;padding:.6rem;border-bottom:1px solid #eee;">IP</th>
+            <th style="text-align:left;padding:.6rem;border-bottom:1px solid #eee;">MAC</th>
+            <th style="text-align:left;padding:.6rem;border-bottom:1px solid #eee;">Nombre</th>
+            <th style="text-align:left;padding:.6rem;border-bottom:1px solid #eee;">Nodo</th>
+            <th style="text-align:left;padding:.6rem;border-bottom:1px solid #eee;">Tópico</th>
+            <th style="text-align:left;padding:.6rem;border-bottom:1px solid #eee;">Vendor</th>
+            <th style="text-align:left;padding:.6rem;border-bottom:1px solid #eee;">Hostname</th>
+            <th style="text-align:left;padding:.6rem;border-bottom:1px solid #eee;">uROS Agent</th>
+            <th style="text-align:left;padding:.6rem;border-bottom:1px solid #eee;">Entrada</th>
+            <th style="text-align:left;padding:.6rem;border-bottom:1px solid #eee;">Última vez</th>
+          </tr>
+        </thead>
+        <tbody id="dev-tbody"></tbody>
+      </table>
+    </div>
+
+    <p id="dev-hint" style="color:#777;font-size:.85rem;margin-top:.5rem;">
+      Escuchando <code>/udp/devices/stream</code>… (si falla, se usa refresco por HTTP)
+    </p>
+  </section>
+  <!-- ========== /Dispositivos UDP ========== -->
+
+  <!-- ========== VISOR ROS: Nodos y Tópicos ========== -->
+  <section id="ros-graph" class="panel" aria-label="ROS Graph" style="margin-top:0;">
+    <div class="toolbar">
+      <h2 style="margin:0;">ROS Graph</h2>
+      <span class="pill">Nodos: <strong id="ros-nodes-count">0</strong> · Tópicos: <strong id="ros-topics-count">0</strong></span>
+      <input id="ros-filter" class="pill" type="search" placeholder="Filtrar (nodo, tópico, tipo, pub/sub…)"
+             style="flex:1;min-width:260px;background:#fff;">
+      <button id="ros-refresh" class="btn btn-primary">Refrescar</button>
+      <label class="pill" title="Actualización automática cada 2 s">
+        <input id="ros-auto" type="checkbox" checked> Auto 2s
+      </label>
+      <span id="ros-hint" class="muted">/ros/graph (JSON). Si hay SSE: /ros/graph/stream</span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:.75rem;">
+      <!-- Nodos -->
+      <div>
+        <h3 style="margin:.25rem 0;">Nodos</h3>
+        <div style="overflow:auto;border:1px solid #eee;border-radius:.5rem;">
+          <table class="table" id="ros-nodes-table">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Namespace</th>
+                <th>Tópicos (pub/sub)</th>
+              </tr>
+            </thead>
+            <tbody id="ros-nodes-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tópicos -->
+      <div>
+        <h3 style="margin:.25rem 0;">Tópicos</h3>
+        <div style="overflow:auto;border:1px solid #eee;border-radius:.5rem;">
+          <table class="table" id="ros-topics-table">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Tipo</th>
+                <th>Publishers</th>
+                <th>Subscribers</th>
+                <th>QoS</th>
+              </tr>
+            </thead>
+            <tbody id="ros-topics-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- ========== /VISOR ROS ========== -->
+
+  <!-- ========== SUSCRIPCIONES (UI) ========== -->
+  <section id="ui-subs" class="panel" aria-label="Suscripciones UI" style="margin:1rem 0;">
+    <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;">
+      <h2 style="margin:0;">Suscripciones (UI)</h2>
+      <span id="subs-count" style="font-size:.9rem;color:#555;">— 0</span>
+
+      <!-- Filtro de nodos (regex simple, separados por coma) -->
+      <label for="subs-filter" style="margin-left:auto;font-size:.9rem;color:#555;">Nodos a considerar:</label>
+      <input id="subs-filter" type="text"
+             value="^ui_,trix_graph_monitor"
+             title="Patrones (regex) separados por comas; se comparan contra el nombre del nodo"
+             style="min-width:260px;padding:.4rem .6rem;border:1px solid #ddd;border-radius:.5rem;">
+      <button id="subs-reset" class="btn btn-sm btn-secondary">Restablecer</button>
+    </div>
+
+    <div style="overflow:auto;border:1px solid #eee;border-radius:.75rem;margin-top:.5rem;">
+      <table id="subs-table" style="width:100%;border-collapse:collapse;font-size:.95rem;">
+        <thead style="background:#fafafa;">
+          <tr>
+            <th style="text-align:left;padding:.6rem;border-bottom:1px solid #eee;">Tópico</th>
+            <th style="text-align:left;padding:.6rem;border-bottom:1px solid #eee;">Tipo</th>
+            <th style="text-align:left;padding:.6rem;border-bottom:1px solid #eee;">Nodo suscriptor</th>
+            <th style="text-align:left;padding:.6rem;border-bottom:1px solid #eee;">QoS</th>
+          </tr>
+        </thead>
+        <tbody id="subs-tbody"></tbody>
+      </table>
+    </div>
+
+    <p id="subs-hint" style="color:#777;font-size:.85rem;margin-top:.5rem;">
+      Leyendo <code>/ros/graph</code> cada 2&nbsp;s… usa los patrones para mostrar solo los nodos de la UI (por defecto: <code>^ui_, trix_graph_monitor</code>).
+    </p>
+  </section>
+  <!-- ========== /SUSCRIPCIONES (UI) ========== -->
+
+  <!-- ========== Datos Modbus ========== -->
+  <section id="modbus-data" class="panel" aria-label="Datos Modbus en tiempo real">
+    <h3>Datos Modbus en Tiempo Real</h3>
+
+    <div class="panel" role="group" aria-label="Telemetría de ESP32">
+      <div class="data-row">
+        <strong>Grados (ESP32):</strong>
+        <span id="deg">{{ degrees }}</span>
+      </div>
+      <div class="data-row">
+        <strong>Pulsos:</strong>
+        <span id="pulses">{{ pulses }}</span>
+      </div>
+
+      <h4>Mover motor manualmente</h4>
+      <div class="data-row">
+        <button id="M1_izquierda_btn" class="btn btn-warning">Izquierda (-1°)</button>
+        <button id="M1_derecha_btn" class="btn btn-warning">Derecha (+1°)</button>
+      </div>
+
+      <button id="btn-plan" type="button">▶ Ejecutar rutina</button>
+      <small id="plan-status" style="margin-left:8px;"></small>
+    </div>
+
+    <div class="data-row">
+      <label for="lw0">Lw0:</label><span id="lw0">{{ lw0 }}</span><span id="lw0-indicator" class="indicator" aria-hidden="true"></span>
+      <button id="toggleLw0Btn" class="btn btn-warning">Toggle Lw0</button>
+    </div>
+    <div class="data-row">
+      <label for="lw1">Lw1:</label><span id="lw1">{{ lw1 }}</span><span id="lw1-indicator" class="indicator" aria-hidden="true"></span>
+      <button id="toggleLw1Btn" class="btn btn-warning">Toggle Lw1</button>
+    </div>
+    <div class="data-row">
+      <label for="lw2">Lw2:</label><span id="lw2">{{ lw2 }}</span><span id="lw2-indicator" class="indicator" aria-hidden="true"></span>
+      <button id="toggleLw2Btn" class="btn btn-warning">Toggle Lw2</button>
+    </div>
+    <div class="data-row">
+      <label for="lb105">LB105:</label><span id="lb105">{{ lb105 }}</span><span id="lb105-indicator" class="indicator" aria-hidden="true"></span>
+    </div>
+    <div class="data-row">
+      <label for="rb1_0">RB1.0:</label><span id="rb1_0">{{ rb1_0 }}</span><span id="rb1_0-indicator" class="indicator" aria-hidden="true"></span>
+    </div>
+  </section>
+  <!-- ========== /Datos Modbus ========== -->
+
+  <!-- ========== Salida de acciones ========== -->
+  <div id="build-output" class="panel" aria-live="polite">
+    <h4>Salida</h4>
+    <pre id="build-output-text"></pre>
+  </div>
+  <!-- ========== /Salida de acciones ========== -->
+
+</div> <!-- /container -->
+
+<!-- ========== SCRIPTS ========== -->
+
+<script>
+/* Net Info (admin toggle, auto-refresh, copiar) */
+(function(){
+  const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+  const els = {
+    status: $('#netinfo-status'),
+    updated: $('#netinfo-updated'),
+    adminFlag: $('#netinfo-admin-flag'),
+    adminToggle: $('#netinfo-admin-toggle'),
+    autoToggle: $('#netinfo-autorefresh-toggle'),
+    interval: $('#netinfo-interval'),
+    btnRefresh: $('#netinfo-refresh'),
+    out: {
+      public4: $('#netinfo-public4'),
+      public6: $('#netinfo-public6'),
+      wgIp: $('#netinfo-wg-ip'),
+      wgEndpoint: $('#netinfo-wg-endpoint'),
+      lanIpv4: $('#netinfo-lan-ipv4'),
+      dockerBridge: $('#netinfo-docker-bridge'),
+    }
+  };
+
+  let timer = null;
+  const ENDPOINT = '/api/net/info'; // ajusta si usas otro prefix
+
+  function humanTime(ts){
+    try {
+      const d = new Date((ts || Date.now()/1000) * 1000);
+      return d.toLocaleString();
+    } catch { return '—'; }
+  }
+
+  function setStatus(msg, ok=true){
+    els.status.textContent = msg;
+    els.status.style.color = ok ? '#6b7280' : '#b91c1c';
+  }
+
+  async function fetchNetInfo(isAdmin){
+    setStatus('Actualizando…', true);
+    try {
+      const headers = {};
+      // Solo para pruebas; en producción usa tu JWT/cookie detrás de Kong.
+      if (isAdmin) headers['X-Role'] = 'admin';
+
+      const res = await fetch(ENDPOINT, { headers, cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+
+      // Render
+      els.out.public4.textContent   = data.public_ipv4 ?? '—';
+      els.out.public6.textContent   = data.public_ipv6 ?? '—';
+      els.out.wgIp.textContent      = (data.wg && data.wg.server_ip) || '—';
+      els.out.wgEndpoint.textContent= (data.wg && data.wg.endpoint)  || '—';
+      els.out.dockerBridge.textContent = (data.docker && data.docker.bridge_ipv4) || '—';
+
+      const lanArr = (data.lan && data.lan.ipv4) ? data.lan.ipv4 : [];
+      els.out.lanIpv4.textContent = lanArr.length ? lanArr.join(', ') : '—';
+
+      els.updated.textContent = humanTime(data.ts);
+      const admin = !!data.admin;
+      els.adminFlag.style.display = admin ? 'inline-block' : 'none';
+      setStatus('OK', true);
+    } catch (err) {
+      console.error('netinfo:', err);
+      setStatus('Error al actualizar', false);
+    }
+  }
+
+  function startAuto(){
+    stopAuto();
+    const sec = Math.max(Number(els.interval.value || 30), 5);
+    timer = setInterval(() => fetchNetInfo(els.adminToggle.checked), sec * 1000);
+  }
+
+  function stopAuto(){
+    if (timer) { clearInterval(timer); timer = null; }
+  }
+
+  function attachCopyButtons(){
+    $$('#netinfo-section .copy-btn').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        const target = btn.getAttribute('data-copy');
+        const el = $(target);
+        if (!el) return;
+        const text = el.textContent.trim();
+        if (!text || text === '—') return;
+
+        try {
+          await navigator.clipboard.writeText(text);
+          const prev = btn.textContent;
+          btn.textContent = '✓';
+          setTimeout(()=> btn.textContent = prev, 800);
+        } catch {
+          // Fallback
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+          const prev = btn.textContent;
+          btn.textContent = '✓';
+          setTimeout(()=> btn.textContent = prev, 800);
+        }
+      });
+    });
+  }
+
+  // Eventos
+  els.btnRefresh.addEventListener('click', ()=> fetchNetInfo(els.adminToggle.checked));
+  els.autoToggle.addEventListener('change', ()=>{
+    if (els.autoToggle.checked) startAuto(); else stopAuto();
+  });
+  els.interval.addEventListener('change', ()=>{
+    if (els.autoToggle.checked) startAuto();
+  });
+
+  // Init
+  attachCopyButtons();
+  fetchNetInfo(false);
+})();
+</script>
+
+<script>
+/* Dispositivos UDP (SSE + fallback) */
+(function(){
+  const tbody   = document.getElementById('dev-tbody');
+  const counter = document.getElementById('dev-count');
+  const filter  = document.getElementById('dev-filter');
+  const hint    = document.getElementById('dev-hint');
+
+  let devices = [];   // último snapshot
+  let sse;            // EventSource activo
+  let fallbackTimer;  // intervalo de polling si no hay SSE
+
+  function fmtTs(ts){
+    if(!ts && ts!==0) return '—';
+    try { return new Date(ts*1000).toLocaleString(); } catch(e){ return '—'; }
+  }
+  function chip(text, ok){
+    const bg = ok ? '#e6f4ea' : '#fbeaea';
+    const fg = ok ? '#1e7e34' : '#b02a37';
+    return `<span style="background:${bg};color:${fg};padding:.2rem .45rem;border-radius:999px;font-weight:600;">${text}</span>`;
+  }
+  function esc(s){ return String(s ?? '').replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+
+  function render(list){
+    // Filtro texto simple
+    const q = (filter.value || '').toLowerCase();
+    let rows = list;
+    if(q){
+      rows = rows.filter(d => {
+        const hay = [
+          d.ip, d.mac, d.vendor, d.hostname, d.name, d.node, d.topic,
+          (d.uros_agent_host? (d.uros_agent_host+':'+(d.uros_agent_port||'')) : '')
+        ].map(x => (x||'').toString().toLowerCase()).join(' ');
+        return hay.includes(q);
+      });
+    }
+    // Orden: online primero, luego por last_seen desc
+    rows.sort((a,b)=>{
+      const ao = a.online?1:0, bo = b.online?1:0;
+      if(ao!==bo) return bo-ao;
+      return (b.last_seen||0) - (a.last_seen||0);
+    });
+
+    // Pintar
+    tbody.innerHTML = rows.map(d => {
+      const online = !!d.online;
+      const agent  = d.uros_agent_host ? `${esc(d.uros_agent_host)}:${d.uros_agent_port||''}` : '';
+      const vendor = d.vendor || (d.mac && d.mac.startsWith('3c:61:05') ? 'Espressif' : (d.vendor||''));
+      return `<tr style="border-bottom:1px solid #f1f1f1;">
+        <td style="padding:.6rem;">${chip(online?'ONLINE':'OFFLINE', online)}</td>
+        <td style="padding:.6rem;font-family:ui-monospace,Menlo,Consolas;">${esc(d.ip||'')}</td>
+        <td style="padding:.6rem;font-family:ui-monospace,Menlo,Consolas;">${esc(d.mac||'')}</td>
+        <td style="padding:.6rem;">${esc(d.name||'')}</td>
+        <td style="padding:.6rem;">${esc(d.node||'')}</td>
+        <td style="padding:.6rem;">${esc(d.topic||'')}</td>
+        <td style="padding:.6rem;">${esc(vendor||'')}</td>
+        <td style="padding:.6rem;">${esc(d.hostname||'')}</td>
+        <td style="padding:.6rem;">${agent}</td>
+        <td style="padding:.6rem;">${fmtTs(d.session_start || d.first_seen_ever)}</td>
+        <td style="padding:.6rem;">${fmtTs(d.last_seen)}</td>
+      </tr>`;
+    }).join('');
+
+    counter.textContent = `— ${rows.length}`;
+  }
+
+  function handleSnapshot(snap){
+    devices = Array.isArray(snap.devices) ? snap.devices : [];
+    render(devices);
+  }
+
+  // --- SSE en /udp/devices/stream ---
+  function startSSE(){
+    if(!('EventSource' in window)) return false;
+    try{
+      sse = new EventSource('/udp/devices/stream', { withCredentials:false });
+      sse.addEventListener('devices', ev => {
+        const snap = JSON.parse(ev.data || '{}');
+        handleSnapshot(snap);
+      });
+      sse.addEventListener('ping', ()=>{ /* heartbeat */ });
+      sse.onerror = () => {
+        hint.textContent = 'SSE desconectado. Usando refresco por HTTP…';
+        stopSSE();
+        startFallback();
+      };
+      hint.textContent = 'Escuchando /udp/devices/stream (SSE activo)…';
+      return true;
+    }catch(e){
+      return false;
+    }
+  }
+  function stopSSE(){
+    if(sse){ try{sse.close();}catch{} sse=null; }
+  }
+
+  // --- Fallback por HTTP polling ---
+  async function fetchOnce(){
+    try{
+      const r = await fetch('/udp/devices', {cache:'no-store'});
+      const snap = await r.json();
+      handleSnapshot(snap);
+    }catch(e){ /* ignore */ }
+  }
+  function startFallback(){
+    if(fallbackTimer) return;
+    fetchOnce();
+    fallbackTimer = setInterval(fetchOnce, 3000);
+  }
+
+  // Eventos UI
+  filter.addEventListener('input', () => render(devices));
+
+  // Bootstrap
+  if(!startSSE()){
+    hint.textContent = 'SSE no disponible. Usando refresco por HTTP…';
+    startFallback();
+  } else {
+    // Carga inicial por si el SSE tarda en empujar el primer evento
+    fetchOnce();
+  }
+})();
+</script>
+
+<script>
+/* Telemetría Modbus + controles de UI */
+(function () {
+  async function fetchJSON(url, options){
+    const r = await fetch(url, options||{});
+    const ct=(r.headers.get('content-type')||'').toLowerCase();
+    if(!ct.includes('application/json')) throw new Error((await r.text()).slice(0,500)||`Respuesta no-JSON (${r.status})`);
+    const j = await r.json();
+    if(!r.ok || j.status==='error') throw new Error(j.message||r.statusText||'Error');
+    return j;
+  }
+  const KEYS=["lw0","lw1","lw2","lb105","rb1_0"];
+  const setText=(id,v)=>{const el=document.getElementById(id); if(el) el.textContent=String(v)};
+  const setIndicator=(id,on)=>{const el=document.getElementById(id); if(el) el.style.background=on?"#16a34a":"#bbb"};
+  const isOn=v=>v===1||v===true||v==="1"||v==="On"||v==="ON";
+
+  function render(d){
+    for(const k of KEYS){
+      if(!(k in d)) continue;
+      const v=d[k];
+      setText(k, v==="Error"?"Error":(isOn(v)?"On":"Off"));
+      setIndicator(k+"-indicator", v!=="Error" && isOn(v));
+    }
+  }
+
+  const outDiv=document.getElementById('build-output');
+  const outPre=document.getElementById('build-output-text');
+  function showOutput(text, ok=true){
+    if(!outDiv||!outPre) return;
+    outPre.textContent=text||'';
+    outDiv.style.display='block';
+    outDiv.style.borderLeftColor = ok ? '#16a34a' : '#dc2626';
+  }
+  window.showOutput=showOutput;
+
+  async function pollData(){
+    try{ render(await fetchJSON(`/data?_=${Date.now()}`,{cache:"no-store"})); }catch(e){ console.warn("poll /data:",e.message);}
+  }
+  async function pollTelemetry(){
+    try{
+      const j=await fetchJSON("/telemetry",{cache:"no-store"});
+      if(typeof j.degrees!=="undefined") setText("deg", Number(j.degrees).toFixed(2));
+      if(typeof j.pulses!=="undefined")  setText("pulses", j.pulses);
+    }catch{}
+  }
+
+  function bindToggle(btnId, endpoint, key){
+    const btn=document.getElementById(btnId); if(!btn) return;
+    btn.addEventListener('click', async ()=>{
+      btn.disabled=true;
+      try{
+        const d=await fetchJSON(endpoint,{method:'POST'});
+        if(typeof d.value!=='undefined') render({[key]:d.value});
+        showOutput(d.output||d.message||`${key} toggled`, true);
+      }catch(e){
+        showOutput(`Error: ${e.message}`, false);
+      }finally{ btn.disabled=false; }
+    });
+  }
+
+  // PASO = 1°, BURST = 1
+  function bindServoStep(btnId, dir){
+    const btn=document.getElementById(btnId); if(!btn) return;
+    const STEP=1, BURST=1;
+    btn.addEventListener('click', async ()=>{
+      btn.disabled=true;
+      try{
+        const url = dir>0 ? `/servo/right?step=${STEP}&burst=${BURST}` : `/servo/left?step=${STEP}&burst=${BURST}`;
+        const d = await fetchJSON(url,{method:'POST'});
+        showOutput(d.message || `Setpoint ${dir>0?'+':'-'}${STEP}° (burst=${BURST}) OK`, true);
+      }catch(e){ showOutput(`Error moviendo setpoint: ${e.message}`, false); }
+      finally{ btn.disabled=false; }
+    });
+  }
+
+  bindToggle('toggleLw0Btn','/toggle_lw0','lw0');
+  bindToggle('toggleLw1Btn','/toggle_lw1','lw1');
+  bindToggle('toggleLw2Btn','/toggle_lw2','lw2');
+  bindServoStep('M1_izquierda_btn',-1);
+  bindServoStep('M1_derecha_btn',+1);
+
+  // Inicial
+  pollData(); pollTelemetry();
+  setInterval(pollData,1000);
+  setInterval(pollTelemetry,200);
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden){ pollData(); pollTelemetry(); }});
+})();
+</script>
+
+<script>
+/* Acciones de rutina /api/plan */
+(function(){
+  const btn  = document.getElementById('btn-plan');
+  const info = document.getElementById('plan-status');
+
+  if(!btn || !info) return;
+
+  btn.addEventListener('click', async () => {
+    btn.disabled = true;
+    info.textContent = 'Llamando /api/plan...';
+    try {
+      const resp = await fetch('/api/plan', { method: 'POST' });
+      const ct = resp.headers.get('content-type') || '';
+      let body;
+      try {
+        body = ct.includes('application/json') ? await resp.json() : await resp.text();
+      } catch {
+        body = await resp.text();
+      }
+      if (!resp.ok) {
+        throw new Error(`HTTP ${resp.status} ${resp.statusText} — ${typeof body === 'string' ? body.slice(0,200) : (body.message || JSON.stringify(body))}`);
+      }
+      info.textContent = body.message || 'OK';
+      console.log('PLAN OK:', body);
+    } catch (e) {
+      info.textContent = 'Error: ' + e.message;
+      console.error('PLAN ERR:', e);
+    } finally {
+      setTimeout(() => { info.textContent = ''; btn.disabled = false; }, 3000);
+    }
+  });
+})();
+</script>
+
+<!-- ========== /SCRIPTS ========== -->
+
+{% endblock %}
+

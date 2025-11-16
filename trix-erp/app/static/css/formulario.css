@@ -1,0 +1,119 @@
+/* Estilos globales para body */
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+/* Estilos para encabezados h2 */
+h2 {
+    margin-bottom: 20px;
+    font-size: 1.8em;
+    color: #333;
+}
+
+/* Si deseas dar estilos específicos a la clase .Formulario_general,
+   ponlos aquí (por ejemplo, un fondo, bordes, etc.) */
+div.Formulario_general {
+    /* Ejemplo de estilos posibles:
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    */
+}
+
+/* Sección del formulario */
+.form-section {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-bottom: 30px;
+    border-radius: 8px;
+}
+
+/* Filas dentro del formulario */
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+/* Grupos de formulario */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 200px;
+}
+
+/* Etiquetas dentro de .form-group */
+.form-group label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 0.9em;
+    color: #e2e2e2;
+}
+
+/* Inputs y selects dentro de .form-group */
+.form-group input,
+.form-group select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+/* Contenedor de productos */
+.productos-container {
+    margin-top: 10px;
+    background: #fff;
+    border: 1px solid #eee;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* Cada producto en la lista */
+.producto {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 5px;
+    flex-wrap: wrap;
+}
+
+/* Etiquetas dentro de .producto */
+.producto label {
+    font-weight: bold;
+    margin-right: 5px;
+    white-space: nowrap;
+}
+
+/* Selects e inputs numéricos dentro de .producto */
+.producto select,
+.producto input[type='number'] {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+/* Botón de submit */
+button[type="submit"] {
+    background: #4CAF50;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1em;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+}
+
+/* Hover del botón de submit */
+button[type="submit"]:hover {
+    background: #45a049;
+}
+
+/* Hover del botón dentro de la columna de búsqueda */
+.search-column button:hover {
+    background: #1976D2;
+}

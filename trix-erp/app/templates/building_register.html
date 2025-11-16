@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block customCSS %}
+
+{% endblock %}
+
+{% block content %}
+<div class="form-section">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/formulario.css') }}">
+        <title>Iniciar Sesión</title>
+    </head>
+    <body>
+        
+        <h1>Registrarse</h1>
+        <form method="POST" action="{{ url_for('building.building_save') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <label for="cel">Teléfono Celular:</label>
+            <input type="tel" id="cel" name="cel" required>
+
+            <label for="direccion">Dirección:</label>
+            <input type="text" id="direccion" name="direccion" required>
+          
+            <label for="lat">Latitud:</label>
+            <input type="text" id="lat" name="lat" required>
+          
+            <label for="lon">Longitud:</label>
+            <input type="text" id="lon" name="lon" required>
+          
+            <label for="rfc">RFC:</label>
+            <input type="text" id="rfc" name="rfc" required>
+          
+            <label for="ra_social">Razon Social - Administración:</label>
+            <input type="text" id="ra_social" name="ra_social" required>
+          
+            <label for="predial">Número predial:</label>
+            <input type="text" id="predial" name="predial" required>
+          
+            <label for="fecha_construccion">Fecha de construcción (año):</label>
+            <input type="number" id="fecha_construccion" name="fecha_construccion" required>
+          
+            <label for="cp">Código Postal:</label>
+            <input type="number" id="cp" name="cp" required>
+          
+            <label for="no_deptos">Número de departamentos:</label>
+            <input type="number" id="no_deptos" name="no_deptos" required>
+          
+            <label for="no_pisos">Número de pisos:</label>
+            <input type="number" id="no_pisos" name="no_pisos" required>
+          
+            <label for="accesos_peatonales">Accesos peatonales:</label>
+            <input type="number" id="accesos_peatonales" name="accesos_peatonales" required>
+          
+            <label for="accesos_vehiculares">Accesos vehiculares:</label>
+            <input type="number" id="accesos_vehiculares" name="accesos_vehiculares" required>
+          
+            <label for="lugares_estacionamiento">Lugares de estacionamiento:</label>
+            <input type="number" id="lugares_estacionamiento" name="lugares_estacionamiento" required>
+          
+            <button type="submit">Registrar Edificio</button>
+            
+    
+
+        </form>
+    </body>
+</div>
+{% endblock %}
+
+{% block body %}
+<!-- Scripts adicionales si es necesario -->
+
+
+<script>
+    console.log("Página cargada exitosamente.");
+</script>
+{% endblock %}

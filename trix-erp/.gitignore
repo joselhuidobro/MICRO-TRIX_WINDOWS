@@ -1,0 +1,10 @@
+# .gitignore
+.env
+secre_script.py
+password_hash.py
+
+
+
+
+
+

@@ -1,0 +1,22 @@
+define IF_WAN = "eth0"  # <-- cámbialo a tu interfaz real
+define IF_WG  = "wg0"
+
+table ip nat {
+  chain postrouting {
+    type nat hook postrouting priority 100;
+    oifname $IF_WAN masquerade
+  }
+}
+table inet filter {
+  chain forward {
+    type filter hook forward priority 0;
+    ct state invalid drop
+    iifname $IF_WG oifname $IF_WAN accept
+    iifname $IF_WAN oifname $IF_WG ct state related,established accept
+  }
+  chain input {
+    type filter hook input priority 0;
+    udp dport 51820 accept
+  }
+}
+

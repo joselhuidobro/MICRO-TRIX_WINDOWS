@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <meta charset="UTF-8" />
+  <link rel="icon" href="/img/logo48.ico" type="image/x-icon" />
+  <link rel="canonical" href="https://automatizaciontrix.com.mx/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  
+  <meta name="keywords" content="renders 4K, diseño arquitectónico CDMX, puertas automáticas, herrería, automatización, modelado 3D, tour 360" />
+  <meta name="description" content="Studio TRIX: renders 4K, diseño, puertas automáticas y herrería en 72 h en CDMX." />
+  <meta name="author" content="Studio TRIX – José Luis Huidobro" />
+  
+  <meta property="og:title" content="Studio TRIX | Renders & Puertas Automáticas en CDMX" />
+  <meta property="og:description" content="Diseñamos y documentamos tu proyecto en 72 h. Renders 4K, puertas automáticas, herrería y más." />
+  <meta property="og:image" content="/img/logo_trix_st.webp" />
+  <meta property="og:url" content="https://automatizaciontrix.com.mx/" />
+  <meta property="og:type" content="website" />
+  
+  <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+  
+  <link rel="stylesheet" href="/styles.css" />
+  
+  <script src="https://cdn.tailwindcss.com" defer></script>
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  
+  <script src="/js/script.js" defer></script>
+  <title></title>
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-11070400416"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-D0R2X2VCKF', { cookie_domain: 'automatizaciontrix.com.mx' });
+    gtag('config', 'AW-11070400416', { cookie_domain: 'automatizaciontrix.com.mx' });
+  </script>
+</head>
+<body class="antialiased leading-relaxed text-gray-800">
+  
+  <header id="headerContainer"></header>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var menuButton = document.getElementById('menuButton');
+      var navList = document.getElementById('navList');
+      if (menuButton && navList) {
+        menuButton.addEventListener('click', function() {
+          navList.classList.toggle('active'); 
+        });
+      }
+    });
+  </script>
+  <main>
+<header>
+  <div class="container">
+    <div class="logo-wrapper">
+      <img class="logo-trix" src="/img/logo_trix_st.png" alt="Logo TRIX">
+    </div>
+    <nav>
+      <div id="menuButton" class="menu-button">☰</div>
+      <ul class="nav-list" id="navList">
+        <li><a href="/">Inicio</a></li>
+        <li><a href="/ruta_modelado/">3D y Renderizado</a></li>
+        <li><a href="/ruta_modeladoPLC/">HVAC</a></li>
+        <li><a href="/ruta_controles_accesorios/">Controles</a></li>
+        <li><a href="/ruta_tarjetas_control/">Tarjetas de Control Puertas</a></li>
+        <li><a href="/alarmasyaccesorios/">Alarmas y Accesorios</a></li>
+        <li><a href="/ruta_cremallera/">Motores de Cremallera</a></li>
+        <li><a href="/ruta_barreras/">Barreras</a></li>
+        <li><a href="/electronica/">Educación Tecnológica</a></li>
+        <li><a href="/puertas_edificios/">Puertas especializadas</a></li>
+        <li><a href="/quienes-somos/">About</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var menuButton = document.getElementById('menuButton');
+    var navList = document.getElementById('navList');
+    if (menuButton && navList) {
+      menuButton.addEventListener('click', function() {
+        navList.classList.toggle('active');
+      });
+    }
+  });
+</script>
+<main>
+  
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="https://automatizaciontrix.com.mx/img/logo48.ico" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TRIX: Educación Tecnológica</title>
+    <link rel="stylesheet" href="static/styles.css">
+</head>
+
+<body>
+
+    <!-- HEADER DINÁMICO -->
+    <header id="headerContainer"></header>
+
+    <main>
+        <section id="kits-para-jovenes">
+
+            <!-- Script para cargar el header -->
+            <script>
+                fetch('header.html')
+                    .then(response => response.text())
+                    .then(data => {
+                        document.getElementById('headerContainer').innerHTML = data;
+                        setupMenuToggle();
+                    });
+
+                function setupMenuToggle() {
+                    var menuButton = document.getElementById('menuButton');
+                    if (menuButton) {
+                        menuButton.addEventListener('click', function () {
+                            var navList = document.getElementById('navList');
+                            navList.classList.toggle('active');
+                        });
+                    }
+                }
+            </script>
+
+            <section id="curso-robotica-dev-drone" class="course-section">
+                <div class="header-section">
+                    <h2>Curso de Robótica y Controladores DEV: DRONE</h2>
+                    <p>Aprende a programar sin Arduino usando ESP-IDF en un entorno profesional.</p>
+                    <p>Domina Docker, Docker&nbsp;Compose, UDP y ROS&nbsp;2.</p>
+                    <p>Programa un ESP32 con los sensores necesarios.</p>
+                    <p>Duración: 40&nbsp;horas.</p>
+                    <p>Modela y simula tu dron en Blender.</p>
+                    <p>Interfaz gráfica FLASK.</p>
+                    <p>Curso presencial.</p>
+                </div>
+            </section>
+            
+
+            <!-- Sección de productos/kits -->
+            <div class="servicio">
+                <div class="container">
+         
+                    <div class="product">
+                        <img class="logo-img" src="img/logo_trix_st.webp" 
+                             alt="Logo TRIX Automatización" loading="lazy">
+                        <img class="img-product" src="img/esp-32.webp" 
+                             alt="esp-32" width="200" height="200" loading="lazy">
+                    </div>
+                    <div class="product">
+                        <img class="logo-img" src="img/logo_trix_st.webp" 
+                             alt="Logo TRIX Automatización" loading="lazy">
+                        <img class="img-product" src="img/docker.webp" 
+                             alt="BluePill stm32" width="200" height="160" loading="lazy">
+                    </div>
+                </div>
+            </div>
+
+            <h3>por que es importante este curso</h3>
+            <ul>
+                <li><strong>Arduino</strong> te limita cuando necesitas control de bajo nivel; con <em>ESP-IDF</em> accedes a todo el hardware.</li>
+                <li><strong>Docker</strong> reproduce tu entorno robótico al 100 %, incluidas dependencias y estructura de carpetas.</li>
+                <li><strong>Flask</strong> es un framework Python ligero ideal para paneles web e interfaces gráficas.</li>
+                <li><strong>ROS 2</strong> orquesta tus nodos y crea flujos de datos en tiempo real entre sensores y actuadores.</li>
+            </ul>
+            
+
+            <section id="preparatorias">
+                <div class="header-section">
+                    <h2>Preparatorias Privadas en la CDMX</h2>
+                    <h3>Forma a los Futuros Líderes Tecnológicos</h3>
+                </div>
+                <p>
+                    Nuestra ruta de proyectos conecta y fomentan el interés temprano en la tecnología. 
+                    Despierta la curiosidad científica en tus estudiantes y dales una base sólida 
+                    en programación y electrónica antes de entrar a la universidad.
+                </p>
+            </section>
+
+
+
+        </section>
+    </main>
+
+    <!-- ASIDE & FOOTER DINÁMICOS -->
+    <div id="asideContainer"></div>
+    <div id="footerContainer"></div>
+
+     <!-- ------------------------ SCRIPTS ------------------------ -->
+  <script>
+    /** carga header y footer **/
+    Promise.all([
+      fetch('_includes/header.html').then(r => r.text()),
+      fetch('_includes/footer.html').then(r => r.text())
+    ]).then(([header, footer]) => {
+      document.getElementById('headerContainer').innerHTML  = header;
+      document.getElementById('footerContainer').innerHTML  = footer;
+
+      /* menú hamburguesa */
+      const btn = document.getElementById('menuButton');
+      if (btn) btn.addEventListener('click', () =>
+        document.getElementById('navList').classList.toggle('active')
+      );
+    });
+
+   
+  </script>
+
+    <!-- 4) BOTÓN FLOTANTE DE WHATSAPP -->
+    <a href="https://wa.me/525544727104?text=¡Hola!+Estoy+interesado+en+sus+kits+educativos"
+       style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;"
+       target="_blank">
+       <img src="img/whatsapp_icon.webp"
+            alt="WhatsApp"
+            width="60"
+            height="60"
+            style="border-radius:50%;">
+    </a>
+
+</body>
+</html>
+
+
+</main>
+<footer>
+  <div>
+    
+    <div class="mb-6">
+      <img class="logo-img" src="/img/logo_trix_st.png" alt="Logo TRIX Automatización" loading="lazy">
+    </div>
+    
+    <div class="flex flex-col md:flex-row justify-center items-center gap-4 mb-6">
+      <a href="tel:+525554539552" id="callNowBtn" class="text-blue-400 hover:text-blue-300 font-semibold">
+        Teléfono: +52 55 5453 9552
+      </a>
+      <a href="https://wa.me/525554539552" id="whatsappBtn" class="text-green-400 hover:text-green-300 font-semibold">
+        WhatsApp
+      </a>
+      <a href="mailto:contacto@automatizaciontrix.com.mx" class="text-gray-300 hover:text-gray-200 font-semibold">
+        contacto@automatizaciontrix.com.mx
+      </a>
+    </div>
+    
+    <p class="text-gray-400 text-sm">
+      © 2025 TRIX Studio. Todos los derechos reservados.
+    </p>
+  </div>
+</footer>
+<script>
+  document.getElementById('callNowBtn')?.addEventListener('click', () => {
+    gtag('event', 'call_click', { event_category: 'CTA', event_label: 'Llamar ahora' });
+  });
+  document.getElementById('whatsappBtn')?.addEventListener('click', () => {
+    gtag('event', 'whatsapp_click', { event_category: 'CTA', event_label: 'WhatsApp Footer' });
+  });
+</script>
+
+  
+
+    
+  </main>
+  
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "TRIX Studio",
+      "image": "\/img\/logo_trix_st.webp",
+      "telephone": "+52 55 5453 9552",
+      "url": "https://automatizaciontrix.com.mx/",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "MX"
+      },
+      "description": "Estudio de ingeniería y diseño especializado en puertas automáticas, renderizado 4K y desarrollo robótico."
+    }
+  </script>
+</body>
+</html>

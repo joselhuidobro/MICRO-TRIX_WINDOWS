@@ -1,0 +1,23 @@
+running develop
+running egg_info
+creating robotio_description.egg-info
+writing robotio_description.egg-info/PKG-INFO
+writing dependency_links to robotio_description.egg-info/dependency_links.txt
+writing requirements to robotio_description.egg-info/requires.txt
+writing top-level names to robotio_description.egg-info/top_level.txt
+writing manifest file 'robotio_description.egg-info/SOURCES.txt'
+reading manifest file 'robotio_description.egg-info/SOURCES.txt'
+writing manifest file 'robotio_description.egg-info/SOURCES.txt'
+running build_ext
+Creating /ws/install/robotio_description/lib/python3.10/site-packages/robotio-description.egg-link (link to .)
+
+Installed /ws/build/robotio_description
+running symlink_data
+creating /ws/install/robotio_description/share/ament_index
+creating /ws/install/robotio_description/share/ament_index/resource_index
+creating /ws/install/robotio_description/share/ament_index/resource_index/packages
+symbolically linking /ws/build/robotio_description/resource/robotio_description -> /ws/install/robotio_description/share/ament_index/resource_index/packages
+symbolically linking /ws/build/robotio_description/package.xml -> /ws/install/robotio_description/share/robotio_description
+creating /ws/install/robotio_description/share/robotio_description/urdf
+symbolically linking /ws/build/robotio_description/robotio_description/urdf/robotio.urdf.xacro -> /ws/install/robotio_description/share/robotio_description/urdf
+creating /ws/install/robotio_description/share/robotio_description/config

@@ -1,0 +1,40 @@
+<!-- ./gazebo/worlds/my_model.world -->
+<sdf version="1.6">
+  <world name="default">
+    <!-- Suelo y sol por defecto -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- Tu malla en el ORIGEN (0,0,0) -->
+    <model name="my_glb_as_dae">
+      <static>true</static>
+      <!-- Ajusta z si tu malla está centrada y queda enterrada: ej. 0.5 -->
+      <pose>0 0 0 0 0 0</pose>
+      <link name="link">
+        <visual name="mesh_vis">
+          <geometry>
+            <mesh>
+              <!-- usa file:// ruta absoluta o relativa dentro del contenedor -->
+              <uri>file:///sim/models/my_model/meshes/model.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+        <!-- (Opcional) colisión igual a la malla; para debug rápido puedes omitirla -->
+        <collision name="mesh_col">
+          <geometry>
+            <mesh>
+              <uri>file:///sim/models/my_model/meshes/model.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+        </collision>
+      </link>
+    </model>
+  </world>
+</sdf>
+

@@ -1,0 +1,53 @@
+C:\Users\Charo>java -version
+openjdk version "17.0.13" 2024-10-15
+OpenJDK Runtime Environment Temurin-17.0.13+11 (build 17.0.13+11)
+OpenJDK 64-Bit Server VM Temurin-17.0.13+11 (build 17.0.13+11, mixed mode, sharing)
+
+-----------------------------------------------
+
+where java
+C:\Users\Charo>where java
+C:\Program Files\Eclipse Adoptium\jdk-17.0.13.11-hotspot\bin\java.exe
+---------------------
+en la carpeta donde esta el archivo de instalacion de jenkins: 
+
+prender jenkins 
+desde cmd :
+java -jar jenkins.war --httpPort=9090
+
+
+    huidobro
+    Donadona12
+
+   jenkins automatiza estos comandos , el git add ,commit y push siguen siendo manuales
+
+2. contruir imagen y 
+
+    docker build -t joselhuidobro/trix-svm:v12024-2025 .
+    docker tag joselhuidobro/trix-svm:v12024-2025 registry.heroku.com/trix-svm-backend/web
+    heroku container:login
+    docker push registry.heroku.com/trix-svm-backend/web
+
+4.Liberar aplicación
+
+    heroku container:release web -a trix-svm-backend
+    heroku config:set FLASK_APP=run.py FLASK_ENV=production --app trix-svm-backend
+    heroku logs --tail --app trix-svm-backend
+    
+
+tuve que cargar en heroku y en jenkins ( en el dashboard correspondiente) los siguientes parametros, 
+esto en local estaria en env, pero env. esta en gitignore, entonces jenkins no puede jalar las credenciales. 
+Tambien se modifico el script jenkins
+
+
+
+heroku_api_key: xxxxxxxxxxxxxxxxxxxxxxxxxx
+DATABASE_URL=postgres://u7vqat3333333333333333333333g7.us-east-1.rds.amazonaws.com:5432/da1111111b8t
+EMAIL_USER=joselhuidobro@gmail.com
+EMAIL_PASSWORD=cz11111skl34223
+DB_USER=u7v11111111
+DB_PASSWORD=p3b293434343434
+DB_HOST=cbdhrt3434343434s.amazonaws.com
+DB_PORT=5432
+DB_NAME=daaqaaec34343434
+SECRET_KEY=tu_clave_secreta_muy_segura_y_unica

@@ -1,0 +1,52 @@
+/* chatbot.css */
+
+.chatbot-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 300px;
+    background-color: #f1f1f1;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    overflow: hidden;
+    display: none; /* Inicialmente oculto */
+}
+
+.chatbot-container.active {
+    display: block; /* Se muestra cuando tiene la clase 'active' */
+}
+
+.chatbot-container h3 {
+    background-color: #4CAF50;
+    color: white;
+    margin: 0;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.chatbox {
+    padding: 10px;
+    max-height: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+.messages {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 10px;
+}
+
+.input-area {
+    display: flex;
+}
+
+.input-area input {
+    flex: 1;
+    padding: 5px;
+}
+
+.input-area button {
+    padding: 5px 10px;
+}
