@@ -537,6 +537,11 @@ def cotizar_trix(form_data: ImmutableMultiDict):
     # Guardar el archivo
     ruta_archivo = os.path.join(current_app.root_path, 'static', 'cotizaciones', f"{fecha_cotizacion}-{Direccion_cliente}-{unique_id}.docx")
     
+    # ******* AÑADE ESTAS DOS LÍNEAS *******
+    directorio = os.path.dirname(ruta_archivo)
+    os.makedirs(directorio, exist_ok=True)
+# **************************************
+    
     archivo=document.save(ruta_archivo)
        # Enviar el correo con el archivo adjunto
     clasificacion = predict_location(form_data.get('lat'),form_data.get('lon'))

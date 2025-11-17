@@ -10,3 +10,7 @@ docker exec -it postgres_trix psql -U trix -d trixdb -c "INSERT INTO usuarios (c
 
 con hash = trix (pruebas)
 docker exec -it postgres_trix psql -U trix -d trixdb -c "INSERT INTO usuarios (correo, password_hash, nivel_seguridad, nombre, rfc, razon_social, cel) VALUES ('joselhuidobro@gmail.com', 'pbkdf2:sha256:600000$ZU8wT0hzjPbJnGvt$c5ba9a1f36d3621d29c4be5b356ed6f54a4349166744422dfba3022a1df8b2c0', 3, 'Jose Luis', 'XAX', 'Administrador', '5550000000');"
+
+
+Validar
+docker exec -it postgres_trix psql -U trix -d trixdb -c "SELECT id, correo, nombre, nivel_seguridad FROM usuarios WHERE correo='joselhuidobro@gmail.com';"

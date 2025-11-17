@@ -16,7 +16,7 @@ def correo2(direccion, lat, lon, nombre, fecha, concepto_list, clasificacion, ar
 
     email_user = os.getenv("EMAIL_USER")
     email_password = os.getenv("EMAIL_PASSWORD")
-    email_destinatario = "automatizaciontrix@gmail.com"
+    email_destinatario = "joselhuidobrox@gmail.com"
 
     # Verificar que las variables de entorno se cargaron correctamente
     if not email_user or not email_password:

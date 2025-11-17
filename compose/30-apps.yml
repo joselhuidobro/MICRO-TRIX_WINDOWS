@@ -105,6 +105,7 @@ services:
     restart: unless-stopped
     volumes:
       - ../trix-erp/.env.trix_erp:/app/.env:ro
+      - ../trix-erp/cotizaciones:/app/app/static/cotizaciones
     depends_on:
       postgres:
         condition: service_healthy
