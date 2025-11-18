@@ -114,17 +114,15 @@ services:
   trixweb:
     build:
       context: ../trix-web
-    container_name: trix-pagina
-    user: "0:0"
     ports:
       - "8030:8030"
-    tmpfs:
-      - /var/cache/nginx
-      - /var/run
-    volumes:
-      - ../trix-web/nginx/mime.types:/etc/nginx/mime.types:ro
     networks: [trix-net]
     restart: unless-stopped
+    volumes:
+       - ../trix-web/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    user: "root" 
+
+
 
   # Git observer (utilidad)
   git:

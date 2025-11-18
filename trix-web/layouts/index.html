@@ -1,4 +1,17 @@
-{{ define "main" }}
-{{ .Content }}
+﻿{{ define "main" }}
+<div class="home-content">
+    <h1>{{ .Title }}</h1>
+    {{ .Content }}
+    
+    <!-- Sección de posts recientes -->
+    <section class="recent-posts">
+        <h2>Últimas Publicaciones</h2>
+        {{ range first 5 .Site.RegularPages }}
+        <article>
+            <h3><a href="{{ .Permalink }}">{{ .Title }}</a></h3>
+            <p>{{ .Summary }}</p>
+        </article>
+        {{ end }}
+    </section>
+</div>
 {{ end }}
-

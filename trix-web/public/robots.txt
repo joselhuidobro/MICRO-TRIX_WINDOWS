@@ -1,4 +1,0 @@
-User-agent: *
-Disallow:
-
-Sitemap: https://automatizaciontrix.com.mx/sitemap.xml

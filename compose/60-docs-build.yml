@@ -1,19 +1,6 @@
 
 services:
-  hugo_build:
-    build:
-      context: ../hugo_builder
-      args:
-        HUGO_VERSION: "0.135.0"
-    platform: linux/arm64/v8
-    working_dir: /src
-    command: ["sh","-lc","cd /src && hugo --minify --cleanDestinationDir --destination /public"]
-    volumes:
-      - ../trix-web:/src
-      - hugo_public:/public
-    networks: [web-net]
-    restart: "no"
-    pull_policy: never
+
 
   doxygen_build:
     build:

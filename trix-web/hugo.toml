@@ -1,5 +1,4 @@
-baseURL = "/"
-
+baseURL = "https://automatizaciontrix2.com.mx"    
 languageCode = "es-MX"
 title = "TRIX Studio | Ingeniería & Diseño"
 defaultContentLanguage = "es"

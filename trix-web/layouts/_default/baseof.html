@@ -1,85 +1,45 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <link rel="icon" href="{{ "img/logo48.ico" | relURL }}" type="image/x-icon" />
-  <link rel="canonical" href="https://automatizaciontrix.com.mx/" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- Google Fonts -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} | {{ .Site.Title }}{{ end }}</title>
+  
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- TU CSS -->
+  <link rel="stylesheet" href="{{ "css/styles.css" | relURL }}">
+  <!-- Favicon -->
+  <link rel="icon" href="{{ "img/logo48.ico" | absURL }}" type="image/x-icon">
+  
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-  <!-- SEO -->
-  <meta name="keywords" content="renders 4K, diseño arquitectónico CDMX, puertas automáticas, herrería, automatización, modelado 3D, tour 360" />
-  <meta name="description" content="Studio TRIX: renders 4K, diseño, puertas automáticas y herrería en 72 h en CDMX." />
-  <meta name="author" content="Studio TRIX – José Luis Huidobro" />
-  <!-- OpenGraph -->
-  <meta property="og:title" content="Studio TRIX | Renders & Puertas Automáticas en CDMX" />
-  <meta property="og:description" content="Diseñamos y documentamos tu proyecto en 72 h. Renders 4K, puertas automáticas, herrería y más." />
-  <meta property="og:image" content="{{ "img/logo_trix_st.webp" | relURL }}" />
-  <meta property="og:url" content="https://automatizaciontrix.com.mx/" />
-  <meta property="og:type" content="website" />
-  <!-- Pre-connect para mejorar TTFB en Tailwind CDN -->
-  <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
-  <!-- Hoja de estilos propia -->
-  <link rel="stylesheet" href="{{ "styles.css" | relURL }}" />
-  <!-- Tailwind CDN (utility clases) -->
-  <script src="https://cdn.tailwindcss.com" defer></script>
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <!-- Model Viewer -->
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
-  <!-- Script externo -->
-  <script src="{{ "js/script.js" | relURL }}" defer></script>
-  <title>{{ .Title }}</title>
-  <!-- Google Tag Manager -->
+  
+  <!-- Google Tag -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=AW-11070400416"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+    function gtag(){ dataLayer.push(arguments); }
     gtag('js', new Date());
     gtag('config', 'G-D0R2X2VCKF', { cookie_domain: 'automatizaciontrix.com.mx' });
     gtag('config', 'AW-11070400416', { cookie_domain: 'automatizaciontrix.com.mx' });
   </script>
 </head>
 <body class="antialiased leading-relaxed text-gray-800">
-  <!-- HEADER DINÁMICO -->
-  <header id="headerContainer"></header>
-  <!-- Script inline para el menú (puedes moverlo a un partial si crece) -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      var menuButton = document.getElementById('menuButton');
-      var navList = document.getElementById('navList');
-      if (menuButton && navList) {
-        menuButton.addEventListener('click', function() {
-          navList.classList.toggle('active'); 
-        });
-      }
-    });
-  </script>
+  {{ partial "header.html" . }}
   <main>
-{{ partial "header.html" . }}
-<main>
-  {{ block "main" . }}{{ end }}
-</main>
-{{ partial "footer.html" . }}
-
-  
-
-    
+    {{ block "main" . }}{{ end }}
   </main>
-  <!-- SCHEMA.ORG LocalBusiness (SEO) -->
-  <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "LocalBusiness",
-      "name": "TRIX Studio",
-      "image": "{{ "img/logo_trix_st.webp" | relURL }}",
-      "telephone": "+52 55 5453 9552",
-      "url": "https://automatizaciontrix.com.mx/",
-      "address": {
-        "@type": "PostalAddress",
-        "addressCountry": "MX"
-      },
-      "description": "Estudio de ingeniería y diseño especializado en puertas automáticas, renderizado 4K y desarrollo robótico."
-    }
-  </script>
+  {{ partial "footer.html" . }}
+  <script src="{{ "js/script.js" | absURL }}" defer></script>
 </body>
 </html>
