@@ -5,7 +5,7 @@
  heroku container:push web -a trix-2025-app
 heroku container:release web -a trix-2025-app
 
-
+docker run cloudflare/cloudflared:latest tunnel --no-autoupdate run --token eyJhIjoiYWJiZGI1ODQ2YmYyYzRkMjUzYWE3ZjE0OGZjNjI0MGMiLCJ0IjoiMmVlODkxNzAtNjZlYy00OWRlLTgyMTctY2IzNjZiMzFjOTdkIiwicyI6Ik1ERm1ZakJpWXpRdFpqZGtaaTAwWVRabExXRXhZbUV0TnpCbVkyUTNNR1kyTXpZeSJ9
 
 TRIX: Automatización Administrativa, Técnica y Legal con una Única Mensualidad
 El mejor aliado para la gestión de edificios y condominios en la CDMX

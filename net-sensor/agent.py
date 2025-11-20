@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 """
 TRIX Net Sensor Agent
-- Sniff pasivo: ARP + mDNS
+- Sniff pasivo: ARP + mDNS + ICMPv6 (ND)
 - Escaneo profundo:
-    * ARP sweep activo (subredes detectadas + SUBNETS_EXTRA)
-    * Mini-portscan TCP (puertos comunes, configurable)
+    * ARP sweep activo (IPv4)
+    * ICMPv6 Neighbor Solicitation sweep (IPv6)
+    * Mini-portscan TCP (IPv4 + IPv6, puertos comunes)
     * Sondeo SSDP (UPnP) para nombres/servicios por multicast
 - Persistencia en Redis: snapshot de devices + puertos/servicios
 """
@@ -14,10 +15,12 @@ import os, time, json, threading, socket, ipaddress, fnmatch, subprocess, re
 from typing import Optional, Dict, Any, List, Set, Tuple
 
 from scapy.all import (  # type: ignore
-    sniff, ARP, UDP, IP, Ether, Raw, conf, get_if_list, srp,
-    Ether as ScapyEther, ARP as ScapyARP
+    sniff, ARP, UDP, IP, IPv6, Ether, Raw, conf, get_if_list, srp,
+    Ether as ScapyEther, ARP as ScapyARP, ICMPv6ND_NS, ICMPv6ND_NA,
+    IPv6 as ScapyIPv6, ICMPv6ND_NS as ScapyICMPv6ND_NS
 )
 import redis  # type: ignore
+import requests
 
 # ───────────────────────── Config ─────────────────────────
 DOCKER_NETS_CIDR = os.getenv("DOCKER_NETS", "172.17.0.0/16,172.18.0.0/16")
@@ -33,13 +36,9 @@ REDIS_PASS  = os.getenv("REDIS_PASSWORD", "")
 REDIS_DB    = int(os.getenv("REDIS_DB", "0"))
 REDIS_KEY_DEVICES = os.getenv("REDIS_KEY_DEVICES", "trix:udp:devices:last")
 
-# Compatibilidad: si alguien define REDIS_KEY, úsalo como alias
-if os.getenv("REDIS_KEY") and not os.getenv("REDIS_KEY_DEVICES"):
-    REDIS_KEY_DEVICES = os.getenv("REDIS_KEY")
-
 ENV_IFACE = (os.getenv("IFACE") or "").strip()
-SCAN_IFACES_ENV = (os.getenv("SCAN_IFACES") or "").strip()       # ej: "eth0,br-*,docker0"
-SUBNETS_EXTRA_ENV = (os.getenv("SUBNETS_EXTRA") or "").strip()   # ej: "192.168.0.0/24,172.20.0.0/24"
+SCAN_IFACES_ENV = (os.getenv("SCAN_IFACES") or "").strip()
+SUBNETS_EXTRA_ENV = (os.getenv("SUBNETS_EXTRA") or "").strip()
 PORTS_TCP_ENV = (os.getenv("PORTS_TCP") or
                  "22,80,443,1883,8883,8080,3000,6379,9100,8123,502,9200,5601,3306,5432")
 
@@ -47,7 +46,7 @@ SCAN_INTERVAL_ARP   = int(os.getenv("SCAN_INTERVAL_ARP", "60"))
 SCAN_INTERVAL_PORTS = int(os.getenv("SCAN_INTERVAL_PORTS", "120"))
 TCP_TIMEOUT         = float(os.getenv("TCP_TIMEOUT", "0.35"))
 MCAST_PROBE_INTERVAL= int(os.getenv("MCAST_PROBE_INTERVAL", "90"))
-ARP_MAX_HOSTS       = int(os.getenv("ARP_MAX_HOSTS", "65536"))  # salta redes más grandes que esto
+ARP_MAX_HOSTS       = int(os.getenv("ARP_MAX_HOSTS", "65536"))
 
 ESP_PREFIXES = {"3c:61:05", "24:6f:28", "7c:df:a1", "84:f7:03", "bc:dd:c2"}
 
@@ -92,7 +91,7 @@ def classify_scope(ip: str) -> str:
         for n in _lan_nets:
             if ip4 in n: return "LAN"
     except: pass
-    return "HOST"  # fallback
+    return "HOST"
 
 def iface_exists(name: str) -> bool:
     return bool(name) and os.path.exists(f"/sys/class/net/{name}")
@@ -104,7 +103,7 @@ def default_iface_from_proc() -> Optional[str]:
                 cols = line.split()
                 if len(cols) < 4: continue
                 iface, dest_hex, flags_hex = cols[0], cols[1], cols[3]
-                if dest_hex == "00000000" and (int(flags_hex, 16) & 0x2):  # RTF_GATEWAY
+                if dest_hex == "00000000" and (int(flags_hex, 16) & 0x2):
                     if not iface.startswith(("lo", "veth")) and iface_exists(iface):
                         return iface
     except Exception:
@@ -146,7 +145,6 @@ def parse_ports_env(s: str) -> List[int]:
         if not p: continue
         try: out.append(int(p))
         except: pass
-    # únicos y orden estable
     seen=set(); res=[]
     for p in out:
         if p not in seen:
@@ -172,11 +170,6 @@ def list_candidate_ifaces() -> List[str]:
     return names
 
 def get_iface_ipv4(nic: str) -> Optional[Tuple[str, str]]:
-    """Obtiene (ip, netmask) del NIC.
-       1) Scapy (addr + netmask)
-       2) Fallback: `ip -4 addr show <nic>` + conversión /prefix → netmask dotted
-    """
-    # 1) Scapy
     try:
         ip = conf.route.get_if_addr(nic)
         nm = conf.route.get_if_netmask(nic)
@@ -184,7 +177,6 @@ def get_iface_ipv4(nic: str) -> Optional[Tuple[str, str]]:
             return ip, nm
     except Exception:
         pass
-    # 2) Fallback con `ip`
     try:
         out = subprocess.check_output(["ip","-4","addr","show",nic], text=True, stderr=subprocess.DEVNULL)
         m = re.search(r"inet\s+(\d+\.\d+\.\d+\.\d+)/(\d+)", out)
@@ -198,40 +190,61 @@ def get_iface_ipv4(nic: str) -> Optional[Tuple[str, str]]:
         pass
     return None
 
-def networks_from_ifaces() -> List[ipaddress.IPv4Network]:
-    nets: List[ipaddress.IPv4Network] = []
+def get_iface_ipv6(nic: str) -> Optional[str]:
+    try:
+        out = subprocess.check_output(["ip","-6","addr","show",nic], text=True, stderr=subprocess.DEVNULL)
+        for line in out.splitlines():
+            m = re.search(r"inet6\s+([0-9a-fA-F:]+)/\d+", line)
+            if m:
+                addr = m.group(1)
+                if not addr.startswith("fe80"):
+                    return addr
+    except Exception:
+        pass
+    return None
+
+def networks_from_ifaces() -> Tuple[List[ipaddress.IPv4Network], List[ipaddress.IPv6Network]]:
+    nets4: List[ipaddress.IPv4Network] = []
+    nets6: List[ipaddress.IPv6Network] = []
     for nic in list_candidate_ifaces():
-        v = get_iface_ipv4(nic)
-        if not v: continue
-        ip_s, nm_s = v
-        try:
-            net = ipaddress.IPv4Network((ip_s, nm_s), strict=False)
-            if net.num_addresses >= 4:
-                # si ocultamos Docker, no barremos sus redes
+        v4 = get_iface_ipv4(nic)
+        if v4:
+            ip_s, nm_s = v4
+            try:
+                net = ipaddress.IPv4Network((ip_s, nm_s), strict=False)
+                if net.num_addresses >= 4:
+                    if HIDE_DOCKER and any(net.overlaps(n) for n in _docker_nets):
+                        continue
+                    nets4.append(net)
+            except: pass
+        v6 = get_iface_ipv6(nic)
+        if v6:
+            try:
+                net = ipaddress.IPv6Network(v6 + "/64", strict=False)
                 if HIDE_DOCKER and any(net.overlaps(n) for n in _docker_nets):
                     continue
-                nets.append(net)
-        except:
-            pass
-    # Extras por ENV
+                nets6.append(net)
+            except: pass
     for s in SUBNETS_EXTRA_ENV.split(","):
         s = s.strip()
         if not s: continue
         try:
-            net = ipaddress.IPv4Network(s, strict=False)
-            if HIDE_DOCKER and any(net.overlaps(n) for n in _docker_nets):
-                continue
-            nets.append(net)
-        except:
-            pass
+            if ":" in s:
+                net = ipaddress.IPv6Network(s, strict=False)
+                nets6.append(net)
+            else:
+                net = ipaddress.IPv4Network(s, strict=False)
+                nets4.append(net)
+        except: pass
     # dedup
-    uniq: List[ipaddress.IPv4Network] = []
-    seen: Set[str] = set()
-    for n in nets:
-        key = str(n)
-        if key not in seen:
-            seen.add(key); uniq.append(n)
-    return uniq
+    def dedup(nets):
+        seen = set(); uniq = []
+        for n in nets:
+            key = str(n)
+            if key not in seen:
+                seen.add(key); uniq.append(n)
+        return uniq
+    return dedup(nets4), dedup(nets6)
 
 def try_rdns(ip: str) -> Optional[str]:
     try:
@@ -261,7 +274,6 @@ def upsert_device(mac: Optional[str], ip: Optional[str] = None, hostname: Option
         if hostname:
             d["hostname"] = hostname
             d.setdefault("name", hostname)
-        # vendor solo si MAC válida de verdad
         if mac and mac_is_valid(mac) and not d.get("vendor"):
             d["vendor"] = vendor_from_mac(mac)
         d["online"] = True
@@ -275,7 +287,6 @@ def set_device_ports(ip: str, open_ports: List[int]) -> None:
         d["ip"] = ip
         d["scope"] = classify_scope(ip)
         d["ports"] = sorted(open_ports)
-        # heurística simple de servicios
         services = []
         sset = set(open_ports)
         if 1883 in sset: services.append("MQTT")
@@ -289,7 +300,6 @@ def set_device_ports(ip: str, open_ports: List[int]) -> None:
         if 80 in sset or 8080 in sset or 443 in sset: services.append("HTTP(S)")
         if 22 in sset: services.append("SSH")
         d["services_guess"] = services
-        # RDNS opcional (una sola vez)
         if RESOLVE_RDNS and ip and not d.get("rdns_checked"):
             rdns = try_rdns(ip)
             if rdns:
@@ -322,6 +332,11 @@ def handle_packet(pkt) -> None:
             ip = pkt[IP].src if IP in pkt else None
             name = mdns_try_extract_name(pkt)
             upsert_device(mac, ip=ip, hostname=name)
+        # ICMPv6 Neighbor Discovery
+        if ICMPv6ND_NS in pkt or ICMPv6ND_NA in pkt:
+            mac = pkt[Ether].src if Ether in pkt else None
+            ip6 = pkt[IPv6].src if IPv6 in pkt else None
+            upsert_device(mac, ip=ip6)
     except Exception as e:
         print("[agent] handle_packet err:", repr(e))
 
@@ -340,9 +355,21 @@ def make_redis() -> redis.Redis:
 def flush_loop() -> None:
     r = make_redis()
     last_log = 0
+    public_ip_cache = None
+    last_public_ip_check = 0
+    PUBLIC_IP_CHECK_INTERVAL = 300
+
     while True:
         time.sleep(2.0)
         try:
+            current_time = now()
+            if current_time - last_public_ip_check >= PUBLIC_IP_CHECK_INTERVAL:
+                new_public_ip = get_public_ip()
+                if new_public_ip:
+                    public_ip_cache = new_public_ip
+                    print(f"[agent] IP pública actualizada: {public_ip_cache}")
+                last_public_ip_check = current_time
+
             with lock:
                 lst = []
                 for d in devices.values():
@@ -367,23 +394,30 @@ def flush_loop() -> None:
                         "sensor": SENSOR_NAME,
                         "scope": d.get("scope"),
                     })
-                snap = {"devices": lst, "sensor": SENSOR_NAME, "ts": now()}
+                snap = {
+                    "devices": lst,
+                    "sensor": SENSOR_NAME,
+                    "ts": now(),
+                    "public_ip": public_ip_cache
+                }
             r.set(REDIS_KEY_DEVICES, json.dumps(snap, ensure_ascii=False))
 
             t = now()
             if t - last_log >= 5:
-                print(f"[agent] devices={len(lst)} flushed → redis://{REDIS_HOST}:{REDIS_PORT} key={REDIS_KEY_DEVICES} iface={IFACE}")
+                ip_info = f" public_ip={public_ip_cache}" if public_ip_cache else ""
+                print(f"[agent] devices={len(lst)} flushed → redis://{REDIS_HOST}:{REDIS_PORT} key={REDIS_KEY_DEVICES} iface={IFACE}{ip_info}")
                 last_log = t
         except Exception as e:
             print("[agent] redis err:", repr(e))
 
-# ───────────────────────── Escaneo ARP activo ─────────────────────────
+# ───────────────────────── Escaneo ARP activo + ICMPv6 ─────────────────────────
 def arp_sweep_once() -> Dict[str, List[str]]:
     results: Dict[str, List[str]] = {}
-    nets = networks_from_ifaces()
-    print(f"[scan] candidate nets: {', '.join(map(str, nets)) or '(none)'}")
-    print(f"[scan] ARP sweep on {len(nets)} network(s): ", ", ".join(str(n) for n in nets))
-    for net in nets:
+    nets4, nets6 = networks_from_ifaces()
+    print(f"[scan] IPv4 nets: {', '.join(map(str, nets4)) or '(none)'}")
+    print(f"[scan] IPv6 nets: {', '.join(map(str, nets6)) or '(none)'}")
+    # IPv4
+    for net in nets4:
         try:
             if net.num_addresses > ARP_MAX_HOSTS:
                 print(f"[scan] skip net {net} ({net.num_addresses} hosts) > ARP_MAX_HOSTS={ARP_MAX_HOSTS}")
@@ -404,6 +438,26 @@ def arp_sweep_once() -> Dict[str, List[str]]:
             results[str(net)] = found_ips
         except Exception as e:
             print("[scan] ARP error on", net, ":", repr(e))
+    # IPv6
+    for net6 in nets6:
+        try:
+            # Tomamos solo un /64 para evitar explosión
+            hosts = list(net6.hosts())[:256]
+            found_ips = []
+            for tgt in hosts:
+                ans, _ = srp(
+                    ScapyEther(dst="ff:ff:ff:ff:ff:ff")/
+                    ScapyIPv6(dst=str(tgt))/ScapyICMPv6ND_NS(tgt=str(tgt)),
+                    timeout=1, retry=0, verbose=0
+                )
+                for _snd, rcv in ans:
+                    mac = (rcv[ScapyEther].src or "").lower()
+                    ip6 = rcv[ScapyIPv6].src
+                    upsert_device(mac, ip=ip6)
+                    found_ips.append(ip6)
+            results[str(net6)] = found_ips
+        except Exception as e:
+            print("[scan] ICMPv6 ND error on", net6, ":", repr(e))
     return results
 
 def arp_sweep_loop() -> None:
@@ -416,10 +470,11 @@ def arp_sweep_loop() -> None:
             print("[scan] redis err:", repr(e))
         time.sleep(SCAN_INTERVAL_ARP)
 
-# ───────────────────────── Mini-portscan TCP ─────────────────────────
+# ───────────────────────── Mini-portscan TCP (IPv4 + IPv6) ─────────────────────────
 def tcp_connect(ip: str, port: int, timeout: float) -> bool:
     try:
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        family = socket.AF_INET6 if ":" in ip else socket.AF_INET
+        with socket.socket(family, socket.SOCK_STREAM) as s:
             s.settimeout(timeout)
             s.connect((ip, port))
             return True
@@ -502,6 +557,28 @@ def mcast_probe_loop():
         ssdp_probe_once()
         time.sleep(MCAST_PROBE_INTERVAL)
 
+# ───────────────────────── Obtener IP pública (IPv4 o IPv6) ─────────────────────────
+def get_public_ip() -> Optional[str]:
+    services = [
+        "https://api.ipify.org?format=json",
+        "https://ifconfig.me/ip",
+        "https://icanhazip.com",
+        "https://checkip.amazonaws.com"
+    ]
+    for service in services:
+        try:
+            response = requests.get(service, timeout=3)
+            if response.status_code == 200:
+                if "json" in service:
+                    return response.json().get("ip", "").strip()
+                else:
+                    return response.text.strip()
+        except Exception as e:
+            print(f"[agent] Error obteniendo IP pública de {service}: {repr(e)}")
+            continue
+    print("[agent] No se pudo obtener la IP pública")
+    return None
+
 # ───────────────────────── Main / Sniffer ─────────────────────────
 def main() -> None:
     try:
@@ -512,8 +589,14 @@ def main() -> None:
     print(f"[agent] SENSOR_NAME={SENSOR_NAME}")
     print(f"[agent] REDIS={REDIS_HOST}:{REDIS_PORT}/{REDIS_DB} key={REDIS_KEY_DEVICES}")
     print(f"[agent] IFACE={IFACE}")
-    print("[agent] sniffing filters: ARP + mDNS (udp/5353)")
-    print(f"[agent] deep-scan: ARP every {SCAN_INTERVAL_ARP}s, PORTS every {SCAN_INTERVAL_PORTS}s, multicast every {MCAST_PROBE_INTERVAL}s")
+    initial_public_ip = get_public_ip()
+    if initial_public_ip:
+        print(f"[agent] IP pública detectada: {initial_public_ip}")
+    else:
+        print("[agent] No se pudo obtener IP pública al inicio")
+
+    print("[agent] sniffing filters: ARP + mDNS (udp/5353) + ICMPv6 ND")
+    print(f"[agent] deep-scan: ARP/ICMPv6 every {SCAN_INTERVAL_ARP}s, PORTS every {SCAN_INTERVAL_PORTS}s, multicast every {MCAST_PROBE_INTERVAL}s")
 
     threading.Thread(target=flush_loop, daemon=True).start()
     threading.Thread(target=arp_sweep_loop, daemon=True).start()
@@ -522,7 +605,7 @@ def main() -> None:
 
     sniff(
         iface=IFACE,
-        filter="arp or (udp and port 5353)",
+        filter="arp or (udp and port 5353) or (icmp6 and ip6[40] == 135 or ip6[40] == 136)",
         prn=handle_packet,
         store=False,
         promisc=True,
@@ -530,4 +613,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

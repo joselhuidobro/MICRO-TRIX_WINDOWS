@@ -1,4 +1,15 @@
 
+/*───────────────────────────────────
+ *  ████████╗██████╗ ██╗██╗  ██╗    
+ *  ╚══██╔══╝██╔══██╗██║╚██╗██╔╝   
+ *     ██║   ██████╔╝██║ ╚███╔╝     
+ *     ██║   ██╔══██╗██║ ██╔██╗     
+ *     ██║   ██║  ██║██║██╔╝ ██╗    
+ *     ╚═╝   ╚═╝  ╚═╝╚═╝╚═╝  ╚═╝   
+ *──────────────────────────────────
+
+
+
 Arquitectura (resumen express)
 
 
@@ -121,6 +132,89 @@ Modbus: Flask/HMI (IP por env vars)  ✖  (no enviar al ESP32)
 - Exponer endpoints de **observabilidad** y comandos de **operación/diagnóstico**.
 
 ---
+
+
+✅ Redes separadas: web-net para servicios públicos, trix-net para internos
+✅ Volúmenes persistentes: Definidos centralmente en 00-foundation
+✅ Token seguro: Almacenado en .env, no en el código
+✅ Healthcheck: El tunnel espera a que Caddy esté listo
+✅ Sin puertos expuestos públicamente: Todo va por Cloudflare Tunnel
+
+
+cloudflare_tunnel:
+  command: tunnel --url http://caddy:80  # ← SOLO este endpoint
+```
+
+✅ **Accesible**: Tu sitio Hugo servido por Caddy en el puerto 80
+- `https://random-xyz.trycloudflare.com/` → Hugo
+- `https://random-xyz.trycloudflare.com/docs` → Sphinx docs
+- `https://random-xyz.trycloudflare.com/api` → Doxygen API
+
+## Lo que NO es accesible:
+
+❌ Kong (puerto 30080, 8100)
+❌ Knot DNS (puerto 5353)
+❌ Cualquier otro servicio en `trix-net`
+❌ Tu equipo local
+❌ Otros contenedores Docker
+❌ Bases de datos (PostgreSQL, Redis)
+❌ EMQX, Node-RED, Grafana, etc.
+
+## ¿Por qué es seguro?
+```
+Internet
+    ↓
+Cloudflare Tunnel (tunnel container)
+    ↓
+[web-net] ← Solo esta red Docker
+    ↓
+Caddy:80 ← SOLO este servicio
+    ↓
+Volúmenes de archivos estáticos (hugo_public, sphinx_html, doxygen_html)
+```
+
+**Aislamiento por capas:**
+
+1. **Red `trix-net`**: Completamente aislada, el tunnel ni siquiera está conectado
+2. **Red `web-net`**: El tunnel solo puede hablar con Caddy
+3. **Caddy**: Solo sirve archivos estáticos desde volúmenes read-only (`:ro`)
+
+## Ejemplo visual de tu arquitectura:
+```
+┌─────────────────────────────────────────────┐
+│         Internet (público)                  │
+└─────────────────┬───────────────────────────┘
+                  │
+          ┌───────▼────────┐
+          │ Cloudflare     │
+          │ Tunnel         │
+          └───────┬────────┘
+                  │
+    ┌─────────────▼─────────────┐
+    │      web-net (aislada)    │
+    │                           │
+    │    ┌─────────────┐        │
+    │    │   Caddy:80  │        │
+    │    └──────┬──────┘        │
+    │           │               │
+    │    Archivos estáticos     │
+    │    (solo lectura)         │
+    └───────────────────────────┘
+
+    ┌───────────────────────────┐
+    │   trix-net (privada)      │
+    │                           │
+    │  ┌──────┐  ┌──────┐      │
+    │  │ Kong │  │ Knot │      │
+    │  └──────┘  └──────┘      │
+    │                           │
+    │  ┌──────┐  ┌──────┐      │
+    │  │ EMQX │  │  DB  │      │
+    │  └──────┘  └──────┘      │
+    └───────────────────────────┘
+         ↑
+         └── SIN acceso desde Internet
+
 
 ## Accesos rápidos (localhost)
 

@@ -124,7 +124,7 @@
 
 
 
-  <!-- ========== Net Info Card ========== -->
+ <!-- ========== Net Info Card ========== -->
   <section id="netinfo-section" aria-label="Estado de red"
            style="max-width:800px;margin:24px auto;padding:16px;border:1px solid #e5e7eb;border-radius:16px;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,.06);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;">
     <header style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
@@ -173,7 +173,7 @@
           <span id="netinfo-wg-ip">—</span>
           <button data-copy="#netinfo-wg-ip" class="copy-btn" title="Copiar WG server IP">⧉</button>
         </div>
-        <div class="hint">Acceso UI vía VPN: <code>http://10.6.0.1:30080</code></div>
+        <div class="hint">Acceso UI vía VPN: <code>http://10.6.0.1:30080 </code></div>
       </div>
 
       <div class="card">
@@ -209,6 +209,158 @@
       <span id="netinfo-admin-flag" style="margin-left:8px;padding:2px 6px;border-radius:6px;background:#eef2ff;color:#3730a3;display:none;">ADMIN</span>
     </div>
   </section>
+
+  <!-- ========== SECCIÓN: IPv6 descubiertas ========== -->
+<section id="ipv6-list-section" aria-label="IPv6 descubiertas"
+         style="max-width:800px;margin:24px auto;padding:16px;border:1px solid #e5e7eb;border-radius:16px;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,.06);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;">
+  <header style="display:flex;align-items:center;justify-content:space-between;">
+    <h3 style="margin:0;font-size:18px;font-weight:700;">IPv6 descubiertas</h3>
+    <span id="ipv6-count" style="font-size:12px;color:#6b7280;">—</span>
+  </header>
+  <hr style="border:none;border-top:1px solid #f3f4f6;margin:12px 0;">
+  <ul id="ipv6-list" style="margin:0;padding:0;list-style:none;font-size:14px;color:#111827;">
+    <!-- se llenan dinámicamente -->
+  </ul>
+</section>
+
+<!-- ========== SECCIÓN: Puertos abiertos ========== -->
+<section id="ports-list-section" aria-label="Puertos abiertos"
+         style="max-width:800px;margin:24px auto;padding:16px;border:1px solid #e5e7eb;border-radius:16px;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,.06);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;">
+  <header style="display:flex;align-items:center;justify-content:space-between;">
+    <h3 style="margin:0;font-size:18px;font-weight:700;">Puertos abiertos</h3>
+    <span id="ports-count" style="font-size:12px;color:#6b7280;">—</span>
+  </header>
+  <hr style="border:none;border-top:1px solid #f3f4f6;margin:12px 0;">
+  <div id="ports-list" style="font-size:14px;color:#111827;">
+    <!-- se llenan dinámicamente -->
+  </div>
+</section>
+
+
+
+
+  <script>
+    // JavaScript para obtener y mostrar datos de Redis
+    class NetInfoManager {
+      constructor() {
+        this.refreshInterval = null;
+        this.isAutoRefresh = false;
+        this.init();
+      }
+
+      init() {
+        this.bindEvents();
+        this.loadData();
+        this.startAutoRefresh();
+      }
+
+      bindEvents() {
+        document.getElementById('netinfo-refresh').addEventListener('click', () => this.loadData());
+        document.getElementById('netinfo-autorefresh-toggle').addEventListener('change', (e) => {
+          this.isAutoRefresh = e.target.checked;
+          if (this.isAutoRefresh) {
+            this.startAutoRefresh();
+          } else {
+            this.stopAutoRefresh();
+          }
+        });
+
+        // Botones de copiar
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const selector = e.target.dataset.copy;
+            const element = document.querySelector(selector);
+            if (element && element.textContent !== '—') {
+              navigator.clipboard.writeText(element.textContent).then(() => {
+                e.target.style.color = '#10b981';
+                setTimeout(() => e.target.style.color = '', 1000);
+              });
+            }
+          });
+        });
+      }
+
+      async loadData() {
+        try {
+          document.getElementById('netinfo-status').textContent = 'Cargando…';
+          
+          // Obtener datos de Redis (ajusta la URL según tu configuración)
+          const response = await fetch('/api/redis/trix:udp:devices:last');
+          const data = await response.json();
+          
+          if (data && data.devices) {
+            this.updateUI(data);
+          }
+          
+          document.getElementById('netinfo-status').textContent = 'Actualizado';
+          document.getElementById('netinfo-updated').textContent = new Date().toLocaleTimeString();
+        } catch (error) {
+          console.error('Error cargando datos:', error);
+          document.getElementById('netinfo-status').textContent = 'Error al cargar';
+          this.loadFallbackData();
+        }
+      }
+
+updateUI(snap) {
+  // 1- IPs públicas
+  const v4 = snap.public_ip && !snap.public_ip.includes(':') ? snap.public_ip : '';
+  const v6 = snap.public_ip && snap.public_ip.includes(':') ? snap.public_ip : '';
+  if (v4) document.getElementById('netinfo-public4').textContent = v4;
+  if (v6) document.getElementById('netinfo-public6').textContent = v6;
+  if (snap.sensor) document.getElementById('netinfo-status').textContent = `Sensor: ${snap.sensor}`;
+
+  // 2- IPv6 descubiertas
+  const ipv6List = document.getElementById('ipv6-list');
+  const ipv6Items = snap.devices
+    .map(d => d.ip)
+    .filter(ip => ip && ip.includes(':'))
+    .sort();
+  ipv6List.innerHTML = ipv6Items.length
+    ? ipv6Items.map(ip => `<li style="padding:4px 0;">${ip}</li>`).join('')
+    : '<li style="color:#9ca3af;">Ninguna IPv6 detectada</li>';
+  document.getElementById('ipv6-count').textContent = `${ipv6Items.length} encontradas`;
+
+  // 3- Puertos abiertos
+  const portsList = document.getElementById('ports-list');
+  const portsHtml = snap.devices
+    .filter(d => d.ports && d.ports.length)
+    .map(d => `
+      <div style="margin-bottom:12px;">
+        <div style="font-weight:600;">${d.ip || d.mac}</div>
+        <div style="font-size:13px;color:#4b5563;">${d.ports.join(', ')}</div>
+      </div>`)
+    .join('');
+  portsList.innerHTML = portsHtml || '<div style="color:#9ca3af;">Sin puertos abiertos detectados</div>';
+  document.getElementById('ports-count').textContent = `${snap.devices.filter(d => d.ports && d.ports.length).length} hosts`;
+}
+
+/* ----------  Fallback por si Redis no responde  ---------- */
+async loadPublicIPFallback() {
+  const sv = [
+    'https://api.ipify.org?format=json',
+    'https://ifconfig.me/ip',
+    'https://icanhazip.com',
+    'https://checkip.amazonaws.com'
+  ];
+  for (const u of sv) {
+    try {
+      const r = await fetch(u, { timeout: 3000 });
+      if (!r.ok) continue;
+      const ip = u.includes('json') ? (await r.json()).ip : (await r.text()).trim();
+      if (ip) {
+        const isV6 = ip.includes(':');
+        document.getElementById(isV6 ? 'netinfo-public6' : 'netinfo-public4').textContent = ip;
+        break;
+      }
+    } catch {}
+  }
+}
+
+/* ----------  Validación simple (IPv4 rápida)  ---------- */
+isValidIP(ip) {
+  return /^(\d{1,3}\.){3}\d{1,3}$/.test(ip);
+}
+  </script>
   <!-- ========== /Net Info Card ========== -->
 
   <!-- ========== Dispositivos UDP ========== -->
@@ -730,7 +882,6 @@
 </script>
 
 <script>
-/* Acciones de rutina /api/plan */
 (function(){
   const btn  = document.getElementById('btn-plan');
   const info = document.getElementById('plan-status');

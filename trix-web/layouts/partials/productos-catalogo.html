@@ -1,0 +1,158 @@
+<section class="service-section text-center py-8 bg-gray-50" aria-labelledby="catalogo-puertas">
+  <div class="max-w-6xl mx-auto">
+    
+    <div class="flex flex-col md:flex-row justify-center items-start gap-8 mb-12">
+      <div class="flex-1 bg-white p-6 rounded-lg shadow-md">
+        <h2 id="catalogo-puertas" class="section-title text-4xl md:text-5xl font-bold text-[var(--brand-blue-700)] mb-2">
+          Puertas automáticas
+        </h2>
+        <h3 class="text-xl md:text-2xl font-semibold text-slate-700 mb-6">Seguridad, confort y precisión</h3>
+        <div class="flex justify-center items-center mb-6">
+          <span class="text-5xl mr-4" aria-hidden="true">🛠️</span>
+          <p class="text-xl md:text-2xl font-semibold text-gray-800">Instalación y mantenimiento profesional</p>
+        </div>
+        <p class="text-lg md:text-xl text-gray-700 mb-6">
+          Ingeniería de selección, obra civil y puesta a punto. Soporte post-venta con tiempos de respuesta reales.
+        </p>
+        <a id="callNowBtn2" href="tel:+525554539552"
+           class="inline-block btn-primary hover:opacity-95 text-white px-5 py-2 rounded-full shadow-sm focus:outline-none focus:ring">
+          Llamar ahora
+        </a>
+      </div>
+
+      <!-- Banner Render -->
+      <div class="max-w-4xl mx-auto">
+        <h3 class="text-3xl md:text-4xl font-bold text-[var(--brand-blue-700)] mb-6">
+          ¿Quieres transformar tu espacio?
+        </h3>
+        <img class="card-image rounded-lg shadow" 
+             src="{{ "img/renderluces7.webp" | relURL }}" 
+             alt="Diseño de interiores con iluminación"
+             loading="lazy" width="960" height="540">
+        <h3 class="text-2xl md:text-3xl font-bold text-[var(--brand-blue-700)] mt-6">
+          Diseño de espacios y productos
+        </h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grid de productos -->
+  <div class="servicio">
+    <div class="container mx-auto px-4 text-center">
+      <img class="logo-img" 
+           src="{{ "img/logo_trix_st.webp" | relURL }}" 
+           alt="Logo TRIX Automatización" loading="lazy" width="256" height="256">
+      <h2 class="text-3xl md:text-4xl font-bold text-[var(--brand-blue-700)] mb-6">
+        ¡Automatiza tu puerta!
+      </h2>
+
+      <div class="container">
+        
+        <!-- Categoría: Puertas abatibles -->
+        <summary class="product-category-banner">Puertas abatibles (cadena y brazos)</summary>
+
+        {{ $productos_abatibles := slice
+          (dict "nombre" "Merik 511 W" "imagen" "img/511w.webp" "alt" "Motor de cadena Merik 511 W 110 VAC")
+          (dict "nombre" "Merik 711 W" "imagen" "img/711w.webp" "alt" "Motor de cadena Merik 711 W silencioso")
+          (dict "nombre" "Merik 7511" "imagen" "img/merik7511.webp" "alt" "Motor de cadena Merik 7511 24 Vdc")
+          (dict "nombre" "LiftMaster 5011" "imagen" "img/bmt_5011_liftmaster.webp" "alt" "Motor LiftMaster 5011 1/2 HP")
+          (dict "nombre" "Merik 411 W" "imagen" "img/merik_411.webp" "alt" "Motor Merik 411 W 1/2 HP con MyQ")
+          (dict "nombre" "SEG RC800" "imagen" "img/segrc800-removebg.webp" "alt" "Motor SEG RC800 24 Vdc")
+        }}
+
+        {{ range $productos_abatibles }}
+        <article class="product">
+          <h3 class="titulo-producto">{{ .nombre }}</h3>
+          <a href="https://api.whatsapp.com/send?phone=+525554539552&text=Quiero%20cotizar%20el%20{{ .nombre | urlize }}"
+             target="_blank" rel="noopener" class="whatsapp-link" 
+             aria-label="Cotizar {{ .nombre }} por WhatsApp">
+            <img src="{{ "img/whatsapp.ico" | relURL }}" alt="" class="whatsapp-icon" aria-hidden="true">
+            <span>Cotizar {{ .nombre }}</span>
+          </a>
+          <img class="img-product" 
+               src="{{ .imagen | relURL }}" 
+               alt="{{ .alt }}" width="523" height="230" loading="lazy">
+        </article>
+        {{ end }}
+
+        <h2 class="text-3xl md:text-4xl font-bold text-[var(--brand-blue-700)] mb-6">Más opciones</h2>
+
+        {{ $productos_adicionales := slice
+          (dict "nombre" "Merik Power 230" "imagen" "img/power230.webp")
+          (dict "nombre" "Genius G-Bat 300 (110 V)" "imagen" "img/gbat300.webp")
+          (dict "nombre" "SEG Combat Duo" "imagen" "img/segcombatduo.webp")
+          (dict "nombre" "SEG Pivus 300" "imagen" "img/Pivus300.webp")
+          (dict "nombre" "Kit FAAC 422" "imagen" "img/FAAC422CBAC.webp")
+          (dict "nombre" "BFT LUX 2B" "imagen" "img/bft200h.webp")
+          (dict "nombre" "BFT LUX GV" "imagen" "img/bft200h.webp")
+          (dict "nombre" "FAAC 422 (pistón)" "imagen" "img/422_hidraulicop.webp")
+          (dict "nombre" "FAAC S800H (subterráneo)" "imagen" "img/S800H.webp")
+          (dict "nombre" "Kit FAAC 770N 24 V (subterráneo)" "imagen" "img/FAAC770N24v.webp")
+        }}
+
+        {{ range $productos_adicionales }}
+        <div class="product">
+          <h3 class="titulo-producto">{{ .nombre }}</h3>
+          <a href="https://api.whatsapp.com/send?phone=+525554539552&text=Quiero%20cotizar%20el%20{{ .nombre | urlize }}"
+             target="_blank" rel="noopener" class="whatsapp-link" 
+             aria-label="Cotizar {{ .nombre }} por WhatsApp">
+            <img src="{{ "img/whatsapp.ico" | relURL }}" alt="" class="whatsapp-icon" aria-hidden="true">
+            <span>Cotizar {{ .nombre }}</span>
+          </a>
+          <img class="img-product" 
+               src="{{ .imagen | relURL }}" 
+               alt="{{ .nombre }}" width="523" height="230" loading="lazy">
+        </div>
+        {{ end }}
+
+        <h2 class="text-3xl md:text-4xl font-bold text-[var(--brand-blue-700)] mb-6">Corredizas</h2>
+
+        {{ $productos_corredizas := slice
+          (dict "nombre" "FAAC 844" "imagen" "img/operador-FACC-844-220v-2-fases.webp")
+          (dict "nombre" "FAAC 741" "imagen" "img/MOTOR-FAAC-741.webp")
+          (dict "nombre" "Merik Blizzard 500" "imagen" "img/blizzard.webp")
+          (dict "nombre" "Merik Blizzard 900" "imagen" "img/blizzard.webp")
+          (dict "nombre" "Forte 2000 C" "imagen" "img/operador-corredizo-forte-2000c.webp")
+          (dict "nombre" "Afpam 1500" "imagen" "img/afpam1500_cremallera_w.webp")
+          (dict "nombre" "SEG CH 2015 R" "imagen" "img/SEGCH2015R.webp")
+          (dict "nombre" "Merik KS 3000" "imagen" "img/ks_3000high-rem.webp")
+          (dict "nombre" "Gilgen SLA" "imagen" "img/gilgensla.webp")
+          (dict "nombre" "ASSA ABLOY · Besam SL500" "imagen" "img/besam_sl500.webp")
+          (dict "nombre" "Gilgen FD20 · Peatonales" "imagen" "img/gilgen_fd20.webp")
+          (dict "nombre" "Gilgen FD20 · Uso rudo" "imagen" "img/fd20_doble.webp")
+        }}
+
+        {{ range $productos_corredizas }}
+        <div class="product">
+          <h3 class="titulo-producto">{{ .nombre }}</h3>
+          <img class="img-product" 
+               src="{{ .imagen | relURL }}" 
+               alt="{{ .nombre }}" width="500" height="200" loading="lazy">
+          <a href="https://api.whatsapp.com/send?phone=+525554539552&text=Me%20interesa%20{{ .nombre | urlize }}"
+             target="_blank" rel="noopener" class="info-button" 
+             aria-label="Cotizar {{ .nombre }} por WhatsApp">
+            <img src="{{ "img/whatsapp.ico" | relURL }}" alt="" 
+                 style="height:20px;width:20px;vertical-align:middle;" aria-hidden="true">
+          </a>
+        </div>
+        {{ end }}
+
+      </div>
+    </div>
+
+    <div class="servicio">
+      <img class="img-product_trix" 
+           src="{{ "img/camionetrix.webp" | relURL }}" 
+           alt="Camioneta TRIX" width="400" height="100" loading="lazy">
+      <div class="service-section">
+        <h4>Recomendaciones en pistones hidráulicos</h4>
+        <ul>
+          <li>Puertas largas</li>
+          <li>Alta frecuencia de uso por hora</li>
+          <li>Puertas pesadas</li>
+          <li>Reparación y mantenimiento (válvulas, empaques y aceite)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>  

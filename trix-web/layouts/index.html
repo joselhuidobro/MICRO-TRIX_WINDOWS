@@ -1,17 +1,192 @@
 ﻿{{ define "main" }}
-<div class="home-content">
-    <h1>{{ .Title }}</h1>
-    {{ .Content }}
+
+<!-- HERO Section -->
+{{ partial "hero.html" . }}
+
+<!-- Intro Section -->
+<section class="py-12 md:py-16 bg-gray-50">
+  <div class="max-w-7xl mx-auto px-6">
+    <h2 class="text-3xl md:text-4xl font-bold text-[var(--brand-blue-700)] text-center">
+      ¿Qué necesitas automatizar? | Integración Agente IA a redes Industriales
+    </h2>
     
-    <!-- Sección de posts recientes -->
-    <section class="recent-posts">
-        <h2>Últimas Publicaciones</h2>
-        {{ range first 5 .Site.RegularPages }}
-        <article>
-            <h3><a href="{{ .Permalink }}">{{ .Title }}</a></h3>
-            <p>{{ .Summary }}</p>
-        </article>
-        {{ end }}
-    </section>
-</div>
+    <h4 class="mt-6 text-3xl md:text-4xl font-bold text-[var(--brand-blue-700)]">
+      Moderniza tus máquinas
+    </h4>
+
+    <h3 id="intro-linux-microservices" class="mt-6 font-bold text-lg">
+      <i class="fa-brands fa-linux" aria-hidden="true"></i>
+      Integramos tus equipos y PLC standalone con Linux y arquitectura de microservicios
+    </h3>
+  </div>
+</section>
+
+<!-- Tres tarjetas principales -->
+{{ partial "servicios-cards.html" . }}
+
+<!-- Microservicios texto -->
+<section aria-labelledby="intro-linux-microservices" class="max-w-[980px] mx-auto px-4 md:px-6 pb-6">
+  <p class="text-justify">
+    Sistemas basados en Linux con microservicios: dividimos tu flujo en partes manejables y automatizamos su
+    despliegue para darte mayor seguridad, redundancia e integración total.
+  </p>
+  <p class="mt-2 text-sm">
+    <i class="fa-solid fa-diagram-project" aria-hidden="true"></i> Orquestación por servicios ·
+    <i class="fa-solid fa-network-wired" aria-hidden="true"></i> Integración de equipos y protocolos ·
+    <i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Despliegues seguros y redundantes
+  </p>
+
+  <h4 class="mt-4 font-semibold">
+    <i class="fa-solid fa-network-wired" aria-hidden="true"></i> Servicios de red para oficinas
+  </h4>
+  <ul class="list-none pl-0 text-justify m-0">
+    <li><i class="fa-solid fa-plug" aria-hidden="true"></i> Cableado estructurado</li>
+    <li><i class="fa-solid fa-server" aria-hidden="true"></i> Switches, routers, repetidores Wi-Fi</li>
+    <li><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> Actualización de firmware</li>
+    <li><i class="fa-solid fa-phone-volume" aria-hidden="true"></i> Soporte VoIP</li>
+  </ul>
+</section>
+
+<!-- CTA / COTIZACIÓN -->
+<section id="cta" class="section">
+  <div class="container cta-box">
+    <h3 class="mt-6 text-3xl md:text-4xl font-bold text-[var(--brand-blue-700)]">
+      ¿Te interesa comprar o vender equipo?
+    </h3>
+    <p>Te ayudamos a tomar decisión de inversión en compras de maquinaria usada o sin historial.</p>
+    
+    <h2>¿Reparar o reemplazar?</h2>
+    <p>Te damos un comparativo con base en datos: costo, riesgo y vida útil estimada.</p>
+  </div>
+</section>
+
+<!-- SERVICIOS / TARJETAS -->
+<section id="servicios" class="section muted">
+  <div class="container grid-3">
+    <article class="card">
+      <p>Pruebas dirigidas por función, riesgos → Plan de restauración.</p>
+      <ul>
+        <li>Evaluación por módulos e interfaces.</li>
+        <li>Estimación de vida útil con base en criterios.</li>
+        <li>Reporte ejecutivo + técnico.</li>
+      </ul>
+    </article>
+    <article class="card">
+      <h3>Restauración de equipo</h3>
+      <ul>
+        <li>Reparación mecánica y recableado.</li>
+        <li>Restauración de tablero e indicadores.</li>
+        <li>Actualización de controladores y drivers de potencia.</li>
+      </ul>
+    </article>
+    <article class="card">
+      <h3>Ensayos mecánicos</h3>
+      <ul>
+        <li>Resistencia, rigidez, precisión y repetibilidad.</li>
+        <li>Pruebas bajo carga y condiciones reales.</li>
+        <li>Protocolo de ensayo y resultados trazables.</li>
+      </ul>
+    </article>
+  </div>
+</section>
+
+<!-- Piloto IA -->
+{{ partial "piloto-ia.html" . }}
+
+<!-- Diseño y automatización -->
+<section class="py-12 md:py-16">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="text-center mb-10">
+      <h2 class="text-3xl md:text-4xl font-bold text-[var(--brand-blue-700)]">Diseño y automatización</h2>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-8 items-start">
+      <!-- Visualización / embebidos -->
+      <div class="exec-card bg-white p-6 rounded-xl">
+        <h3 class="text-xl font-semibold text-slate-800">Visualiza instalaciones</h3>
+        <h4 class="text-xl font-semibold text-slate-800">Servidor local o nube · Dashboard a medida</h4>
+
+        <p><strong>1. Venta e instalación de servidores industriales:</strong></p>
+        <ul>
+          <li>Servidores físicos con Linux y Kubernetes (Intel o AMD)</li>
+          <li>Configuración personalizada para control industrial</li>
+          <li>Soporte para sistemas SCADA y microservicios</li>
+        </ul>
+
+        <p><strong>2. Diseño y ejecución de cableado estructurado:</strong></p>
+        <ul>
+          <li>Planeación basada en plano unifilar de la fábrica</li>
+          <li>Instalación de cableado de red para computadoras y PLCs</li>
+          <li>Identificación y etiquetado de puntos de red</li>
+        </ul>
+
+        <!-- Resto del contenido... -->
+
+        <div class="mt-4">
+          <img class="rounded-lg shadow" src="{{ "img/renderluces7.webp" | relURL }}" 
+               alt="Diseño de interiores con iluminación" loading="lazy" width="960" height="540">
+        </div>
+
+        <div class="mt-6">
+          <h4 class="font-semibold text-slate-800 mb-2">Vista 3D interactiva</h4>
+          <model-viewer src="{{ "models/brazo_solo.glb" | relURL }}" 
+                        alt="Modelo 3D de brazo robótico"
+                        auto-rotate camera-controls ar loading="lazy"
+                        class="rounded-lg shadow w-full h-72"></model-viewer>
+        </div>
+      </div>
+
+      <!-- Demo software -->
+      <div class="exec-card bg-white p-0 rounded-xl overflow-hidden">
+        <div class="bg-slate-100 px-6 pt-6">
+          <h3 class="text-xl font-semibold text-slate-800">¿Necesitas desarrollar software?</h3>
+          <p class="text-slate-700 mb-4">Apps y paneles para administradores de edificios.</p>
+        </div>
+        <p class="px-6 text-slate-700 mb-4">Prueba nuestro demo.</p>
+        <div class="rounded-none shadow-none overflow-hidden w-full h-[60vh] md:h-[70vh]">
+          <iframe src="https://trix-2025-app-263ab0e0f70f.herokuapp.com/map3/"
+                  loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                  class="w-full h-full border-0 block"
+                  title="Demo TRIX"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA rápido -->
+<section class="py-10 bg-gray-50">
+  <div class="max-w-6xl mx-auto px-6 text-center">
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <a href="https://wa.me/525554539552" target="_blank" rel="noopener"
+         class="border border-[var(--brand-blue)] text-[var(--brand-blue)] font-semibold py-3 px-6 rounded-lg hover:bg-[var(--brand-blue)] hover:text-white transition">
+        Cotiza por WhatsApp
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Catálogo Puertas Automáticas -->
+{{ partial "productos-catalogo.html" . }}
+
+<!-- Schema.org JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "TRIX Studio",
+  "image": "{{ "img/logo_trix_st.webp" | absURL }}",
+  "telephone": "+52 55 5453 9552",
+  "url": "{{ .Site.BaseURL }}",
+  "address": {
+    "@type": "PostalAddress",
+    "addressCountry": "MX",
+    "addressRegion": "CDMX",
+    "addressLocality": "Benito Juárez",
+    "postalCode": "03100"
+  },
+  "description": "Estudio de ingeniería y diseño especializado en puertas automáticas, renderizado 4K y desarrollo robótico."
+}
+</script>
+
 {{ end }}

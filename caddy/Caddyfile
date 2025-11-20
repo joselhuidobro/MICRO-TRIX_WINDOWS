@@ -28,4 +28,32 @@
     }
     file_server
   }
+
+   # Documentación Sphinx
+    handle /docs* {
+        uri strip_prefix /docs
+        root * /srv/docs
+        file_server
+    }
+
+    # API Doxygen
+    handle /api* {
+        uri strip_prefix /api
+        root * /srv/api
+        file_server
+    }
+
+    # Compresión
+    encode gzip zstd
+
+    # Logs
+    log {
+        output stdout
+        format console
+    }
+
+
 }
+
+
+

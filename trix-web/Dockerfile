@@ -2,7 +2,7 @@
 FROM klakegg/hugo:0.111.3 AS builder
 WORKDIR /src
 COPY . .
-RUN hugo --minify --verbose --debug
+RUN hugo --minify
 
 # FASE 2: Servir con Nginx
 FROM nginx:alpine

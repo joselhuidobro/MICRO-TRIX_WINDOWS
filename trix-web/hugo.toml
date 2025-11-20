@@ -1,19 +1,43 @@
-baseURL = "https://automatizaciontrix2.com.mx"    
-languageCode = "es-MX"
-title = "TRIX Studio | Ingeniería & Diseño"
-defaultContentLanguage = "es"
+baseURL = 'https://automatizaciontrix.com.mx/'
+languageCode = 'es-MX'
+title = 'TRIX Studio | Ingeniería & Diseño'
+# Elimina o deja vacía la línea theme
+# theme = ''
 
-[permalinks]
-  sections = "/:section/:slug/"
+[params]
+  description = "TRIX ofrece soluciones técnicas con soporte experto, instalación impecable, software a medida, renderizado 4K e integración total para automatización, puertas automáticas, HVAC y electrónica en CDMX."
+  author = "TRIX Studio – José Luis Huidobro"
+  google_analytics = "AW-11070400416"
+  phone = "+52 55 5453 9552"
+  whatsapp = "525554539552"
+  home_css = true
 
 [markup]
   [markup.goldmark]
     [markup.goldmark.renderer]
       unsafe = true
-  
-[params]
-  logo = "img/logo_trix_st.png"
-  logo_webp = "img/logo_trix_st.webp"
-  whatsapp_icon = "img/whatsapp.ico"
-  gabinete = "img/gabinete.webp"
-  bft200h = "img/bft200h.webp"
+
+[[menus.main]]
+  name = "Inicio"
+  url = "/"
+  weight = 1
+
+[[menus.main]]
+  name = "BLOG: Quiero aprender"
+  url = "/blog/"
+  weight = 2
+
+[[menus.main]]
+  name = "3D y Renderizado"
+  url = "/renderizado/"
+  weight = 3
+
+[[menus.main]]
+  name = "HVAC"
+  url = "/hvac/"
+  weight = 4
+
+[[menus.main]]
+  name = "About"
+  url = "/about/"
+  weight = 5
