@@ -1,6 +1,8 @@
 {% extends "layout.html" %}
 {% block title %}TRIX{% endblock %}
 
+
+
 {% block customCSS %}
 <style>
   .indicator{width:10px;height:10px;border-radius:50%;display:inline-block;margin-left:10px;background:#bbb}
@@ -28,6 +30,11 @@
 {% block body %}
 <div class="container">
 
+<h1>Visitas</h1>
+  <section style="text-align:center;font-size:3rem;font-family:system-ui,serif;color:#0f0;background:#111;padding:2rem">
+  {{ visits }}
+</section>
+
 <section id="trix-quick-links" style="padding:16px; font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;">
   <h2 style="margin:0 0 12px;">TRIX — Accesos rápidos</h2>
   <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:10px;">
@@ -45,6 +52,8 @@
     
   </div>
 </section>
+
+
 
 
 <section id="trix-local-tools" style="padding:16px;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;">

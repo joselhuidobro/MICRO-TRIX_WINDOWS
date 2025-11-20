@@ -9,85 +9,113 @@ rule_files:
   - /etc/prometheus/rules/*.yml
 
 scrape_configs:
-  # --- existentes ---
+  # --- Monitorización Propia ---
   - job_name: 'prometheus'
-    static_configs: [{ targets: ['prometheus:9090'] }]
+    static_configs:
+      - targets: ['prometheus:9090']
 
   - job_name: 'grafana'
-    static_configs: 
+    metrics_path: /grafana/metrics
+    static_configs:
       - targets: ['grafana:3000']
-    metrics_path: /grafana/metrics  # ← AÑADE /grafana al inicio
 
+  # --- Infraestructura y Gateways ---
   - job_name: 'kong'
-    static_configs: [{ targets: ['kong:8100'] }]
     metrics_path: /metrics
+    static_configs:
+      - targets: ['kong:8100']
 
+  - job_name: 'caddy'
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['caddy:2019']
+
+  # --- Aplicaciones ---
   - job_name: 'ui'
-    static_configs: [{ targets: ['ui:5000'] }]
     metrics_path: /metrics
+    static_configs:
+      - targets: ['ui:5000']
 
+  - job_name: 'trix_erp'
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['trix-erp:6800']
+        labels:
+          app: 'erp'
+
+  - job_name: 'trix_agent'
+    static_configs:
+      - targets: ['trix_agent:9080']
+        labels:
+          app: 'agent'
+
+  - job_name: 'springboot'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['springboot:8080']
+
+  - job_name: 'git'
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['git:7011']
+
+  # --- Bases de Datos y Colas ---
   - job_name: 'redis_exporter'
     scrape_interval: 15s
     static_configs:
       - targets: ['redis_exporter:9121']
 
-  - job_name: 'springboot'
-    static_configs: [{ targets: ['springboot:8080'] }]
-    metrics_path: /actuator/prometheus
+  - job_name: 'emqx'
+    metrics_path: /prometheus
+    static_configs:
+      - targets: ['emqx:18083']
+        labels:
+          service: 'mqtt'
 
-  - job_name: 'git'
-    static_configs: [{ targets: ['git:7011'] }]
-    metrics_path: /metrics
-
-  - job_name: node
+  # --- Exporters del Sistema ---
+  - job_name: 'node_exporter'
     scrape_interval: 15s
     scrape_timeout: 10s
     metrics_path: /metrics
     scheme: http
     static_configs:
       - targets: ['node_exporter:9100']
+        labels:
+          service: 'node-exporter'
+          tier: 'exporter'
 
   - job_name: 'cadvisor'
     static_configs:
-      - targets: ['cadvisor:8080']   # ← CAMBIADO: 'localhost' → 'cadvisor'
+      - targets: ['cadvisor:8080']
+        labels:
+          service: 'cadvisor'
+          tier: 'monitoring'
 
-  # Caddy (métricas del admin /metrics)
-  - job_name: 'caddy'
-    metrics_path: /metrics
-    static_configs:
-      - targets: ['caddy:2019']   # puerto del admin de Caddy
-
-  # GitLab (Rails /-/metrics servido por NGINX interno)
-  - job_name: 'gitlab'
-    metrics_path: /-/metrics
-    static_configs:
-      - targets: ['gitlab:80']    # dentro de la red de Docker GitLab escucha en 80
-
-  # Sphinx y Doxygen: chequeo HTTP con blackbox_exporter (uptime/latencia)
-  - job_name: 'docs_http'
-    metrics_path: /probe
-    params:
-      module: [http_2xx]
-    static_configs:
-      - targets: ['caddy:80']      # ← CORREGIDA la indentación
-        labels:                     # ← CORREGIDA la indentación
-          __metrics_path__: '/docs/sphinx'  # ← CORREGIDA la indentación
-    relabel_configs:                # ← MOVIDO aquí, dentro de docs_http
-      - source_labels: [__address__]
-        target_label: __param_target
-      - target_label: __address__
-        replacement: blackbox_exporter:9115
-
-  # Loki métricas
+  # --- Logs ---
   - job_name: 'loki'
     static_configs:
       - targets: ['loki:3100']
         labels:
           service: 'loki'
 
-  # Promtail métricas
   - job_name: 'promtail'
     static_configs:
       - targets: ['promtail:9080']
         labels:
           service: 'promtail'
+
+  # --- Blackbox (HTTP Checks) ---
+  # Nota: Requiere el servicio blackbox_exporter corriendo en puerto 9115
+  - job_name: 'docs_http'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets: ['caddy:80']
+        labels:
+          __metrics_path__: '/docs/sphinx'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - target_label: __address__
+        replacement: blackbox_exporter:9115

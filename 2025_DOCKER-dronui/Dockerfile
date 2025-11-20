@@ -26,7 +26,7 @@ COPY app/requirements.txt /tmp/requirements.txt
 RUN python3 -m pip install --no-cache-dir -r /tmp/requirements.txt || \
     python3 -m pip install --no-cache-dir \
       flask gunicorn pymodbus orjson flask-sock hypercorn simple-websocket \
-      prometheus-client prometheus-flask-exporter
+      prometheus-client prometheus-flask-exporter flask-cors
 RUN pip install --no-cache-dir docker==6.1.3 redis==5.0.6
 RUN pip install --no-cache-dir docker requests-unixsocket
 

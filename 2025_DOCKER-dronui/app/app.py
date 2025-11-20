@@ -9,7 +9,7 @@ from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_
 
 import config  # ← ahora importamos el módulo completo
 
-
+from flask_cors import CORS   # <- nuevo
 from blueprints import netinfo_bp
 
 from modbus_functions import get_modbus_data, toggle_lw, perform_modbus_scan
@@ -56,7 +56,7 @@ REDIS_KEYS = {
 app = Flask(__name__, static_folder="static", template_folder="templates")
 
 app.register_blueprint(netinfo_bp, url_prefix="/api")
-
+CORS(app)  
 
 sock = Sock(app)
 ros_publish_q = Queue()

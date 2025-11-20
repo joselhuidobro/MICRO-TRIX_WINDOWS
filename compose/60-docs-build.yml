@@ -14,13 +14,9 @@ services:
      - ./esp-docker-jetson-encoder_motor_ui/components:/work/esp/components:ro
      - doxygen_html:/out/html
      - doxygen_xml:/out/xml
-
-
     networks: [web-net]
     restart: "no"
     pull_policy: never
-
-
 
   sphinx_build:
     build:
