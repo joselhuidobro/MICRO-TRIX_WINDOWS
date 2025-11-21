@@ -16,7 +16,7 @@ volumes:
   
   # PostgreSQL
   pg_data:
-    external: true  
+    driver: local
     name: trix_pg_data  # Especifica el nombre exacto
     
   # Redis
