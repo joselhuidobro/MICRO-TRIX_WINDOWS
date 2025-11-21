@@ -43,6 +43,23 @@ services:
       retries: 10
       start_period: 30s
 
+  # ... tus otros servicios ...
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter
+    container_name: postgres_exporter_trix
+    environment:
+      # Sintaxis: postgresql://usuario:password@nombre_servicio_docker:puerto/nombre_db?sslmode=disable
+      DATA_SOURCE_NAME: "postgresql://trix:trixpass@postgres:5432/trixdb?sslmode=disable"
+    ports:
+      - "9181:9181"
+    networks:
+      - trix-net
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: pgadmin_trix

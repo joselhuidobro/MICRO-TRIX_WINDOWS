@@ -2,6 +2,7 @@ auth_enabled: false
 
 server:
   http_listen_port: 3100
+  grpc_listen_port: 9096 # Define un puerto gRPC explícito
 
 common:
   path_prefix: /loki
@@ -24,8 +25,22 @@ schema_config:
         prefix: index_
         period: 24h
 
+# Agrega el compactador para limpiar índices viejos y bajar carga
+compactor:
+  working_directory: /loki/boltdb-shipper-compactor
+  shared_store: filesystem
+  compaction_interval: 10m
+  retention_enabled: true
+  retention_delete_delay: 2h
+  retention_delete_worker_count: 150
+
 limits_config:
-  max_query_parallelism: 2  
-  query_timeout: 10s
-  ingestion_rate_mb: 32
-  ingestion_burst_size_mb: 64
+  retention_period: 48h  # No guardes logs eternamente en local
+  enforce_metric_name: false
+  reject_old_samples: true
+  reject_old_samples_max_age: 168h
+  
+  # LIMITES MÁS ESTRICTOS PARA BAJAR CPU
+  ingestion_rate_mb: 4           # Bajado de 32 a 4 (suficiente para local)
+  ingestion_burst_size_mb: 6     # Bajado de 64 a 6
+  max_streams_per_user: 1000     # Evita crear miles de pequeños stream

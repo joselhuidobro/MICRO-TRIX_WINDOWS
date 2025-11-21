@@ -84,6 +84,12 @@ scrape_configs:
           service: 'node-exporter'
           tier: 'exporter'
 
+  - job_name: 'postgresql'
+    static_configs:
+      - targets: ['postgres-exporter:9181']
+        labels:
+          alias: 'postgres_trix'
+
   - job_name: 'cadvisor'
     static_configs:
       - targets: ['cadvisor:8080']
